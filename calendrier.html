@@ -16,8 +16,11 @@
     --g300:     #CCCCCC;
     --g500:     #888888;
     --g700:     #444444;
-    --pub:      #555555;
-    --pubL:     #BBBBBB;
+    --accent:   #4e36ff;
+    --accentL:  #ede9ff;
+    --accentM:  #cfc7ff;
+    --pub:      #4e36ff;
+    --pubL:     #cfc7ff;
   }
 
   body { font-family: var(--f); background: var(--white); color: var(--black); }
@@ -43,7 +46,7 @@
     margin-bottom: -1px;
     transition: all .12s;
   }
-  .tab-btn.active { font-weight: 700; color: var(--black); border-bottom-color: var(--black); }
+  .tab-btn.active { font-weight: 700; color: var(--accent); border-bottom-color: var(--accent); }
 
   /* ── CONTROLS ── */
   #cal-controls {
@@ -69,22 +72,24 @@
   }
   .pill.active { font-weight: 700; background: var(--black); color: var(--white); border-color: var(--black); }
   .pill-pub { display: flex; align-items: center; gap: 5px; }
+  .pill-pub span { color: var(--accent); }
   .pill-pub.active { background: var(--g100); color: var(--black); border-color: var(--black); }
 
   /* ── PUBLISH BANNER ── */
   #pub-banner {
     display: none;
-    border-bottom: 1px solid var(--g200);
+    border-bottom: 1px solid var(--accentM);
     padding: 10px 32px;
-    background: var(--g100);
+    background: linear-gradient(90deg, var(--accentL) 0%, #ffffff 100%);
   }
   #pub-banner .inner {
     max-width: 1060px; margin: 0 auto;
     display: flex; gap: 24px; flex-wrap: wrap; align-items: center;
   }
-  .pub-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .pub-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
   .pub-items { display: flex; gap: 20px; flex-wrap: wrap; }
   .pub-item { display: flex; align-items: center; gap: 7px; font-size: 10px; color: var(--g700); }
+  .pub-item strong { color: var(--accent); }
   .pub-swatch { width: 18px; height: 5px; border-radius: 1px; flex-shrink: 0; }
 
   /* ── CALENDAR BODY ── */
@@ -105,7 +110,7 @@
     padding-bottom: 5px;
     border-bottom: 1px solid var(--g200);
   }
-  .month-label.current { color: var(--black); font-weight: 700; border-bottom: 2px solid var(--black); }
+  .month-label.current { color: var(--accent); font-weight: 700; border-bottom: 2px solid var(--accent); }
 
   /* School card */
   .school-card {
@@ -115,7 +120,7 @@
     margin-bottom: 3px;
     transition: border-color .12s;
   }
-  .school-card.open { border-color: var(--black); }
+  .school-card.open { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(78,54,255,.06); }
 
   .school-row {
     display: grid;
@@ -132,7 +137,7 @@
     display: flex; flex-direction: column; justify-content: center; gap: 4px;
   }
   .school-name-row { display: flex; align-items: center; gap: 8px; }
-  .school-dot { width: 7px; height: 7px; background: var(--black); border-radius: 1px; flex-shrink: 0; }
+  .school-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 1px; flex-shrink: 0; }
   .school-name { font-size: 13px; font-weight: 700; }
   .school-chevron { margin-left: auto; font-size: 10px; color: var(--g500); }
   .school-level { font-size: 9px; color: var(--g500); margin-left: 15px; letter-spacing: .05em; }
@@ -142,7 +147,7 @@
     font-weight: 700; letter-spacing: .06em;
   }
   .tag-solid { background: var(--black); color: var(--white); }
-  .tag-outline { background: var(--white); color: var(--black); border: 1px solid var(--black); }
+  .tag-outline { background: var(--white); color: var(--accent); border: 1px solid var(--accent); }
 
   /* Bars */
   .school-bars { padding: 10px 8px 8px; display: flex; flex-direction: column; gap: 8px; }
@@ -168,7 +173,7 @@
     width: 4px; height: 4px; border-radius: 50%;
     background: var(--g500);
   }
-  .avail-bar.current-filled { outline: 2px solid var(--black); outline-offset: 1px; }
+  .avail-bar.current-filled { outline: 2px solid var(--accent); outline-offset: 1px; }
   .bar-letter {
     position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
@@ -180,14 +185,14 @@
     height: 5px; border-radius: 1px;
     background: transparent;
   }
-  .pub-bar.now { background: var(--pub); }
-  .pub-bar.prep { background: var(--pubL); border: 1px dashed var(--pubL); }
+  .pub-bar.now { background: var(--pub); box-shadow: 0 0 0 1px rgba(78,54,255,.12); }
+  .pub-bar.prep { background: var(--pubL); border: 1px dashed var(--accent); }
   .bar-row-label {
     font-size: 8px; color: var(--g500); margin-top: 3px;
     letter-spacing: .09em; text-transform: uppercase;
     display: flex; align-items: center; gap: 6px;
   }
-  .pub-hint { color: var(--g500); }
+  .pub-hint { color: var(--accent); font-weight: 700; }
 
   /* Expanded detail */
   .school-detail {
@@ -203,7 +208,7 @@
   }
   .detail-meta-title {
     font-size: 9px; font-weight: 700; letter-spacing: .1em;
-    text-transform: uppercase; color: var(--g700); margin-bottom: 12px;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
   }
   .meta-row { margin-bottom: 10px; }
   .meta-key { font-size: 9px; color: var(--g500); text-transform: uppercase; letter-spacing: .07em; }
@@ -216,13 +221,14 @@
     display: flex; align-items: center; gap: 6px;
   }
   .note-dot-solid { width: 7px; height: 7px; background: var(--black); border-radius: 1px; }
-  .note-dot-outline { width: 7px; height: 7px; border: 2px solid var(--black); border-radius: 1px; }
+  .note-dot-outline { width: 7px; height: 7px; border: 2px solid var(--accent); border-radius: 1px; }
   .note-text { font-size: 12px; color: var(--g700); line-height: 1.75; }
   .pub-box {
-    margin-top: 12px; padding: 8px 12px;
-    background: var(--g100); border: 1px solid var(--g300); border-radius: 3px;
+    margin-top: 12px; padding: 10px 12px;
+    background: linear-gradient(90deg, var(--accentL) 0%, #ffffff 100%); border: 1px solid var(--accentM); border-radius: 3px;
+    box-shadow: inset 3px 0 0 var(--accent);
   }
-  .pub-box-title { font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
+  .pub-box-title { font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; color: var(--accent); }
   .pub-box-text { font-size: 11px; color: var(--g700); line-height: 1.6; }
 
   /* Legend */
@@ -231,11 +237,11 @@
     border: 1px solid var(--g200); border-radius: 4px;
     display: flex; gap: 20px; flex-wrap: wrap; align-items: center;
   }
-  .legend-title { font-size: 9px; font-weight: 700; color: var(--g700); letter-spacing: .1em; text-transform: uppercase; }
+  .legend-title { font-size: 9px; font-weight: 700; color: var(--accent); letter-spacing: .1em; text-transform: uppercase; }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--g700); }
   .legend-swatch { width: 18px; height: 9px; border-radius: 2px; flex-shrink: 0; }
   .legend-current { margin-left: auto; display: flex; align-items: center; gap: 5px; font-size: 9px; color: var(--g500); }
-  .legend-current-bar { width: 2px; height: 14px; background: var(--black); border-radius: 1px; }
+  .legend-current-bar { width: 2px; height: 14px; background: var(--accent); border-radius: 1px; }
 
   #cal-note { margin-top: 12px; margin-bottom: 40px; font-size: 10px; color: var(--g500); line-height: 1.7; }
 
@@ -321,7 +327,7 @@
     color: var(--g500);
     border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .1s;
   }
-  .admin-tab.active { font-weight: 700; color: var(--black); border-bottom-color: var(--black); }
+  .admin-tab.active { font-weight: 700; color: var(--accent); border-bottom-color: var(--accent); }
   .admin-profile-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
   .admin-field label { font-size: 9px; color: var(--g500); text-transform: uppercase; letter-spacing: .1em; display: block; margin-bottom: 4px; }
   .admin-field input, .admin-field textarea {
@@ -389,11 +395,11 @@
     <div class="pub-items">
       <div class="pub-item">
         <div class="pub-swatch" style="background:var(--pub)"></div>
-        Publier maintenant — 1 mois avant (stage) · 4 mois avant (alternance)
+        Publier maintenant — <strong>1 mois avant</strong> (stage) · <strong>4 mois avant</strong> (alternance)
       </div>
       <div class="pub-item">
         <div class="pub-swatch" style="background:var(--pubL);border:1px dashed var(--pubL)"></div>
-        Commencer à préparer — 2 mois avant (stage) · 5 mois avant (alternance)
+        Commencer à préparer — <strong>2 mois avant</strong> (stage) · <strong>5 mois avant</strong> (alternance)
       </div>
     </div>
   </div>
@@ -425,7 +431,7 @@
     </div>
   </div>
 
-  <p id="cal-note">* Calendriers indicatifs. Les dates exactes varient selon le campus, l'année d'étude et le parcours de l'étudiant. En cas de doute, toujours valider avec le service Relations Entreprises de l'école concernée. Cliquer sur une école pour afficher la fiche détaillée.</p>
+  <p id="cal-note">* Calendriers indicatifs mis à jour pour 2026. Les dates exactes varient selon le campus, l'année d'étude et le parcours. En cas de doute, toujours valider avec le service Relations Entreprises de l'école concernée. Cliquer sur une école pour afficher la fiche détaillée.</p>
 </div>
 
 <!-- ADMIN TRIGGER -->
@@ -471,109 +477,131 @@ let DATA = {
   "CRÉA": {
     fullLabel: "Profils Création",
     tagline: "Stylisme · Modélisme · Design textile · Studio · Direction artistique",
-    context: "Les profils création sont principalement disponibles en stage de juin à septembre pour les niveaux bachelor. Les contrats d'alternance démarrent quasi-exclusivement en septembre–octobre sur les cycles mastère.",
+    context: "Les profils création restent surtout disponibles en stage de fin d'année académique, avec un pic de juin à septembre. Côté alternance, la majorité des rentrées se concentrent en septembre–octobre, à l'exception de quelques parcours plus souples selon les écoles.",
     schools: {
       "MODART": {
-        level: "Bac+3 à Bac+5", stageDuration: "2 à 10 mois",
-        contact: "contact@modart-paris.com", url: "modart-paris.com",
-        stage:      [0,0,0,0,0,2,2,2,2,0,0,1],
+        level: "Bac+3 à Bac+5",
+        stageDuration: "2 à 10 mois",
+        contact: "contact@modart-paris.com",
+        url: "modart-paris.com",
+        stage:      [0,0,0,0,1,2,2,2,2,0,0,1],
         alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
-        stageNote: "Fenêtres principales : juin → septembre (bachelors). Stage long de 6 à 10 mois possible sur certains cursus (COSTAL). Décembre est un créneau secondaire pour certains mastères.",
-        altNote: "Mastères uniquement (cycle 2 ans). Rythme 1 jour école / 4 jours entreprise. Démarrage impératif septembre–octobre. Contrat d'apprentissage ou de professionnalisation."
+        stageNote: "Selon les cursus, les étudiants réalisent un à deux stages par an. Pour les profils création, la fenêtre la plus crédible reste mai/juin → septembre, avec quelques créneaux plus ponctuels en fin d'année selon les spécialisations.",
+        altNote: "L'alternance est possible dès la 4e année. Sur les profils créatifs, le démarrage se concentre surtout à la rentrée de septembre–octobre, avec un rythme à confirmer selon la spécialisation."
       },
       "LISAA": {
-        level: "Bac+3 à Bac+5", stageDuration: "2 à 6 mois",
-        contact: "entreprises@lisaa.com", url: "lisaa.com",
+        level: "Bac+3 à Bac+5",
+        stageDuration: "2 à 6 mois",
+        contact: "entreprises@lisaa.com",
+        url: "lisaa.com",
         stage:      [0,0,0,0,0,2,2,2,2,0,0,0],
         alternance: [0,0,0,0,0,0,0,0,1,1,0,0],
-        stageNote: "Bachelors mode Paris : disponibilité annoncée juin → septembre. Plusieurs stages obligatoires sur le cursus (fin de 2e et 3e année).",
-        altNote: "Mastères mode et luxe : repère automne. Rythme variable selon le programme. À confirmer selon le parcours choisi."
+        stageNote: "Les profils création LISAA sont surtout disponibles en stage entre juin et septembre, dans la logique des fins de bachelors et des stages de professionnalisation.",
+        altNote: "Sur le versant création, l'alternance n'est pas la norme sur l'ensemble des parcours. La disponibilité existe surtout sur certains niveaux et se cale globalement sur la rentrée d'automne."
       },
       "ESMOD": {
-        level: "Bac à Bac+5", stageDuration: "2 à 6 mois selon l'année",
-        contact: "À contacter par campus", url: "esmod.com",
-        stage:      [0,0,0,0,0,1,2,2,1,0,0,0],
-        alternance: [0,0,0,0,0,0,0,0,1,1,0,0],
-        stageNote: "Repère été. 2e année : 2 à 3 mois. 3e année : 3 à 6 mois. Le calendrier varie selon les campus (Paris, Rennes, Lyon, Bordeaux). Toujours valider avec le campus ciblé.",
-        altNote: "L'alternance en création n'est pas disponible sur tous les programmes. À confirmer avec le campus. Quelques ouvertures en 3e cycle."
+        level: "Bac à Bac+5",
+        stageDuration: "2 à 6 mois selon l'année",
+        contact: "esmod.com",
+        url: "esmod.com",
+        stage:      [0,0,0,0,1,2,2,2,1,0,0,0],
+        alternance: [0,0,0,0,0,0,0,0,0,0,0,0],
+        stageNote: "Les stages ESMOD en création démarrent surtout entre mai et juin selon l'année d'étude, avec des formats allant d'environ 5 à 10 semaines à plusieurs mois pour les niveaux supérieurs.",
+        altNote: "À date, ESMOD indique que seule la formation Postgraduate Fashion Business est éligible à l'alternance. Les profils création doivent donc être considérés comme disponibles principalement en stage."
       },
       "MOD'SPE": {
-        level: "Bac+4 à Bac+5 (5e année uniquement)", stageDuration: "Non applicable",
-        contact: "entreprises@ifmparis.fr", url: "ifmparis.fr",
-        stage:      [0,0,0,0,0,0,0,0,0,0,0,0],
+        level: "Bac+3 à Bac+5",
+        stageDuration: "2 à 6 mois",
+        contact: "modspeparis.com",
+        url: "modspeparis.com",
+        stage:      [0,0,0,0,1,2,2,2,1,0,0,0],
         alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
-        stageNote: "Pas de stage création dédié en bachelor. Les profils sont disponibles exclusivement en alternance de 5e année.",
-        altNote: "Alternance création disponible en 5e année uniquement. Programme sélectif, profils hautement qualifiés. Démarrage septembre–octobre impératif."
+        stageNote: "MOD'SPE met en avant des périodes de stage en 1re et 2e année de Bachelor. Pour les profils création, la disponibilité stage est donc surtout pertinente de mai/juin à septembre.",
+        altNote: "L'alternance démarre à partir de la 3e année de Bachelor et se poursuit tout au long du MBA. Le rythme annoncé par l'école est de 1 jour à l'école pour 4 jours en entreprise, avec une rentrée surtout concentrée en septembre."
       }
     }
   },
   "RETAIL": {
     fullLabel: "Profils Retail",
     tagline: "Vente · Wholesale · Visual Merchandising · Commerce en ligne · Réseau boutiques · Expérience client",
-    context: "Les profils retail sont les plus disponibles en stage sur l'ensemble de l'année, notamment via MODART qui ouvre des créneaux dès janvier. La rentrée d'alternance reste concentrée sur septembre–octobre.",
+    context: "Les profils retail offrent des fenêtres plus souples selon les écoles. MODART et MOD'SPE permettent d'identifier des recrutements plus étalés, tandis que LISAA reste davantage concentrée sur l'été et l'automne.",
     schools: {
       "MODART": {
-        level: "Bac+2 à Bac+5", stageDuration: "2 à 6 mois",
-        contact: "contact@modart-paris.com", url: "modart-paris.com",
+        level: "Bac+2 à Bac+5",
+        stageDuration: "2 à 6 mois",
+        contact: "contact@modart-paris.com",
+        url: "modart-paris.com",
         stage:      [2,2,2,1,1,2,2,2,2,0,0,1],
         alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
-        stageNote: "Profil le plus disponible parmi les écoles partenaires. Fenêtres : décembre (secondaire), janvier → mars, puis juin → septembre. Bachelor Retail & Management. Adapté aux renforts de collection et ouvertures de boutique.",
-        altNote: "Mastère Management Retail et Digital. Démarrage octobre. Rythme 1 jour école / 4 jours entreprise. Excellents profils omnicanal et Visual Merchandising."
+        stageNote: "MODART indique un à deux stages par an selon les cursus. Sur les profils retail, cela permet de viser à la fois des besoins de début d'année et de pic estival, ce qui en fait l'école la plus souple du panel.",
+        altNote: "L'alternance est possible dès la 4e année. Les profils retail/wholesale/VM sont particulièrement pertinents pour une rentrée septembre–octobre."
       },
       "LISAA": {
-        level: "Bac+3 à Bac+5", stageDuration: "2 à 4 mois",
-        contact: "entreprises@lisaa.com", url: "lisaa.com",
+        level: "Bac+3 à Bac+5",
+        stageDuration: "2 à 4 mois",
+        contact: "entreprises@lisaa.com",
+        url: "lisaa.com",
         stage:      [0,0,0,0,0,1,1,1,1,0,0,0],
-        alternance: [0,0,0,0,0,0,0,0,1,1,0,0],
-        stageNote: "Parcours Fashion Business avec spécialisation retail et wholesale. Disponibilité juin → septembre.",
-        altNote: "Alternance Fashion Business : à confirmer selon le niveau et le parcours. Rentrée automne."
+        alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
+        stageNote: "Les profils Fashion Business à dominante retail sont surtout disponibles en stage entre juin et septembre.",
+        altNote: "LISAA annonce de l'alternance en 3e année sur le Bachelor Fashion Business. La rentrée principale reste à l'automne."
       },
       "MOD'SPE": {
-        level: "Bac+3 à Bac+5", stageDuration: "2 à 6 mois",
-        contact: "entreprises@ifmparis.fr", url: "ifmparis.fr",
-        stage:      [0,0,0,0,0,1,1,1,1,0,0,0],
-        alternance: [0,0,0,0,0,0,0,0,1,1,0,0],
-        stageNote: "Retail et business bien couverts dans les programmes bachelor. Repère : été.",
-        altNote: "Alternance possible selon le niveau. À confirmer avec le service entreprises."
+        level: "Bac+3 à Bac+5",
+        stageDuration: "2 à 6 mois",
+        contact: "modspeparis.com",
+        url: "modspeparis.com",
+        stage:      [0,0,0,0,1,2,2,2,1,0,0,0],
+        alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
+        stageNote: "Les stages ont lieu en 1re et 2e année de Bachelor ; pour des besoins retail, les créneaux les plus réalistes restent la fin de printemps et l'été.",
+        altNote: "L'alternance est proposée à partir de la 3e année de Bachelor puis tout au long du MBA, avec un rythme 4 jours entreprise / 1 jour école."
       }
     }
   },
   "BUSINESS": {
     fullLabel: "Profils Business",
     tagline: "Communication · Marketing · Gestion de marque · Achats · Influence · Développement commercial · Merchandising",
-    context: "Profils les plus demandés par les marques membres. LISAA se distingue par une disponibilité en alternance quasi-annuelle sur ses mastères. MODART propose deux larges fenêtres de stage en début et milieu d'année.",
+    context: "Les profils business sont les plus recrutables. LISAA permet une entrée en alternance dès la 3e année du Bachelor Fashion Business, MODART ouvre l'alternance dès la 4e année, ESMOD la réserve à son Postgraduate Fashion Business, et MOD'SPE la déploie dès la 3e année puis sur tout le MBA.",
     schools: {
       "MODART": {
-        level: "Bac+2 à Bac+5", stageDuration: "3 à 6 mois",
-        contact: "contact@modart-paris.com", url: "modart-paris.com",
+        level: "Bac+2 à Bac+5",
+        stageDuration: "3 à 6 mois",
+        contact: "contact@modart-paris.com",
+        url: "modart-paris.com",
         stage:      [2,2,2,0,0,2,2,2,2,0,0,1],
         alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
-        stageNote: "Deux fenêtres distinctes : janvier → mars (communication, management) et juin → septembre (marketing, gestion de marque). Stage long possible. Profils très adaptés aux marques membres.",
-        altNote: "Mastères Communication Internationale et Management Mode. Démarrage octobre. Excellents profils marketing digital et développement de marque."
+        stageNote: "Grâce à son système d'un à deux stages par an selon les cursus, MODART permet de couvrir à la fois des besoins business de début d'année et de milieu d'année. C'est l'école la plus flexible du panel pour communication, marketing et développement commercial.",
+        altNote: "L'alternance est ouverte dès la 4e année. Le Mastère Communication de Mode mentionne un parcours en alternance, avec un volume minimum obligatoire de 110 jours."
       },
       "LISAA": {
-        level: "Bac+3 à Bac+5", stageDuration: "3 à 6 mois",
-        contact: "entreprises@lisaa.com", url: "lisaa.com",
+        level: "Bac+3 à Bac+5",
+        stageDuration: "2 à 6 mois",
+        contact: "entreprises@lisaa.com",
+        url: "lisaa.com",
         stage:      [0,0,0,0,0,2,2,2,2,0,0,0],
-        alternance: [2,2,2,2,2,2,2,2,2,2,2,2],
-        stageNote: "Bachelors mode Paris : repère juin → septembre. Mastère e-learning : rentrée possible également en janvier.",
-        altNote: "Disponibilité quasi-annuelle en alternance sur les mastères (dont e-learning). Très flexible pour les marques souhaitant recruter en dehors des périodes habituelles."
+        alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
+        stageNote: "Les stages business LISAA se concentrent surtout de juin à septembre sur les bachelors.",
+        altNote: "Le Bachelor Fashion Business est proposé en classique et alternance en 3e année. Des mastères mode et luxe existent aussi en rythme alterné selon les parcours."
       },
       "ESMOD": {
-        level: "Bac à Bac+5", stageDuration: "2 à 6 mois",
-        contact: "À contacter par campus", url: "esmod.com",
-        stage:      [0,0,0,0,0,1,2,2,1,0,0,0],
-        alternance: [0,0,0,0,0,0,0,0,1,1,0,0],
-        stageNote: "ESMOD Fashion Business : stages obligatoires en 2e et 3e année. Repère : été. Multi-campus, disponibilité à vérifier par ville.",
-        altNote: "L'alternance n'est pas disponible sur le programme Fashion Business strictement. Quelques ouvertures sur d'autres programmes (Manager International). Repère : automne."
+        level: "Bac+3 à Bac+5",
+        stageDuration: "2 à 6 mois",
+        contact: "esmod.com",
+        url: "esmod.com",
+        stage:      [0,0,0,0,1,2,2,2,1,0,0,0],
+        alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
+        stageNote: "Les stages business ESMOD démarrent principalement entre mai et juin selon le niveau. Ils restent très intéressants sur les fonctions marketing, communication et développement international.",
+        altNote: "ESMOD précise qu'à date seule la formation Postgraduate Fashion Business est éligible à l'alternance. Son rythme officiel est de 3 semaines en entreprise et 1 semaine à l'école, sur 2 ans."
       },
       "MOD'SPE": {
-        level: "Bac+3 à Bac+5", stageDuration: "3 à 6 mois",
-        contact: "entreprises@ifmparis.fr", url: "ifmparis.fr",
-        stage:      [0,0,0,0,0,1,1,1,1,0,0,0],
-        alternance: [0,0,0,0,0,0,0,0,1,1,0,0],
-        stageNote: "Profils business disponibles en stage l'été. À confirmer selon le parcours (bachelor ou mastère).",
-        altNote: "Alternance possible selon le niveau et le programme. À confirmer avec le service entreprises."
+        level: "Bac+3 à Bac+5",
+        stageDuration: "2 à 6 mois",
+        contact: "modspeparis.com",
+        url: "modspeparis.com",
+        stage:      [0,0,0,0,1,2,2,2,1,0,0,0],
+        alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
+        stageNote: "Les profils business de MOD'SPE sont disponibles en stage sur les premières années de Bachelor, avec un pic de disponibilité en fin d'année académique.",
+        altNote: "MOD'SPE annonce l'alternance à partir de la 3e année de Bachelor et pendant tout le MBA. Le rythme officiel communiqué par l'école est de 1 jour école / 4 jours entreprise."
       }
     }
   }
