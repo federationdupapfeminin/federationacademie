@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendrier Académie</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --f: 'Neue Haas Grotesk Display Pro', 'Neue Haas Grotesk Text Pro', 'Neue Haas Grotesk', Helvetica, Arial, sans-serif;
+    --black:    #000000;
+    --white:    #FFFFFF;
+    --g100:     #F2F2F2;
+    --g200:     #E5E5E5;
+    --g300:     #CCCCCC;
+    --g500:     #888888;
+    --g700:     #444444;
+    --pub:      #555555;
+    --pubL:     #BBBBBB;
+  }
+
+  body { font-family: var(--f); background: var(--white); color: var(--black); }
+
+  button { font-family: var(--f); cursor: pointer; }
+  input, textarea { font-family: var(--f); }
+
+  /* ── TABS ── */
+  #cal-tabs {
+    border-bottom: 1px solid var(--g200);
+  }
+  #cal-tabs .inner {
+    max-width: 1060px; margin: 0 auto; padding: 0 32px;
+    display: flex;
+  }
+  .tab-btn {
+    padding: 16px 28px;
+    font-size: 11px; font-weight: 400;
+    letter-spacing: .08em; text-transform: uppercase;
+    border: none; background: transparent;
+    color: var(--g500);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all .12s;
+  }
+  .tab-btn.active { font-weight: 700; color: var(--black); border-bottom-color: var(--black); }
+
+  /* ── CONTROLS ── */
+  #cal-controls {
+    border-bottom: 1px solid var(--g200);
+    padding: 12px 32px;
+  }
+  #cal-controls .inner {
+    max-width: 1060px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+  #cal-tagline { font-size: 11px; color: var(--g500); font-style: italic; }
+  .ctrl-group { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .sep { width: 1px; height: 20px; background: var(--g200); }
+  .pill {
+    padding: 5px 14px;
+    font-size: 10px; font-weight: 400;
+    letter-spacing: .07em; text-transform: uppercase;
+    border: 1px solid var(--g300);
+    background: var(--white); color: var(--g500);
+    border-radius: 20px; transition: all .12s;
+    white-space: nowrap;
+  }
+  .pill.active { font-weight: 700; background: var(--black); color: var(--white); border-color: var(--black); }
+  .pill-pub { display: flex; align-items: center; gap: 5px; }
+  .pill-pub.active { background: var(--g100); color: var(--black); border-color: var(--black); }
+
+  /* ── PUBLISH BANNER ── */
+  #pub-banner {
+    display: none;
+    border-bottom: 1px solid var(--g200);
+    padding: 10px 32px;
+    background: var(--g100);
+  }
+  #pub-banner .inner {
+    max-width: 1060px; margin: 0 auto;
+    display: flex; gap: 24px; flex-wrap: wrap; align-items: center;
+  }
+  .pub-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .pub-items { display: flex; gap: 20px; flex-wrap: wrap; }
+  .pub-item { display: flex; align-items: center; gap: 7px; font-size: 10px; color: var(--g700); }
+  .pub-swatch { width: 18px; height: 5px; border-radius: 1px; flex-shrink: 0; }
+
+  /* ── CALENDAR BODY ── */
+  #cal-body { max-width: 1060px; margin: 0 auto; padding: 28px 32px; }
+  #cal-context { font-size: 12px; color: var(--g700); line-height: 1.7; max-width: 680px; margin-bottom: 24px; }
+
+  /* Month header */
+  .month-header {
+    display: grid;
+    grid-template-columns: 172px repeat(12, 1fr);
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+  .month-label {
+    font-size: 9px; text-align: center;
+    color: var(--g500); font-weight: 400;
+    letter-spacing: .07em; text-transform: uppercase;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--g200);
+  }
+  .month-label.current { color: var(--black); font-weight: 700; border-bottom: 2px solid var(--black); }
+
+  /* School card */
+  .school-card {
+    border: 1px solid var(--g200);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 3px;
+    transition: border-color .12s;
+  }
+  .school-card.open { border-color: var(--black); }
+
+  .school-row {
+    display: grid;
+    grid-template-columns: 172px 1fr;
+    cursor: pointer;
+    background: var(--white);
+    transition: background .1s;
+  }
+  .school-card.open .school-row { background: var(--g100); }
+
+  .school-label {
+    padding: 14px 16px;
+    border-right: 1px solid var(--g200);
+    display: flex; flex-direction: column; justify-content: center; gap: 4px;
+  }
+  .school-name-row { display: flex; align-items: center; gap: 8px; }
+  .school-dot { width: 7px; height: 7px; background: var(--black); border-radius: 1px; flex-shrink: 0; }
+  .school-name { font-size: 13px; font-weight: 700; }
+  .school-chevron { margin-left: auto; font-size: 10px; color: var(--g500); }
+  .school-level { font-size: 9px; color: var(--g500); margin-left: 15px; letter-spacing: .05em; }
+  .school-tags { display: flex; gap: 4px; margin-left: 15px; margin-top: 1px; flex-wrap: wrap; }
+  .tag {
+    font-size: 8px; padding: 1px 6px; border-radius: 2px;
+    font-weight: 700; letter-spacing: .06em;
+  }
+  .tag-solid { background: var(--black); color: var(--white); }
+  .tag-outline { background: var(--white); color: var(--black); border: 1px solid var(--black); }
+
+  /* Bars */
+  .school-bars { padding: 10px 8px 8px; display: flex; flex-direction: column; gap: 8px; }
+  .bar-group { display: flex; flex-direction: column; }
+  .bar-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 4px;
+  }
+  .cal-cell { display: flex; flex-direction: column; gap: 2px; }
+  .avail-bar {
+    height: 24px; border-radius: 2px;
+    position: relative;
+    background: var(--g100);
+    border: 1px solid var(--g200);
+  }
+  .avail-bar.strong { background: var(--black); border: none; }
+  .avail-bar.possible { background: var(--g300); border: none; }
+  .avail-bar.current-empty::after {
+    content: '';
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--g500);
+  }
+  .avail-bar.current-filled { outline: 2px solid var(--black); outline-offset: 1px; }
+  .bar-letter {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px; font-weight: 700; letter-spacing: .06em;
+  }
+  .bar-letter.white { color: var(--white); }
+  .bar-letter.dark { color: var(--g700); font-weight: 600; }
+  .pub-bar {
+    height: 5px; border-radius: 1px;
+    background: transparent;
+  }
+  .pub-bar.now { background: var(--pub); }
+  .pub-bar.prep { background: var(--pubL); border: 1px dashed var(--pubL); }
+  .bar-row-label {
+    font-size: 8px; color: var(--g500); margin-top: 3px;
+    letter-spacing: .09em; text-transform: uppercase;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .pub-hint { color: var(--g500); }
+
+  /* Expanded detail */
+  .school-detail {
+    display: none;
+    border-top: 1px solid var(--g200);
+    grid-template-columns: 172px 1fr;
+  }
+  .school-card.open .school-detail { display: grid; }
+  .detail-meta {
+    padding: 18px 16px;
+    border-right: 1px solid var(--g200);
+    background: var(--g100);
+  }
+  .detail-meta-title {
+    font-size: 9px; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--g700); margin-bottom: 12px;
+  }
+  .meta-row { margin-bottom: 10px; }
+  .meta-key { font-size: 9px; color: var(--g500); text-transform: uppercase; letter-spacing: .07em; }
+  .meta-val { font-size: 11px; color: var(--black); margin-top: 2px; line-height: 1.4; }
+  .detail-notes { padding: 18px 22px; display: grid; gap: 24px; }
+  .note-block {}
+  .note-title {
+    font-size: 9px; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .note-dot-solid { width: 7px; height: 7px; background: var(--black); border-radius: 1px; }
+  .note-dot-outline { width: 7px; height: 7px; border: 2px solid var(--black); border-radius: 1px; }
+  .note-text { font-size: 12px; color: var(--g700); line-height: 1.75; }
+  .pub-box {
+    margin-top: 12px; padding: 8px 12px;
+    background: var(--g100); border: 1px solid var(--g300); border-radius: 3px;
+  }
+  .pub-box-title { font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
+  .pub-box-text { font-size: 11px; color: var(--g700); line-height: 1.6; }
+
+  /* Legend */
+  #cal-legend {
+    margin-top: 20px; padding: 12px 16px;
+    border: 1px solid var(--g200); border-radius: 4px;
+    display: flex; gap: 20px; flex-wrap: wrap; align-items: center;
+  }
+  .legend-title { font-size: 9px; font-weight: 700; color: var(--g700); letter-spacing: .1em; text-transform: uppercase; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--g700); }
+  .legend-swatch { width: 18px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+  .legend-current { margin-left: auto; display: flex; align-items: center; gap: 5px; font-size: 9px; color: var(--g500); }
+  .legend-current-bar { width: 2px; height: 14px; background: var(--black); border-radius: 1px; }
+
+  #cal-note { margin-top: 12px; margin-bottom: 40px; font-size: 10px; color: var(--g500); line-height: 1.7; }
+
+  /* ── ADMIN TRIGGER ── */
+  #admin-trigger {
+    position: fixed; bottom: 14px; right: 14px;
+    width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; cursor: pointer;
+    opacity: 0; transition: opacity .2s; z-index: 200;
+  }
+  #admin-trigger:hover { opacity: .35; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.4);
+    align-items: center; justify-content: center;
+    z-index: 300;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--white); border-radius: 6px;
+    padding: 32px 36px; width: 320px;
+    border: 1px solid var(--g200);
+    box-shadow: 0 8px 40px rgba(0,0,0,.14);
+  }
+  .modal-title { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 6px; }
+  .modal-sub { font-size: 12px; color: var(--g500); margin-bottom: 20px; }
+  .modal-input {
+    width: 100%; padding: 10px 12px;
+    font-size: 13px;
+    border: 1px solid var(--g300); border-radius: 3px; outline: none;
+    margin-bottom: 14px;
+  }
+  .modal-input.error { border-color: var(--black); margin-bottom: 6px; }
+  .modal-error { font-size: 11px; margin-bottom: 10px; }
+  .modal-btns { display: flex; gap: 8px; }
+  .btn-primary {
+    flex: 1; padding: 9px 0;
+    font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    background: var(--black); color: var(--white); border: none; border-radius: 3px;
+  }
+  .btn-secondary {
+    padding: 9px 16px;
+    font-size: 11px; color: var(--g700);
+    background: var(--g100); border: 1px solid var(--g200); border-radius: 3px;
+  }
+
+  /* ── ADMIN OVERLAY ── */
+  #admin-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: var(--white);
+    z-index: 400; overflow-y: auto;
+  }
+  #admin-overlay.open { display: block; }
+  #admin-topbar {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--black); padding: 0 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 52px;
+  }
+  #admin-topbar-title { font-size: 11px; font-weight: 700; color: var(--white); letter-spacing: .12em; text-transform: uppercase; }
+  .admin-topbar-btns { display: flex; gap: 8px; }
+  .btn-save {
+    padding: 7px 18px;
+    font-size: 11px; font-weight: 700; letter-spacing: .08em;
+    background: var(--white); color: var(--black); border: none; border-radius: 3px;
+  }
+  .btn-cancel-admin {
+    padding: 7px 14px;
+    font-size: 11px; color: rgba(255,255,255,.6);
+    background: transparent; border: 1px solid rgba(255,255,255,.2); border-radius: 3px;
+  }
+  #admin-body { max-width: 1060px; margin: 0 auto; padding: 28px 32px; }
+  .admin-tabs { display: flex; border-bottom: 2px solid var(--g200); margin-bottom: 24px; }
+  .admin-tab {
+    padding: 10px 24px;
+    font-size: 11px; font-weight: 400; letter-spacing: .08em; text-transform: uppercase;
+    border: none; background: transparent; cursor: pointer;
+    color: var(--g500);
+    border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .1s;
+  }
+  .admin-tab.active { font-weight: 700; color: var(--black); border-bottom-color: var(--black); }
+  .admin-profile-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .admin-field label { font-size: 9px; color: var(--g500); text-transform: uppercase; letter-spacing: .1em; display: block; margin-bottom: 4px; }
+  .admin-field input, .admin-field textarea {
+    width: 100%; padding: 8px 10px;
+    font-size: 11px;
+    border: 1px solid var(--g200); border-radius: 3px;
+    resize: vertical; line-height: 1.6;
+  }
+  .admin-school-card { border: 1px solid var(--g200); border-radius: 4px; margin-bottom: 6px; overflow: hidden; }
+  .admin-school-card.open { border-color: var(--black); }
+  .admin-school-header {
+    padding: 14px 18px; cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--white);
+  }
+  .admin-school-card.open .admin-school-header { background: var(--g100); }
+  .admin-school-body { display: none; padding: 0 18px 20px; border-top: 1px solid var(--g200); }
+  .admin-school-card.open .admin-school-body { display: block; }
+  .admin-bar-section { margin-top: 18px; }
+  .admin-bar-title {
+    font-size: 9px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .1em; margin-bottom: 8px; color: var(--g700);
+  }
+  .admin-bar-title span { color: var(--g500); font-weight: 400; margin-left: 10px; }
+  .admin-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; }
+  .admin-month-label { font-size: 8px; text-align: center; color: var(--g500); margin-bottom: 3px; }
+  .admin-cell {
+    width: 100%; height: 28px; border-radius: 2px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 700;
+    border: 1px solid var(--g200);
+    background: var(--g100); color: var(--g700);
+    user-select: none;
+  }
+  .admin-cell.v1 { background: var(--g300); border-color: var(--g500); }
+  .admin-cell.v2 { background: var(--black); color: var(--white); border-color: var(--black); }
+  .admin-text-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<!-- TABS -->
+<div id="cal-tabs"><div class="inner" id="tab-container"></div></div>
+
+<!-- CONTROLS -->
+<div id="cal-controls">
+  <div class="inner">
+    <div id="cal-tagline"></div>
+    <div class="ctrl-group">
+      <button class="pill active" data-type="both">Stages &amp; Alternance</button>
+      <button class="pill" data-type="stage">Stages uniquement</button>
+      <button class="pill" data-type="alternance">Alternance uniquement</button>
+      <div class="sep"></div>
+      <button class="pill pill-pub" id="pub-toggle">
+        <span>⏱</span> Quand publier mes offres ?
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- PUBLISH BANNER -->
+<div id="pub-banner">
+  <div class="inner">
+    <span class="pub-label">⏱ Délais conseillés pour publier vos offres</span>
+    <div class="pub-items">
+      <div class="pub-item">
+        <div class="pub-swatch" style="background:var(--pub)"></div>
+        Publier maintenant — 1 mois avant (stage) · 4 mois avant (alternance)
+      </div>
+      <div class="pub-item">
+        <div class="pub-swatch" style="background:var(--pubL);border:1px dashed var(--pubL)"></div>
+        Commencer à préparer — 2 mois avant (stage) · 5 mois avant (alternance)
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CALENDAR -->
+<div id="cal-body">
+  <p id="cal-context"></p>
+
+  <!-- Month header -->
+  <div class="month-header" id="month-header">
+    <div></div><!-- spacer -->
+  </div>
+
+  <!-- School rows -->
+  <div id="school-rows"></div>
+
+  <!-- Legend -->
+  <div id="cal-legend">
+    <span class="legend-title">Légende</span>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--black)"></div>Période forte</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--g300)"></div>Période possible</div>
+    <div id="legend-pub-items" style="display:none; display:contents">
+      <div class="legend-item pub-legend"><div class="legend-swatch" style="background:var(--pub)"></div>⏱ Publier maintenant</div>
+      <div class="legend-item pub-legend"><div class="legend-swatch" style="background:var(--pubL);border:1px dashed var(--pubL)"></div>⏱ Commencer à préparer</div>
+    </div>
+    <div class="legend-current">
+      <div class="legend-current-bar"></div> Mois en cours
+    </div>
+  </div>
+
+  <p id="cal-note">* Calendriers indicatifs. Les dates exactes varient selon le campus, l'année d'étude et le parcours de l'étudiant. En cas de doute, toujours valider avec le service Relations Entreprises de l'école concernée. Cliquer sur une école pour afficher la fiche détaillée.</p>
+</div>
+
+<!-- ADMIN TRIGGER -->
+<div id="admin-trigger">🔒</div>
+
+<!-- PASSWORD MODAL -->
+<div class="modal-overlay" id="pw-modal">
+  <div class="modal-box" id="pw-box">
+    <div class="modal-title">Accès administration</div>
+    <p class="modal-sub">Entrez le mot de passe pour accéder au backoffice.</p>
+    <input type="password" class="modal-input" id="pw-input" placeholder="Mot de passe">
+    <div class="modal-error" id="pw-error" style="display:none">Mot de passe incorrect.</div>
+    <div class="modal-btns">
+      <button class="btn-primary" id="pw-submit">Accéder</button>
+      <button class="btn-secondary" id="pw-cancel">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN OVERLAY -->
+<div id="admin-overlay">
+  <div id="admin-topbar">
+    <span id="admin-topbar-title">Administration — Calendrier Académie</span>
+    <div class="admin-topbar-btns">
+      <button class="btn-save" id="admin-save">✓ Sauvegarder</button>
+      <button class="btn-cancel-admin" id="admin-cancel">Annuler</button>
+    </div>
+  </div>
+  <div id="admin-body">
+    <div class="admin-tabs" id="admin-tabs"></div>
+    <div class="admin-profile-fields" id="admin-profile-fields"></div>
+    <div id="admin-schools"></div>
+  </div>
+</div>
+
+<script>
+/* ─── DATA ─── */
+const MONTHS = ["Jan","Fév","Mar","Avr","Mai","Juin","Juil","Août","Sep","Oct","Nov","Déc"];
+const CUR = new Date().getMonth();
+const PW = "FFPAPF";
+
+let DATA = {
+  "CRÉA": {
+    fullLabel: "Profils Création",
+    tagline: "Stylisme · Modélisme · Design textile · Studio · Direction artistique",
+    context: "Les profils création sont principalement disponibles en stage de juin à septembre pour les niveaux bachelor. Les contrats d'alternance démarrent quasi-exclusivement en septembre–octobre sur les cycles mastère.",
+    schools: {
+      "MODART": {
+        level: "Bac+3 à Bac+5", stageDuration: "2 à 10 mois",
+        contact: "contact@modart-paris.com", url: "modart-paris.com",
+        stage:      [0,0,0,0,0,2,2,2,2,0,0,1],
+        alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
+        stageNote: "Fenêtres principales : juin → septembre (bachelors). Stage long de 6 à 10 mois possible sur certains cursus (COSTAL). Décembre est un créneau secondaire pour certains mastères.",
+        altNote: "Mastères uniquement (cycle 2 ans). Rythme 1 jour école / 4 jours entreprise. Démarrage impératif septembre–octobre. Contrat d'apprentissage ou de professionnalisation."
+      },
+      "LISAA": {
+        level: "Bac+3 à Bac+5", stageDuration: "2 à 6 mois",
+        contact: "entreprises@lisaa.com", url: "lisaa.com",
+        stage:      [0,0,0,0,0,2,2,2,2,0,0,0],
+        alternance: [0,0,0,0,0,0,0,0,1,1,0,0],
+        stageNote: "Bachelors mode Paris : disponibilité annoncée juin → septembre. Plusieurs stages obligatoires sur le cursus (fin de 2e et 3e année).",
+        altNote: "Mastères mode et luxe : repère automne. Rythme variable selon le programme. À confirmer selon le parcours choisi."
+      },
+      "ESMOD": {
+        level: "Bac à Bac+5", stageDuration: "2 à 6 mois selon l'année",
+        contact: "À contacter par campus", url: "esmod.com",
+        stage:      [0,0,0,0,0,1,2,2,1,0,0,0],
+        alternance: [0,0,0,0,0,0,0,0,1,1,0,0],
+        stageNote: "Repère été. 2e année : 2 à 3 mois. 3e année : 3 à 6 mois. Le calendrier varie selon les campus (Paris, Rennes, Lyon, Bordeaux). Toujours valider avec le campus ciblé.",
+        altNote: "L'alternance en création n'est pas disponible sur tous les programmes. À confirmer avec le campus. Quelques ouvertures en 3e cycle."
+      },
+      "MOD'SPE": {
+        level: "Bac+4 à Bac+5 (5e année uniquement)", stageDuration: "Non applicable",
+        contact: "entreprises@ifmparis.fr", url: "ifmparis.fr",
+        stage:      [0,0,0,0,0,0,0,0,0,0,0,0],
+        alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
+        stageNote: "Pas de stage création dédié en bachelor. Les profils sont disponibles exclusivement en alternance de 5e année.",
+        altNote: "Alternance création disponible en 5e année uniquement. Programme sélectif, profils hautement qualifiés. Démarrage septembre–octobre impératif."
+      }
+    }
+  },
+  "RETAIL": {
+    fullLabel: "Profils Retail",
+    tagline: "Vente · Wholesale · Visual Merchandising · Commerce en ligne · Réseau boutiques · Expérience client",
+    context: "Les profils retail sont les plus disponibles en stage sur l'ensemble de l'année, notamment via MODART qui ouvre des créneaux dès janvier. La rentrée d'alternance reste concentrée sur septembre–octobre.",
+    schools: {
+      "MODART": {
+        level: "Bac+2 à Bac+5", stageDuration: "2 à 6 mois",
+        contact: "contact@modart-paris.com", url: "modart-paris.com",
+        stage:      [2,2,2,1,1,2,2,2,2,0,0,1],
+        alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
+        stageNote: "Profil le plus disponible parmi les écoles partenaires. Fenêtres : décembre (secondaire), janvier → mars, puis juin → septembre. Bachelor Retail & Management. Adapté aux renforts de collection et ouvertures de boutique.",
+        altNote: "Mastère Management Retail et Digital. Démarrage octobre. Rythme 1 jour école / 4 jours entreprise. Excellents profils omnicanal et Visual Merchandising."
+      },
+      "LISAA": {
+        level: "Bac+3 à Bac+5", stageDuration: "2 à 4 mois",
+        contact: "entreprises@lisaa.com", url: "lisaa.com",
+        stage:      [0,0,0,0,0,1,1,1,1,0,0,0],
+        alternance: [0,0,0,0,0,0,0,0,1,1,0,0],
+        stageNote: "Parcours Fashion Business avec spécialisation retail et wholesale. Disponibilité juin → septembre.",
+        altNote: "Alternance Fashion Business : à confirmer selon le niveau et le parcours. Rentrée automne."
+      },
+      "MOD'SPE": {
+        level: "Bac+3 à Bac+5", stageDuration: "2 à 6 mois",
+        contact: "entreprises@ifmparis.fr", url: "ifmparis.fr",
+        stage:      [0,0,0,0,0,1,1,1,1,0,0,0],
+        alternance: [0,0,0,0,0,0,0,0,1,1,0,0],
+        stageNote: "Retail et business bien couverts dans les programmes bachelor. Repère : été.",
+        altNote: "Alternance possible selon le niveau. À confirmer avec le service entreprises."
+      }
+    }
+  },
+  "BUSINESS": {
+    fullLabel: "Profils Business",
+    tagline: "Communication · Marketing · Gestion de marque · Achats · Influence · Développement commercial · Merchandising",
+    context: "Profils les plus demandés par les marques membres. LISAA se distingue par une disponibilité en alternance quasi-annuelle sur ses mastères. MODART propose deux larges fenêtres de stage en début et milieu d'année.",
+    schools: {
+      "MODART": {
+        level: "Bac+2 à Bac+5", stageDuration: "3 à 6 mois",
+        contact: "contact@modart-paris.com", url: "modart-paris.com",
+        stage:      [2,2,2,0,0,2,2,2,2,0,0,1],
+        alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
+        stageNote: "Deux fenêtres distinctes : janvier → mars (communication, management) et juin → septembre (marketing, gestion de marque). Stage long possible. Profils très adaptés aux marques membres.",
+        altNote: "Mastères Communication Internationale et Management Mode. Démarrage octobre. Excellents profils marketing digital et développement de marque."
+      },
+      "LISAA": {
+        level: "Bac+3 à Bac+5", stageDuration: "3 à 6 mois",
+        contact: "entreprises@lisaa.com", url: "lisaa.com",
+        stage:      [0,0,0,0,0,2,2,2,2,0,0,0],
+        alternance: [2,2,2,2,2,2,2,2,2,2,2,2],
+        stageNote: "Bachelors mode Paris : repère juin → septembre. Mastère e-learning : rentrée possible également en janvier.",
+        altNote: "Disponibilité quasi-annuelle en alternance sur les mastères (dont e-learning). Très flexible pour les marques souhaitant recruter en dehors des périodes habituelles."
+      },
+      "ESMOD": {
+        level: "Bac à Bac+5", stageDuration: "2 à 6 mois",
+        contact: "À contacter par campus", url: "esmod.com",
+        stage:      [0,0,0,0,0,1,2,2,1,0,0,0],
+        alternance: [0,0,0,0,0,0,0,0,1,1,0,0],
+        stageNote: "ESMOD Fashion Business : stages obligatoires en 2e et 3e année. Repère : été. Multi-campus, disponibilité à vérifier par ville.",
+        altNote: "L'alternance n'est pas disponible sur le programme Fashion Business strictement. Quelques ouvertures sur d'autres programmes (Manager International). Repère : automne."
+      },
+      "MOD'SPE": {
+        level: "Bac+3 à Bac+5", stageDuration: "3 à 6 mois",
+        contact: "entreprises@ifmparis.fr", url: "ifmparis.fr",
+        stage:      [0,0,0,0,0,1,1,1,1,0,0,0],
+        alternance: [0,0,0,0,0,0,0,0,1,1,0,0],
+        stageNote: "Profils business disponibles en stage l'été. À confirmer selon le parcours (bachelor ou mastère).",
+        altNote: "Alternance possible selon le niveau et le programme. À confirmer avec le service entreprises."
+      }
+    }
+  }
+};
+
+/* ─── STATE ─── */
+let activeProfile = "CRÉA";
+let activeType    = "both";
+let showPublish   = false;
+let expandedSchool = null;
+let adminDraft    = null;
+let adminTab      = "CRÉA";
+let adminExpanded = null;
+
+/* ─── PUBLISH TIMING ─── */
+function computePublish(avail, type) {
+  const r = Array(12).fill(0);
+  const lp = type === "alternance" ? 4 : 1;
+  const lq = type === "alternance" ? 5 : 2;
+  for (let i = 0; i < 12; i++) {
+    if (avail[i] > 0 && (i === 0 || avail[i-1] === 0)) {
+      if (i - lp >= 0 && !r[i-lp]) r[i-lp] = 2;
+      if (i - lq >= 0 && !r[i-lq]) r[i-lq] = 1;
+    }
+  }
+  return r;
+}
+
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+/* ─── RENDER CALENDAR ─── */
+function renderCalendar() {
+  const profile    = DATA[activeProfile];
+  const showStage  = activeType !== "alternance";
+  const showAlt    = activeType !== "stage";
+
+  // Context
+  document.getElementById("cal-context").textContent = profile.context;
+
+  // Month header
+  const hdr = document.getElementById("month-header");
+  hdr.innerHTML = "<div></div>";
+  MONTHS.forEach((m, i) => {
+    const d = document.createElement("div");
+    d.className = "month-label" + (i === CUR ? " current" : "");
+    d.textContent = m;
+    hdr.appendChild(d);
+  });
+
+  // School rows
+  const container = document.getElementById("school-rows");
+  container.innerHTML = "";
+
+  Object.entries(profile.schools).forEach(([school, info]) => {
+    const isOpen  = expandedSchool === school;
+    const stageP  = computePublish(info.stage, "stage");
+    const altP    = computePublish(info.alternance, "alternance");
+    const hasStage = info.stage.some(v => v > 0);
+    const hasAlt   = info.alternance.some(v => v > 0);
+
+    const card = document.createElement("div");
+    card.className = "school-card" + (isOpen ? " open" : "");
+    card.id = "card-" + school;
+
+    // ── Row ──
+    const row = document.createElement("div");
+    row.className = "school-row";
+    row.addEventListener("click", () => {
+      expandedSchool = expandedSchool === school ? null : school;
+      renderCalendar();
+    });
+
+    // Label
+    const lbl = document.createElement("div");
+    lbl.className = "school-label";
+    lbl.innerHTML = `
+      <div class="school-name-row">
+        <div class="school-dot"></div>
+        <span class="school-name">${school}</span>
+        <span class="school-chevron">${isOpen ? "▲" : "▼"}</span>
+      </div>
+      <div class="school-level">${info.level}</div>
+      <div class="school-tags">
+        ${showStage && hasStage ? '<span class="tag tag-solid">STAGE</span>' : ""}
+        ${showAlt && hasAlt ? '<span class="tag tag-outline">ALTERNANCE</span>' : ""}
+      </div>`;
+    row.appendChild(lbl);
+
+    // Bars
+    const bars = document.createElement("div");
+    bars.className = "school-bars";
+
+    const rowDefs = [];
+    if (showStage) rowDefs.push({ key: "stage",      label: "Stage",      data: info.stage,      pub: stageP });
+    if (showAlt)   rowDefs.push({ key: "alternance", label: "Alternance", data: info.alternance, pub: altP   });
+
+    rowDefs.forEach(rd => {
+      const grp = document.createElement("div");
+      grp.className = "bar-group";
+
+      // Grid
+      const grid = document.createElement("div");
+      grid.className = "bar-grid";
+
+      rd.data.forEach((v, mi) => {
+        const p = rd.pub[mi];
+        const cell = document.createElement("div");
+        cell.className = "cal-cell";
+
+        // Avail bar
+        const ab = document.createElement("div");
+        ab.className = "avail-bar";
+        if (v === 2) { ab.classList.add("strong"); if (mi === CUR) ab.classList.add("current-filled"); }
+        else if (v === 1) { ab.classList.add("possible"); if (mi === CUR) ab.classList.add("current-filled"); }
+        else if (mi === CUR) { ab.classList.add("current-empty"); }
+
+        if (v > 0) {
+          const lt = document.createElement("span");
+          lt.className = "bar-letter " + (v === 2 ? "white" : "dark");
+          lt.textContent = rd.key === "stage" ? (v === 2 ? "S" : "s") : (v === 2 ? "A" : "a");
+          ab.appendChild(lt);
+        }
+        cell.appendChild(ab);
+
+        // Publish bar
+        if (showPublish) {
+          const pb = document.createElement("div");
+          pb.className = "pub-bar";
+          if (v === 0 && p === 2) pb.classList.add("now");
+          else if (v === 0 && p === 1) pb.classList.add("prep");
+          cell.appendChild(pb);
+        }
+
+        grid.appendChild(cell);
+      });
+      grp.appendChild(grid);
+
+      // Row label
+      const rl = document.createElement("div");
+      rl.className = "bar-row-label";
+      rl.textContent = rd.label;
+      if (showPublish && rd.pub.some(p => p > 0)) {
+        const hint = document.createElement("span");
+        hint.className = "pub-hint";
+        hint.textContent = "· ⏱ publication";
+        rl.appendChild(hint);
+      }
+      grp.appendChild(rl);
+      bars.appendChild(grp);
+    });
+
+    row.appendChild(bars);
+    card.appendChild(row);
+
+    // ── Detail ──
+    const detail = document.createElement("div");
+    detail.className = "school-detail";
+
+    // Meta
+    const meta = document.createElement("div");
+    meta.className = "detail-meta";
+    meta.innerHTML = `<div class="detail-meta-title">Informations</div>
+      ${[
+        ["Niveau", info.level],
+        ["Durée stage", info.stageDuration],
+        ["Contact", info.contact],
+        ["Site web", info.url]
+      ].map(([k,v]) => `<div class="meta-row"><div class="meta-key">${k}</div><div class="meta-val">${v}</div></div>`).join("")}`;
+    detail.appendChild(meta);
+
+    // Notes
+    const notes = document.createElement("div");
+    notes.className = "detail-notes";
+    notes.style.gridTemplateColumns = showStage && showAlt ? "1fr 1fr" : "1fr";
+
+    const makePubBox = (type, pubArr) => {
+      if (!showPublish || !pubArr.some(p => p > 0)) return "";
+      const msg = type === "stage"
+        ? "Publiez vos offres de stage <strong>4 à 6 semaines avant</strong> la période de disponibilité."
+        : "Pour une rentrée <strong>septembre–octobre</strong>, publiez vos offres d'alternance <strong>dès avril–mai</strong>. Les meilleurs profils sont souvent engagés avant l'été.";
+      return `<div class="pub-box"><div class="pub-box-title">⏱ Publication</div><div class="pub-box-text">${msg}</div></div>`;
+    };
+
+    if (showStage) {
+      notes.innerHTML += `
+        <div class="note-block">
+          <div class="note-title"><div class="note-dot-solid"></div>Stage</div>
+          <p class="note-text">${info.stageNote}</p>
+          ${makePubBox("stage", stageP)}
+        </div>`;
+    }
+    if (showAlt) {
+      notes.innerHTML += `
+        <div class="note-block">
+          <div class="note-title"><div class="note-dot-outline"></div>Alternance</div>
+          <p class="note-text">${info.altNote}</p>
+          ${makePubBox("alternance", altP)}
+        </div>`;
+    }
+
+    detail.appendChild(notes);
+    card.appendChild(detail);
+    container.appendChild(card);
+  });
+
+  // Legend pub items
+  document.querySelectorAll(".pub-legend").forEach(el => {
+    el.style.display = showPublish ? "flex" : "none";
+  });
+}
+
+/* ─── RENDER TABS ─── */
+function renderTabs() {
+  const tc = document.getElementById("tab-container");
+  tc.innerHTML = "";
+  Object.keys(DATA).forEach(key => {
+    const btn = document.createElement("button");
+    btn.className = "tab-btn" + (key === activeProfile ? " active" : "");
+    btn.textContent = DATA[key].fullLabel;
+    btn.addEventListener("click", () => {
+      activeProfile = key;
+      expandedSchool = null;
+      renderTabs();
+      document.getElementById("cal-tagline").textContent = DATA[activeProfile].tagline;
+      renderCalendar();
+    });
+    tc.appendChild(btn);
+  });
+}
+
+/* ─── TYPE PILLS ─── */
+document.querySelectorAll(".pill[data-type]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    activeType = btn.dataset.type;
+    document.querySelectorAll(".pill[data-type]").forEach(b => b.classList.toggle("active", b === btn));
+    renderCalendar();
+  });
+});
+
+/* ─── PUBLISH TOGGLE ─── */
+document.getElementById("pub-toggle").addEventListener("click", function() {
+  showPublish = !showPublish;
+  this.classList.toggle("active", showPublish);
+  document.getElementById("pub-banner").style.display = showPublish ? "block" : "none";
+  renderCalendar();
+});
+
+/* ─── ADMIN TRIGGER ─── */
+const trigger = document.getElementById("admin-trigger");
+document.getElementById("admin-trigger").addEventListener("click", () => {
+  document.getElementById("pw-modal").classList.add("open");
+  setTimeout(() => document.getElementById("pw-input").focus(), 50);
+});
+
+/* ─── PASSWORD MODAL ─── */
+function closeModal() {
+  document.getElementById("pw-modal").classList.remove("open");
+  document.getElementById("pw-input").value = "";
+  document.getElementById("pw-error").style.display = "none";
+  document.getElementById("pw-input").classList.remove("error");
+}
+
+function tryUnlock() {
+  if (document.getElementById("pw-input").value === PW) {
+    closeModal();
+    adminDraft = clone(DATA);
+    adminTab = activeProfile;
+    adminExpanded = null;
+    document.getElementById("admin-overlay").classList.add("open");
+    renderAdmin();
+  } else {
+    document.getElementById("pw-error").style.display = "block";
+    document.getElementById("pw-input").classList.add("error");
+    document.getElementById("pw-input").value = "";
+    document.getElementById("pw-input").focus();
+  }
+}
+
+document.getElementById("pw-modal").addEventListener("click", e => { if (e.target === document.getElementById("pw-modal")) closeModal(); });
+document.getElementById("pw-cancel").addEventListener("click", closeModal);
+document.getElementById("pw-submit").addEventListener("click", tryUnlock);
+document.getElementById("pw-input").addEventListener("keydown", e => { if (e.key === "Enter") tryUnlock(); });
+
+/* ─── ADMIN SAVE / CANCEL ─── */
+document.getElementById("admin-save").addEventListener("click", () => {
+  DATA = clone(adminDraft);
+  document.getElementById("admin-overlay").classList.remove("open");
+  document.getElementById("cal-tagline").textContent = DATA[activeProfile].tagline;
+  renderCalendar();
+});
+document.getElementById("admin-cancel").addEventListener("click", () => {
+  document.getElementById("admin-overlay").classList.remove("open");
+});
+
+/* ─── RENDER ADMIN ─── */
+function renderAdmin() {
+  // Tabs
+  const at = document.getElementById("admin-tabs");
+  at.innerHTML = "";
+  Object.keys(adminDraft).forEach(key => {
+    const btn = document.createElement("button");
+    btn.className = "admin-tab" + (key === adminTab ? " active" : "");
+    btn.textContent = adminDraft[key].fullLabel;
+    btn.addEventListener("click", () => { adminTab = key; adminExpanded = null; renderAdmin(); });
+    at.appendChild(btn);
+  });
+
+  // Profile-level fields
+  const pf = document.getElementById("admin-profile-fields");
+  pf.innerHTML = "";
+  [["tagline","Tagline (métiers)"],["context","Texte de contexte"]].forEach(([key, lbl]) => {
+    const div = document.createElement("div");
+    div.className = "admin-field";
+    const label = document.createElement("label");
+    label.textContent = lbl;
+    const ta = document.createElement("textarea");
+    ta.value = adminDraft[adminTab][key];
+    ta.style.minHeight = "60px";
+    ta.addEventListener("input", () => { adminDraft[adminTab][key] = ta.value; });
+    div.appendChild(label); div.appendChild(ta);
+    pf.appendChild(div);
+  });
+
+  // School editors
+  const sc = document.getElementById("admin-schools");
+  sc.innerHTML = "";
+  Object.entries(adminDraft[adminTab].schools).forEach(([school, info]) => {
+    const isOpen = adminExpanded === school;
+    const card = document.createElement("div");
+    card.className = "admin-school-card" + (isOpen ? " open" : "");
+
+    const hdr = document.createElement("div");
+    hdr.className = "admin-school-header";
+    hdr.innerHTML = `
+      <div style="width:7px;height:7px;background:#000;border-radius:1px"></div>
+      <span style="font-size:13px;font-weight:700">${school}</span>
+      <span style="font-size:11px;color:var(--g500)">${info.level}</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--g500)">${isOpen ? "▲" : "▼"}</span>`;
+    hdr.addEventListener("click", () => { adminExpanded = isOpen ? null : school; renderAdmin(); });
+    card.appendChild(hdr);
+
+    const body = document.createElement("div");
+    body.className = "admin-school-body";
+
+    // Bar grids
+    ["stage","alternance"].forEach(type => {
+      const sec = document.createElement("div");
+      sec.className = "admin-bar-section";
+      sec.innerHTML = `<div class="admin-bar-title">${type === "stage" ? "Stage" : "Alternance"}<span>Cliquer pour modifier · ○ indisponible · ◐ possible · ● forte</span></div>`;
+      const grid = document.createElement("div");
+      grid.className = "admin-grid";
+      MONTHS.forEach((m, mi) => {
+        const col = document.createElement("div");
+        const ml = document.createElement("div");
+        ml.className = "admin-month-label";
+        ml.textContent = m;
+        const v = adminDraft[adminTab].schools[school][type][mi];
+        const cell = document.createElement("div");
+        cell.className = "admin-cell" + (v === 1 ? " v1" : v === 2 ? " v2" : "");
+        cell.textContent = v === 2 ? "●" : v === 1 ? "◐" : "○";
+        cell.addEventListener("click", () => {
+          adminDraft[adminTab].schools[school][type][mi] = (adminDraft[adminTab].schools[school][type][mi] + 1) % 3;
+          renderAdmin();
+        });
+        col.appendChild(ml); col.appendChild(cell);
+        grid.appendChild(col);
+      });
+      sec.appendChild(grid);
+      body.appendChild(sec);
+    });
+
+    // Text fields
+    const tf = document.createElement("div");
+    tf.className = "admin-text-fields";
+    [
+      ["stageNote","Note stage"], ["altNote","Note alternance"],
+      ["level","Niveaux d'étude"], ["stageDuration","Durée de stage"],
+      ["contact","Contact entreprises"], ["url","Site web"]
+    ].forEach(([key, lbl]) => {
+      const div = document.createElement("div");
+      div.className = "admin-field";
+      const label = document.createElement("label");
+      label.textContent = lbl;
+      const isLong = key === "stageNote" || key === "altNote";
+      const input = isLong ? document.createElement("textarea") : document.createElement("input");
+      input.value = info[key];
+      if (isLong) input.style.minHeight = "80px";
+      input.addEventListener("input", () => { adminDraft[adminTab].schools[school][key] = input.value; });
+      div.appendChild(label); div.appendChild(input);
+      tf.appendChild(div);
+    });
+    body.appendChild(tf);
+    card.appendChild(body);
+    sc.appendChild(card);
+  });
+}
+
+/* ─── INIT ─── */
+renderTabs();
+document.getElementById("cal-tagline").textContent = DATA[activeProfile].tagline;
+renderCalendar();
+</script>
+</body>
+</html>
