@@ -1,1008 +1,828 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="beige">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calendrier Académie</title>
+<title>Calendrier Recrutement — Écoles de Mode</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-  :root {
-    --f: 'Neue Haas Grotesk Display Pro', 'Neue Haas Grotesk Text Pro', 'Neue Haas Grotesk', Helvetica, Arial, sans-serif;
-    --black:    #000000;
-    --white:    #FFFFFF;
-    --g100:     #F2F2F2;
-    --g200:     #E5E5E5;
-    --g300:     #CCCCCC;
-    --g500:     #888888;
-    --g700:     #444444;
-    --accent:   #4e36ff;
-    --accentL:  #ede9ff;
-    --accentM:  #cfc7ff;
-    --pub:      #4e36ff;
-    --pubL:     #cfc7ff;
-  }
+/* ══════════════════════════════════════
+   TOKENS
+══════════════════════════════════════ */
+:root{
+  --f:system-ui,'Helvetica Neue',Helvetica,Arial,sans-serif;
+  --blk:#111; --wh:#fff;
+  --g100:#eeeeee; --g200:#e0e0e8; --g300:#c8c8d4; --g400:#9494a8; --g500:#66667a; --g700:#3a3a4a;
+  --acc:#4e36ff; --accL:#eeeaff; --accM:#c4b5ff; --accD:#3828d0;
+  --grn:#16a34a;   /* barres seulement */
+  --amb:#c27803;   /* barres seulement */
+  /* thème beige */
+  --bg:#F8F5EE; --bg-card:#fff;
+  --bg-hdr-open:#faf7f1; --bg-detail:#f3ede0;
+  --border:#e5dfd0; --border-card:#ddd8c8;
+  --bar:32px; --left:60px; --r:7px;
+}
+html[data-theme="white"]{
+  --bg:#ffffff; --bg-card:#fff;
+  --bg-hdr-open:#f5f5f5; --bg-detail:#efefef;
+  --border:#e2e2e2; --border-card:#e0e0e0;
+}
 
-  body { font-family: var(--f); background: var(--white); color: var(--black); }
+body{font-family:var(--f);background:var(--bg);color:var(--blk);-webkit-font-smoothing:antialiased;transition:background .2s}
+button,a,input,textarea{font-family:var(--f)}
 
-  button { font-family: var(--f); cursor: pointer; }
-  input, textarea { font-family: var(--f); }
+/* ══════════════════════════════════════
+   TOPBAR — une seule barre, tout dedans
+══════════════════════════════════════ */
+#topbar{
+  background:var(--bg);border-bottom:1px solid var(--border);
+  padding:0 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;min-height:52px;
+  transition:background .2s;
+  position:sticky;top:0;z-index:30;
+}
 
-  /* ── TABS ── */
-  #cal-tabs {
-    border-bottom: 1px solid var(--g200);
-  }
-  #cal-tabs .inner {
-    max-width: 1060px; margin: 0 auto; padding: 0 32px;
-    display: flex;
-  }
-  .tab-btn {
-    padding: 16px 28px;
-    font-size: 11px; font-weight: 400;
-    letter-spacing: .08em; text-transform: uppercase;
-    border: none; background: transparent;
-    color: var(--g500);
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    transition: all .12s;
-  }
-  .tab-btn.active { font-weight: 700; color: var(--accent); border-bottom-color: var(--accent); }
+/* Onglets profil */
+.tabs{display:flex;gap:0;align-self:stretch}
+.tab{
+  padding:0 20px;font-size:10.5px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;
+  border:none;background:transparent;color:var(--g400);cursor:pointer;
+  border-bottom:2.5px solid transparent;
+  transition:color .13s,border-color .13s;white-space:nowrap;align-self:stretch;
+}
+.tab:hover{color:var(--g700)}
+.tab.on{font-weight:700;color:var(--acc);border-bottom-color:var(--acc)}
 
-  /* ── CONTROLS ── */
-  #cal-controls {
-    border-bottom: 1px solid var(--g200);
-    padding: 12px 32px;
-  }
-  #cal-controls .inner {
-    max-width: 1060px; margin: 0 auto;
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 12px;
-  }
-  #cal-tagline { font-size: 11px; color: var(--g500); font-style: italic; }
-  .ctrl-group { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-  .sep { width: 1px; height: 20px; background: var(--g200); }
-  .pill {
-    padding: 5px 14px;
-    font-size: 10px; font-weight: 400;
-    letter-spacing: .07em; text-transform: uppercase;
-    border: 1px solid var(--g300);
-    background: var(--white); color: var(--g500);
-    border-radius: 20px; transition: all .12s;
-    white-space: nowrap;
-  }
-  .pill.active { font-weight: 700; background: var(--black); color: var(--white); border-color: var(--black); }
-  .pill-pub { display: flex; align-items: center; gap: 5px; }
-  .pill-pub span { color: var(--accent); }
-  .pill-pub.active { background: var(--g100); color: var(--black); border-color: var(--black); }
+/* Groupe d'actions droite */
+.top-actions{display:flex;align-items:center;gap:8px}
 
-  /* ── PUBLISH BANNER ── */
-  #pub-banner {
-    display: none;
-    border-bottom: 1px solid var(--accentM);
-    padding: 10px 32px;
-    background: linear-gradient(90deg, var(--accentL) 0%, #ffffff 100%);
-  }
-  #pub-banner .inner {
-    max-width: 1060px; margin: 0 auto;
-    display: flex; gap: 24px; flex-wrap: wrap; align-items: center;
-  }
-  .pub-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
-  .pub-items { display: flex; gap: 20px; flex-wrap: wrap; }
-  .pub-item { display: flex; align-items: center; gap: 7px; font-size: 10px; color: var(--g700); }
-  .pub-item strong { color: var(--accent); }
-  .pub-swatch { width: 18px; height: 5px; border-radius: 1px; flex-shrink: 0; }
+/* ★ BOUTON PRINCIPAL — QUAND PUBLIER ★ */
+#pub-cta{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:9px 20px;
+  background:var(--acc);color:var(--wh);
+  border:none;border-radius:7px;
+  font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;
+  cursor:pointer;white-space:nowrap;
+  box-shadow:0 3px 10px rgba(78,54,255,.4);
+  transition:background .14s,box-shadow .14s,transform .1s;
+}
+#pub-cta:hover{background:var(--accD);box-shadow:0 5px 16px rgba(78,54,255,.5);transform:translateY(-1px)}
+#pub-cta.on{background:var(--blk);box-shadow:none;color:var(--wh)}
+.pub-cta-icon{font-size:14px;line-height:1}
 
-  /* ── CALENDAR BODY ── */
-  #cal-body { max-width: 1060px; margin: 0 auto; padding: 28px 32px; }
-  #cal-context { font-size: 12px; color: var(--g700); line-height: 1.7; max-width: 680px; margin-bottom: 24px; }
+/* Séparateur vertical */
+.v-sep{width:1px;height:20px;background:var(--border);flex-shrink:0}
 
-  /* Month header */
-  .month-header {
-    display: grid;
-    grid-template-columns: 172px repeat(12, 1fr);
-    gap: 4px;
-    margin-bottom: 4px;
-  }
-  .month-label {
-    font-size: 9px; text-align: center;
-    color: var(--g500); font-weight: 400;
-    letter-spacing: .07em; text-transform: uppercase;
-    padding-bottom: 5px;
-    border-bottom: 1px solid var(--g200);
-  }
-  .month-label.current { color: var(--accent); font-weight: 700; border-bottom: 2px solid var(--accent); }
+/* Filtre Stage / Alternance — segmented */
+.seg{display:flex;border:1.5px solid var(--border);border-radius:6px;overflow:hidden;background:var(--bg-card)}
+.seg-btn{
+  padding:5px 11px;font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  border:none;background:transparent;color:var(--g400);cursor:pointer;
+  transition:background .1s,color .1s;white-space:nowrap
+}
+.seg-btn:not(:last-child){border-right:1px solid var(--border)}
+.seg-btn.on{background:var(--blk);color:var(--wh)}
 
-  /* School card */
-  .school-card {
-    border: 1px solid var(--g200);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 3px;
-    transition: border-color .12s;
-  }
-  .school-card.open { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(78,54,255,.06); }
+/* Petits boutons utilitaires */
+.util{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:6px 11px;font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  border:1.5px solid var(--border);background:var(--bg-card);color:var(--g500);
+  border-radius:6px;cursor:pointer;white-space:nowrap;text-decoration:none;
+  transition:all .12s
+}
+.util:hover{background:var(--bg-hdr-open);border-color:var(--g300);color:var(--g700)}
+.th-dot{width:11px;height:11px;border-radius:3px;border:1px solid var(--g300);flex-shrink:0;transition:background .2s}
 
-  .school-row {
-    display: grid;
-    grid-template-columns: 172px 1fr;
-    cursor: pointer;
-    background: var(--white);
-    transition: background .1s;
-  }
-  .school-card.open .school-row { background: var(--g100); }
+/* Bouton thème — discret, coin inférieur gauche */
+#theme-btn{
+  position:fixed;bottom:14px;left:14px;z-index:100;
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 9px;font-size:8.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+  border:1px solid var(--border);background:var(--bg-card);color:var(--g400);
+  border-radius:20px;cursor:pointer;white-space:nowrap;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+  transition:all .12s
+}
+#theme-btn:hover{background:var(--bg-hdr-open);border-color:var(--g300);color:var(--g700)}
 
-  .school-label {
-    padding: 14px 16px;
-    border-right: 1px solid var(--g200);
-    display: flex; flex-direction: column; justify-content: center; gap: 4px;
-  }
-  .school-name-row { display: flex; align-items: center; gap: 8px; }
-  .school-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 1px; flex-shrink: 0; }
-  .school-name { font-size: 13px; font-weight: 700; }
-  .school-chevron { margin-left: auto; font-size: 10px; color: var(--g500); }
-  .school-level { font-size: 9px; color: var(--g500); margin-left: 15px; letter-spacing: .05em; }
-  .school-tags { display: flex; gap: 4px; margin-left: 15px; margin-top: 1px; flex-wrap: wrap; }
-  .tag {
-    font-size: 8px; padding: 1px 6px; border-radius: 2px;
-    font-weight: 700; letter-spacing: .06em;
-  }
-  .tag-solid { background: var(--black); color: var(--white); }
-  .tag-outline { background: var(--white); color: var(--accent); border: 1px solid var(--accent); }
+/* ══════════════════════════════════════
+   BANDEAU PUBLICATION
+══════════════════════════════════════ */
+#pub-banner{
+  display:none;
+  background:var(--accL);border-bottom:1.5px solid var(--accM);
+  padding:10px 24px;
+}
+.pub-banner-inner{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  font-size:10px;color:var(--g700)
+}
+.pub-badge{
+  background:var(--acc);color:var(--wh);
+  font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 9px;border-radius:4px;flex-shrink:0
+}
+.pub-rules{display:flex;gap:18px;flex-wrap:wrap}
+.pub-rule{display:flex;align-items:center;gap:6px}
+.pub-rule-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
 
-  /* Bars */
-  .school-bars { padding: 10px 8px 8px; display: flex; flex-direction: column; gap: 8px; }
-  .bar-group { display: flex; flex-direction: column; }
-  .bar-grid {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: 4px;
-  }
-  .cal-cell { display: flex; flex-direction: column; gap: 2px; }
-  .avail-bar {
-    height: 24px; border-radius: 2px;
-    position: relative;
-    background: var(--g100);
-    border: 1px solid var(--g200);
-  }
-  .avail-bar.strong { background: var(--black); border: none; }
-  .avail-bar.possible { background: var(--g300); border: none; }
-  .avail-bar.current-empty::after {
-    content: '';
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%,-50%);
-    width: 4px; height: 4px; border-radius: 50%;
-    background: var(--g500);
-  }
-  .avail-bar.current-filled { outline: 2px solid var(--accent); outline-offset: 1px; }
-  .bar-letter {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 8px; font-weight: 700; letter-spacing: .06em;
-  }
-  .bar-letter.white { color: var(--white); }
-  .bar-letter.dark { color: var(--g700); font-weight: 600; }
-  .pub-bar {
-    height: 5px; border-radius: 1px;
-    background: transparent;
-  }
-  .pub-bar.now { background: var(--pub); box-shadow: 0 0 0 1px rgba(78,54,255,.12); }
-  .pub-bar.prep { background: var(--pubL); border: 1px dashed var(--accent); }
-  .bar-row-label {
-    font-size: 8px; color: var(--g500); margin-top: 3px;
-    letter-spacing: .09em; text-transform: uppercase;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .pub-hint { color: var(--accent); font-weight: 700; }
+/* ══════════════════════════════════════
+   TAGLINE BAR (slim)
+══════════════════════════════════════ */
+#tagline-bar{
+  background:var(--bg);border-bottom:1px solid var(--border);
+  padding:6px 24px;transition:background .2s
+}
+#tagline{font-size:10px;color:var(--g400);letter-spacing:.02em}
 
-  /* Expanded detail */
-  .school-detail {
-    display: none;
-    border-top: 1px solid var(--g200);
-    grid-template-columns: 172px 1fr;
-  }
-  .school-card.open .school-detail { display: grid; }
-  .detail-meta {
-    padding: 18px 16px;
-    border-right: 1px solid var(--g200);
-    background: var(--g100);
-  }
-  .detail-meta-title {
-    font-size: 9px; font-weight: 700; letter-spacing: .1em;
-    text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
-  }
-  .meta-row { margin-bottom: 10px; }
-  .meta-key { font-size: 9px; color: var(--g500); text-transform: uppercase; letter-spacing: .07em; }
-  .meta-val { font-size: 11px; color: var(--black); margin-top: 2px; line-height: 1.4; }
-  .detail-notes { padding: 18px 22px; display: grid; gap: 24px; }
-  .note-block {}
-  .note-title {
-    font-size: 9px; font-weight: 700; letter-spacing: .12em;
-    text-transform: uppercase; margin-bottom: 8px;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .note-dot-solid { width: 7px; height: 7px; background: var(--black); border-radius: 1px; }
-  .note-dot-outline { width: 7px; height: 7px; border: 2px solid var(--accent); border-radius: 1px; }
-  .note-text { font-size: 12px; color: var(--g700); line-height: 1.75; }
-  .pub-box {
-    margin-top: 12px; padding: 10px 12px;
-    background: linear-gradient(90deg, var(--accentL) 0%, #ffffff 100%); border: 1px solid var(--accentM); border-radius: 3px;
-    box-shadow: inset 3px 0 0 var(--accent);
-  }
-  .pub-box-title { font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; color: var(--accent); }
-  .pub-box-text { font-size: 11px; color: var(--g700); line-height: 1.6; }
+/* ══════════════════════════════════════
+   CAL BODY
+══════════════════════════════════════ */
+#cal-body{padding:16px 24px 48px}
 
-  /* Legend */
-  #cal-legend {
-    margin-top: 20px; padding: 12px 16px;
-    border: 1px solid var(--g200); border-radius: 4px;
-    display: flex; gap: 20px; flex-wrap: wrap; align-items: center;
-  }
-  .legend-title { font-size: 9px; font-weight: 700; color: var(--accent); letter-spacing: .1em; text-transform: uppercase; }
-  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--g700); }
-  .legend-swatch { width: 18px; height: 9px; border-radius: 2px; flex-shrink: 0; }
-  .legend-current { margin-left: auto; display: flex; align-items: center; gap: 5px; font-size: 9px; color: var(--g500); }
-  .legend-current-bar { width: 2px; height: 14px; background: var(--accent); border-radius: 1px; }
+/* Month strip */
+.ms-wrap{
+  background:var(--bg);padding-bottom:5px;
+  transition:background .2s;margin-bottom:2px
+}
+.ms{display:grid;grid-template-columns:var(--left) repeat(12,1fr);gap:3px;margin:0 9px}
+.ms-cell{
+  height:24px;display:flex;align-items:center;justify-content:center;
+  font-size:7px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--g400);border-radius:4px
+}
+.ms-cell.cur{background:var(--acc);color:var(--wh);font-weight:800}
 
-  #cal-note { margin-top: 12px; margin-bottom: 40px; font-size: 10px; color: var(--g500); line-height: 1.7; }
+/* ══════════════════════════════════════
+   SCHOOL CARD
+══════════════════════════════════════ */
+.sc{
+  background:var(--bg-card);
+  border:1px solid var(--border-card);border-radius:var(--r);
+  overflow:hidden;margin-bottom:4px;
+  transition:border-color .13s,box-shadow .13s;
+}
+.sc:hover{border-color:var(--g300)}
+.sc.open{border-color:var(--acc);box-shadow:0 0 0 2.5px var(--accL)}
 
-  /* ── ADMIN TRIGGER ── */
-  #admin-trigger {
-    position: fixed; bottom: 14px; right: 14px;
-    width: 22px; height: 22px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; cursor: pointer;
-    opacity: 0; transition: opacity .2s; z-index: 200;
-  }
-  #admin-trigger:hover { opacity: .35; }
+/* ─ Header ─ */
+.sc-hdr{
+  display:flex;align-items:center;
+  padding:10px 14px;cursor:pointer;
+  background:var(--bg-card);min-height:54px;
+  transition:background .12s
+}
+.sc.open .sc-hdr{background:var(--bg-hdr-open)}
 
-  /* ── MODAL ── */
-  .modal-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,.4);
-    align-items: center; justify-content: center;
-    z-index: 300;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal-box {
-    background: var(--white); border-radius: 6px;
-    padding: 32px 36px; width: 320px;
-    border: 1px solid var(--g200);
-    box-shadow: 0 8px 40px rgba(0,0,0,.14);
-  }
-  .modal-title { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 6px; }
-  .modal-sub { font-size: 12px; color: var(--g500); margin-bottom: 20px; }
-  .modal-input {
-    width: 100%; padding: 10px 12px;
-    font-size: 13px;
-    border: 1px solid var(--g300); border-radius: 3px; outline: none;
-    margin-bottom: 14px;
-  }
-  .modal-input.error { border-color: var(--black); margin-bottom: 6px; }
-  .modal-error { font-size: 11px; margin-bottom: 10px; }
-  .modal-btns { display: flex; gap: 8px; }
-  .btn-primary {
-    flex: 1; padding: 9px 0;
-    font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-    background: var(--black); color: var(--white); border: none; border-radius: 3px;
-  }
-  .btn-secondary {
-    padding: 9px 16px;
-    font-size: 11px; color: var(--g700);
-    background: var(--g100); border: 1px solid var(--g200); border-radius: 3px;
-  }
+/* Logo zone — strictement contenu */
+.logo-z{
+  flex:0 0 86px;width:86px;overflow:hidden;
+  display:flex;align-items:center;
+  border-right:1px solid var(--border);
+  padding-right:12px;margin-right:14px;
+  height:34px;flex-shrink:0
+}
+.sc-logo{display:block;max-width:72px;max-height:28px;width:auto;height:auto;object-fit:contain;object-position:left}
+.sc-logo-fb{font-size:11px;font-weight:800;color:var(--blk);display:none;white-space:nowrap}
 
-  /* ── ADMIN OVERLAY ── */
-  #admin-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: var(--white);
-    z-index: 400; overflow-y: auto;
-  }
-  #admin-overlay.open { display: block; }
-  #admin-topbar {
-    position: sticky; top: 0; z-index: 10;
-    background: var(--black); padding: 0 32px;
-    display: flex; align-items: center; justify-content: space-between;
-    height: 52px;
-  }
-  #admin-topbar-title { font-size: 11px; font-weight: 700; color: var(--white); letter-spacing: .12em; text-transform: uppercase; }
-  .admin-topbar-btns { display: flex; gap: 8px; }
-  .btn-save {
-    padding: 7px 18px;
-    font-size: 11px; font-weight: 700; letter-spacing: .08em;
-    background: var(--white); color: var(--black); border: none; border-radius: 3px;
-  }
-  .btn-cancel-admin {
-    padding: 7px 14px;
-    font-size: 11px; color: rgba(255,255,255,.6);
-    background: transparent; border: 1px solid rgba(255,255,255,.2); border-radius: 3px;
-  }
-  #admin-body { max-width: 1060px; margin: 0 auto; padding: 28px 32px; }
-  .admin-tabs { display: flex; border-bottom: 2px solid var(--g200); margin-bottom: 24px; }
-  .admin-tab {
-    padding: 10px 24px;
-    font-size: 11px; font-weight: 400; letter-spacing: .08em; text-transform: uppercase;
-    border: none; background: transparent; cursor: pointer;
-    color: var(--g500);
-    border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .1s;
-  }
-  .admin-tab.active { font-weight: 700; color: var(--accent); border-bottom-color: var(--accent); }
-  .admin-profile-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-  .admin-field label { font-size: 9px; color: var(--g500); text-transform: uppercase; letter-spacing: .1em; display: block; margin-bottom: 4px; }
-  .admin-field input, .admin-field textarea {
-    width: 100%; padding: 8px 10px;
-    font-size: 11px;
-    border: 1px solid var(--g200); border-radius: 3px;
-    resize: vertical; line-height: 1.6;
-  }
-  .admin-school-card { border: 1px solid var(--g200); border-radius: 4px; margin-bottom: 6px; overflow: hidden; }
-  .admin-school-card.open { border-color: var(--black); }
-  .admin-school-header {
-    padding: 14px 18px; cursor: pointer;
-    display: flex; align-items: center; gap: 10px;
-    background: var(--white);
-  }
-  .admin-school-card.open .admin-school-header { background: var(--g100); }
-  .admin-school-body { display: none; padding: 0 18px 20px; border-top: 1px solid var(--g200); }
-  .admin-school-card.open .admin-school-body { display: block; }
-  .admin-bar-section { margin-top: 18px; }
-  .admin-bar-title {
-    font-size: 9px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: .1em; margin-bottom: 8px; color: var(--g700);
-  }
-  .admin-bar-title span { color: var(--g500); font-weight: 400; margin-left: 10px; }
-  .admin-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; }
-  .admin-month-label { font-size: 8px; text-align: center; color: var(--g500); margin-bottom: 3px; }
-  .admin-cell {
-    width: 100%; height: 28px; border-radius: 2px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 9px; font-weight: 700;
-    border: 1px solid var(--g200);
-    background: var(--g100); color: var(--g700);
-    user-select: none;
-  }
-  .admin-cell.v1 { background: var(--g300); border-color: var(--g500); }
-  .admin-cell.v2 { background: var(--black); color: var(--white); border-color: var(--black); }
-  .admin-text-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+/* Info */
+.sc-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.sc-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc-sub{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.sc-lvl{font-size:9.5px;color:var(--g400)}
+
+/* Tags — même couleur que le contour des cartes actives (--acc) */
+.tag{
+  font-size:7px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  padding:2px 7px;border-radius:3px;flex-shrink:0;white-space:nowrap
+}
+.tag-s{background:var(--accL);color:var(--acc);border:1px solid var(--accM)}        /* Stage : fond */
+.tag-a{background:transparent;color:var(--acc);border:1.5px solid var(--acc)}      /* Alternance : contour */
+
+/* Contact */
+.sc-cz{flex:0 0 auto;margin-left:12px;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.btn-mail{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:6px 13px;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  background:var(--blk);color:var(--wh);border:none;border-radius:5px;
+  text-decoration:none;cursor:pointer;white-space:nowrap;transition:background .12s;flex-shrink:0
+}
+.btn-mail:hover{background:#2d2d2d}
+.sc-email{font-size:8px;color:var(--g400);white-space:nowrap}
+
+.sc-chev{flex:0 0 auto;margin-left:10px;color:var(--g300);transition:transform .2s,color .13s}
+.sc.open .sc-chev{transform:rotate(180deg);color:var(--acc)}
+
+/* ─ Bars ─ */
+.sc-bars{border-top:1px solid var(--g100);padding:5px 8px 7px}
+.bar-row{display:grid;grid-template-columns:var(--left) repeat(12,1fr);gap:3px;padding:2px 0}
+.bar-lbl{
+  display:flex;align-items:center;justify-content:flex-end;padding-right:8px;
+  font-size:7px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--accM)   /* cohérent avec les tags bleus */
+}
+.cell-w{display:flex;flex-direction:column}
+.bar-cell{
+  height:var(--bar);border-radius:4px;
+  background:#dddde4;border:1px solid #c8c8d2;
+  cursor:default;transition:filter .08s
+}
+.bar-cell:hover{filter:brightness(.87)}
+/* Barres de dispo : VERT et ORANGE uniquement */
+.av2{background:var(--grn);border-color:var(--grn)}
+.av1{background:var(--amb);border-color:var(--amb)}
+.cur-col:not(.av1):not(.av2){background:rgba(78,54,255,.05);border-color:rgba(78,54,255,.2)}
+.av2.cur-col,.av1.cur-col{outline:2.5px solid var(--acc);outline-offset:2px;z-index:1}
+/* Pub sub-bars */
+.pub-sub{height:4px;border-radius:2px;margin-top:2px;background:transparent}
+.p-now{background:var(--acc)}
+.p-prep{background:var(--accM);border:1px dashed var(--acc)}
+
+/* ─ Detail ─ */
+.sc-det{display:none;border-top:1px solid var(--border);background:var(--bg-detail)}
+.sc.open .sc-det{display:block}
+
+/* Barre de contact dans le détail */
+.det-cbar{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:10px 16px;
+  background:var(--bg-hdr-open);   /* même que l'en-tête ouverte */
+  border-bottom:1px solid var(--border)
+}
+.det-clbl{font-size:7.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--g400);margin-right:2px}
+.det-tags{display:flex;gap:4px}
+.det-link{
+  font-size:10px;color:var(--blk);font-weight:500;text-decoration:none;
+  background:var(--bg-card);border:1px solid var(--border);border-radius:4px;
+  padding:4px 10px;transition:background .1s;white-space:nowrap
+}
+.det-link:hover{background:var(--g100)}
+.det-site{
+  font-size:10px;color:var(--g400);text-decoration:none;
+  padding:4px 10px;border:1px solid var(--border);border-radius:4px;
+  transition:background .1s;white-space:nowrap
+}
+.det-site:hover{background:var(--g100);color:var(--blk)}
+
+/* Notes */
+.det-notes{display:grid;padding:14px 16px;gap:0}
+.det-notes.single .det-blk:not(:last-child){border-bottom:1px solid var(--border);margin-bottom:12px;padding-bottom:12px}
+.det-notes.dual{column-gap:20px}
+.det-notes.dual .det-blk:first-child{border-right:1px solid var(--border);padding-right:20px}
+.det-blk{padding-bottom:0}
+.det-head{
+  display:flex;align-items:center;gap:7px;margin-bottom:7px;
+  font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--g700)
+}
+/* Indicateurs Stage / Alternance dans la description : couleur acc, PAS vert/orange */
+.det-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.det-dot.ds{background:var(--acc)}                                      /* Stage : carré plein */
+.det-dot.da{background:transparent;border:2px solid var(--acc)}          /* Alternance : contour */
+.det-txt{font-size:11px;color:var(--g700);line-height:1.9}
+.pub-note{
+  margin-top:9px;padding:8px 12px 8px 13px;
+  background:var(--accL);border-left:3px solid var(--acc);border-radius:0 4px 4px 0
+}
+.pub-note-t{font-size:7.5px;font-weight:800;color:var(--acc);letter-spacing:.11em;text-transform:uppercase;margin-bottom:3px}
+.pub-note-b{font-size:10.5px;color:var(--g700);line-height:1.6}
+
+/* ══════════════════════════════════════
+   LEGEND
+══════════════════════════════════════ */
+#legend{
+  margin-top:16px;background:var(--bg-card);border:1px solid var(--border-card);
+  border-radius:var(--r);padding:11px 16px;
+  display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px
+}
+.leg-t{font-size:7.5px;font-weight:800;color:var(--acc);letter-spacing:.14em;text-transform:uppercase}
+.leg-sec{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.leg-vsep{width:1px;height:15px;background:var(--border);flex-shrink:0}
+.leg-i{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--g700)}
+.leg-sw{width:20px;height:10px;border-radius:3px;flex-shrink:0}
+.leg-tag{font-size:7px;padding:2px 7px;border-radius:3px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.leg-now{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:9px;color:var(--g400)}
+.leg-now-pill{background:var(--acc);color:var(--wh);font-size:7.5px;font-weight:700;padding:2px 8px;border-radius:3px}
+#cal-note{margin-top:9px;font-size:8.5px;color:var(--g400);line-height:1.75}
+
+/* ══════════════════════════════════════
+   TOOLTIP
+══════════════════════════════════════ */
+#tip{
+  position:fixed;z-index:9999;pointer-events:none;display:none;
+  background:rgba(17,17,17,.95);color:#fff;
+  font-size:10px;padding:5px 10px;border-radius:5px;
+  white-space:nowrap;line-height:1.5;box-shadow:0 4px 14px rgba(0,0,0,.2)
+}
+
+/* ══════════════════════════════════════
+   ADMIN
+══════════════════════════════════════ */
+#adm-trig{position:fixed;bottom:10px;right:10px;font-size:13px;cursor:pointer;opacity:0;transition:opacity .2s;z-index:200;user-select:none}
+#adm-trig:hover{opacity:.35}
+.mover{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(3px);align-items:center;justify-content:center;z-index:300}
+.mover.open{display:flex}
+.mbox{background:var(--wh);border-radius:10px;padding:28px 32px;width:340px;border:1px solid var(--border);box-shadow:0 16px 48px rgba(0,0,0,.15)}
+.mbox-t{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.mbox-s{font-size:11.5px;color:var(--g400);margin-bottom:18px;line-height:1.6}
+.m-inp{width:100%;padding:10px 12px;font-size:13px;border:1.5px solid var(--border);border-radius:5px;outline:none;margin-bottom:14px;transition:border-color .15s}
+.m-inp:focus{border-color:var(--acc)}
+.m-inp.err{border-color:#ef4444;margin-bottom:6px}
+.m-err{font-size:11px;color:#ef4444;margin-bottom:10px}
+.m-btns{display:flex;gap:8px}
+.m-ok{flex:1;padding:10px 0;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--blk);color:var(--wh);border:none;border-radius:5px;cursor:pointer}
+.m-no{padding:10px 16px;font-size:10px;color:var(--g700);background:var(--g100);border:1.5px solid var(--border);border-radius:5px;cursor:pointer}
+#adm-ov{display:none;position:fixed;inset:0;background:var(--wh);z-index:400;overflow-y:auto}
+#adm-ov.open{display:block}
+#adm-bar{position:sticky;top:0;z-index:10;background:var(--blk);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:50px}
+#adm-bar-t{font-size:10px;font-weight:700;color:var(--wh);letter-spacing:.12em;text-transform:uppercase}
+.adm-bb{display:flex;gap:8px}
+.btn-sv{padding:7px 18px;font-size:10px;font-weight:700;background:var(--wh);color:var(--blk);border:none;border-radius:4px;cursor:pointer}
+.btn-ca{padding:7px 14px;font-size:10px;color:rgba(255,255,255,.5);background:transparent;border:1px solid rgba(255,255,255,.15);border-radius:4px;cursor:pointer}
+#adm-body{max-width:1060px;margin:0 auto;padding:28px}
+.adm-ts{display:flex;border-bottom:2px solid var(--border);margin-bottom:22px}
+.adm-t{padding:10px 20px;font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;border:none;background:transparent;cursor:pointer;color:var(--g400);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .1s}
+.adm-t.on{font-weight:700;color:var(--acc);border-bottom-color:var(--acc)}
+.adm-pf{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.adm-f label{font-size:8px;color:var(--g400);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:4px}
+.adm-f input,.adm-f textarea{width:100%;padding:8px 10px;font-size:11px;border:1px solid var(--border);border-radius:4px;resize:vertical;line-height:1.6;outline:none}
+.adm-f input:focus,.adm-f textarea:focus{border-color:var(--acc)}
+.adm-sc{border:1px solid var(--border);border-radius:6px;margin-bottom:5px;overflow:hidden}
+.adm-sc.on{border-color:var(--blk)}
+.adm-sh{padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--wh)}
+.adm-sc.on .adm-sh{background:var(--g100)}
+.adm-sb{display:none;padding:0 16px 18px;border-top:1px solid var(--border)}
+.adm-sc.on .adm-sb{display:block}
+.adm-bst{margin-top:16px}
+.adm-bt{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;color:var(--g700)}
+.adm-bt span{color:var(--g400);font-weight:400;margin-left:8px;text-transform:none;letter-spacing:0}
+.adm-g{display:grid;grid-template-columns:repeat(12,1fr);gap:4px}
+.adm-ml{font-size:7px;text-align:center;color:var(--g400);margin-bottom:3px}
+.adm-c{width:100%;height:26px;border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border:1px solid var(--border);background:var(--g100);color:var(--g700);user-select:none;transition:all .1s}
+.adm-c.v1{background:#c27803;border-color:#c27803;color:#fff}
+.adm-c.v2{background:#16a34a;border-color:#16a34a;color:#fff}
+.adm-tf{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 </style>
 </head>
 <body>
+<div id="tip"></div>
 
-<!-- TABS -->
-<div id="cal-tabs"><div class="inner" id="tab-container"></div></div>
+<!-- ══ TOPBAR ══ -->
+<div id="topbar">
+  <!-- Onglets profil -->
+  <div class="tabs" id="tab-container"></div>
 
-<!-- CONTROLS -->
-<div id="cal-controls">
-  <div class="inner">
-    <div id="cal-tagline"></div>
-    <div class="ctrl-group">
-      <button class="pill active" data-type="both">Stages &amp; Alternance</button>
-      <button class="pill" data-type="stage">Stages uniquement</button>
-      <button class="pill" data-type="alternance">Alternance uniquement</button>
-      <div class="sep"></div>
-      <button class="pill pill-pub" id="pub-toggle">
-        <span>⏱</span> Quand publier mes offres ?
-      </button>
+  <!-- Actions -->
+  <div class="top-actions">
+    <!-- ★ CTA PRINCIPAL ★ -->
+    <button id="pub-cta">
+      <span class="pub-cta-icon">⏱</span>
+      Quand publier ?
+    </button>
+
+    <div class="v-sep"></div>
+
+    <!-- Filtre type -->
+    <div class="seg">
+      <button class="seg-btn on" data-type="both">Stages &amp; Alternance</button>
+      <button class="seg-btn" data-type="stage">Stages</button>
+      <button class="seg-btn" data-type="alternance">Alternance</button>
     </div>
+
+    <!-- PDF -->
+    <button class="util" id="pdf-btn">
+      <svg width="11" height="11" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 16v1a1 1 0 001 1h10a1 1 0 001-1v-1M7 10l3 3 3-3M10 3v10"/></svg>
+      PDF
+    </button>
   </div>
 </div>
 
-<!-- PUBLISH BANNER -->
+<!-- ══ TAGLINE ══ -->
+<div id="tagline-bar"><span id="tagline"></span></div>
+
+<!-- ══ BANDEAU PUBLICATION ══ -->
 <div id="pub-banner">
-  <div class="inner">
-    <span class="pub-label">⏱ Délais conseillés pour publier vos offres</span>
-    <div class="pub-items">
-      <div class="pub-item">
-        <div class="pub-swatch" style="background:var(--pub)"></div>
-        Publier maintenant — <strong>1 mois avant</strong> (stage) · <strong>4 mois avant</strong> (alternance)
+  <div class="pub-banner-inner">
+    <span class="pub-badge">⏱ Délais conseillés</span>
+    <div class="pub-rules">
+      <div class="pub-rule">
+        <div class="pub-rule-dot" style="background:#4e36ff"></div>
+        <strong>Publier maintenant</strong> — 1 mois avant la dispo (stage) · 4 mois avant (alternance)
       </div>
-      <div class="pub-item">
-        <div class="pub-swatch" style="background:var(--pubL);border:1px dashed var(--pubL)"></div>
-        Commencer à préparer — <strong>2 mois avant</strong> (stage) · <strong>5 mois avant</strong> (alternance)
+      <div class="pub-rule">
+        <div class="pub-rule-dot" style="background:#c4b5ff"></div>
+        <strong>Commencer à préparer</strong> — 2 mois avant (stage) · 5 mois avant (alternance)
       </div>
     </div>
   </div>
 </div>
 
-<!-- CALENDAR -->
+<!-- ══ CALENDRIER ══ -->
 <div id="cal-body">
-  <p id="cal-context"></p>
-
-  <!-- Month header -->
-  <div class="month-header" id="month-header">
-    <div></div><!-- spacer -->
+  <div class="ms-wrap">
+    <div class="ms" id="ms"><div></div></div>
   </div>
 
-  <!-- School rows -->
   <div id="school-rows"></div>
 
-  <!-- Legend -->
-  <div id="cal-legend">
-    <span class="legend-title">Légende</span>
-    <div class="legend-item"><div class="legend-swatch" style="background:var(--black)"></div>Période forte</div>
-    <div class="legend-item"><div class="legend-swatch" style="background:var(--g300)"></div>Période possible</div>
-    <div id="legend-pub-items" style="display:none; display:contents">
-      <div class="legend-item pub-legend"><div class="legend-swatch" style="background:var(--pub)"></div>⏱ Publier maintenant</div>
-      <div class="legend-item pub-legend"><div class="legend-swatch" style="background:var(--pubL);border:1px dashed var(--pubL)"></div>⏱ Commencer à préparer</div>
+  <!-- Légende -->
+  <div id="legend">
+    <span class="leg-t">Légende</span>
+    <div class="leg-sec">
+      <div class="leg-i"><div class="leg-sw" style="background:#16a34a"></div>Période idéale</div>
+      <div class="leg-i"><div class="leg-sw" style="background:#c27803"></div>Période possible</div>
+      <div class="leg-i"><div class="leg-sw" style="background:#eeeeee;border:1px solid #e0e0e8"></div>Non disponible</div>
     </div>
-    <div class="legend-current">
-      <div class="legend-current-bar"></div> Mois en cours
+    <div class="leg-vsep"></div>
+    <div class="leg-sec">
+      <div class="leg-i">
+        <span class="leg-tag" style="background:#eeeaff;color:#4e36ff;border:1px solid #c4b5ff">Stage</span>École propose des stages
+      </div>
+      <div class="leg-i">
+        <span class="leg-tag" style="background:transparent;color:#4e36ff;border:1.5px solid #4e36ff">Alternance</span>École propose de l'alternance
+      </div>
     </div>
+    <div class="leg-sec pub-leg" style="display:none">
+      <div class="leg-vsep"></div>
+      <div class="leg-i"><div class="leg-sw" style="background:#4e36ff"></div>⏱ Publier maintenant</div>
+      <div class="leg-i"><div class="leg-sw" style="background:#c4b5ff;border:1px dashed #4e36ff"></div>⏱ Préparer</div>
+    </div>
+    <div class="leg-now"><span class="leg-now-pill" id="leg-mo"></span>Mois en cours</div>
   </div>
 
-  <p id="cal-note">* Calendriers indicatifs mis à jour pour 2026. Les dates exactes varient selon le campus, l'année d'étude et le parcours. En cas de doute, toujours valider avec le service Relations Entreprises de l'école concernée. Cliquer sur une école pour afficher la fiche détaillée.</p>
+  <p id="cal-note">* Calendriers indicatifs 2026. Les dates varient selon le campus, l'année d'étude et la spécialisation. À confirmer directement avec chaque établissement avant tout recrutement.</p>
 </div>
 
-<!-- ADMIN TRIGGER -->
-<div id="admin-trigger">🔒</div>
+<button class="util" id="theme-btn">
+  <span class="th-dot" id="th-dot" style="background:#F8F5EE"></span>Fond
+</button>
+<div id="adm-trig">🔒</div>
 
-<!-- PASSWORD MODAL -->
-<div class="modal-overlay" id="pw-modal">
-  <div class="modal-box" id="pw-box">
-    <div class="modal-title">Accès administration</div>
-    <p class="modal-sub">Entrez le mot de passe pour accéder au backoffice.</p>
-    <input type="password" class="modal-input" id="pw-input" placeholder="Mot de passe">
-    <div class="modal-error" id="pw-error" style="display:none">Mot de passe incorrect.</div>
-    <div class="modal-btns">
-      <button class="btn-primary" id="pw-submit">Accéder</button>
-      <button class="btn-secondary" id="pw-cancel">Annuler</button>
-    </div>
+<!-- Modal mot de passe -->
+<div class="mover" id="pw-modal">
+  <div class="mbox">
+    <div class="mbox-t">Administration</div>
+    <p class="mbox-s">Entrez le mot de passe pour modifier le calendrier.</p>
+    <input type="password" class="m-inp" id="pw-inp" placeholder="Mot de passe">
+    <div class="m-err" id="pw-err" style="display:none">Mot de passe incorrect.</div>
+    <div class="m-btns"><button class="m-ok" id="pw-ok">Accéder</button><button class="m-no" id="pw-no">Annuler</button></div>
   </div>
 </div>
 
-<!-- ADMIN OVERLAY -->
-<div id="admin-overlay">
-  <div id="admin-topbar">
-    <span id="admin-topbar-title">Administration — Calendrier Académie</span>
-    <div class="admin-topbar-btns">
-      <button class="btn-save" id="admin-save">✓ Sauvegarder</button>
-      <button class="btn-cancel-admin" id="admin-cancel">Annuler</button>
+<!-- Admin -->
+<div id="adm-ov">
+  <div id="adm-bar">
+    <span id="adm-bar-t">Administration — Calendrier</span>
+    <div class="adm-bb">
+      <button class="btn-sv" id="adm-save">✓ Sauvegarder</button>
+      <button class="btn-ca" id="adm-can">Annuler</button>
     </div>
   </div>
-  <div id="admin-body">
-    <div class="admin-tabs" id="admin-tabs"></div>
-    <div class="admin-profile-fields" id="admin-profile-fields"></div>
-    <div id="admin-schools"></div>
+  <div id="adm-body">
+    <div class="adm-ts" id="adm-tabs"></div>
+    <div class="adm-pf" id="adm-pf"></div>
+    <div id="adm-schools"></div>
   </div>
 </div>
 
 <script>
-/* ─── DATA ─── */
-const MONTHS = ["Jan","Fév","Mar","Avr","Mai","Juin","Juil","Août","Sep","Oct","Nov","Déc"];
-const CUR = new Date().getMonth();
-const PW = "FFPAPF";
+/* ══ CONSTANTES ══ */
+const LOGOS={
+  "MODART":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQPcDbRwWbQ8sgtfq57q1rSDr_6AEwl1HgzGg&s",
+  "LISAA":"https://upload.wikimedia.org/wikipedia/en/c/cd/LISAA_School_of_Art_%26_Design_logo.png",
+  "ESMOD":"https://upload.wikimedia.org/wikipedia/commons/1/1a/Logo_ESMOD_2024.svg",
+  "MOD'SPE":"https://www.modspeparis.com/wp-content/uploads/2024/05/t1_logo1.png"
+};
+const MO=["Jan","Fév","Mar","Avr","Mai","Juin","Juil","Août","Sep","Oct","Nov","Déc"];
+const MOF=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+const CUR=new Date().getMonth();
+const PW="FFPAPF";
+document.getElementById("leg-mo").textContent=MO[CUR];
 
-let DATA = {
-  "CRÉA": {
-    fullLabel: "Profils Création",
-    tagline: "Stylisme · Modélisme · Design textile · Studio · Direction artistique",
-    context: "Les profils création restent surtout disponibles en stage de fin d'année académique, avec un pic de juin à septembre. Côté alternance, la majorité des rentrées se concentrent en septembre–octobre, à l'exception de quelques parcours plus souples selon les écoles.",
-    schools: {
-      "MODART": {
-        level: "Bac+3 à Bac+5",
-        stageDuration: "2 à 10 mois",
-        contact: "contact@modart-paris.com",
-        url: "modart-paris.com",
-        stage:      [0,0,0,0,1,2,2,2,2,0,0,1],
-        alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
-        stageNote: "Selon les cursus, les étudiants réalisent un à deux stages par an. Pour les profils création, la fenêtre la plus crédible reste mai/juin → septembre, avec quelques créneaux plus ponctuels en fin d'année selon les spécialisations.",
-        altNote: "L'alternance est possible dès la 4e année. Sur les profils créatifs, le démarrage se concentre surtout à la rentrée de septembre–octobre, avec un rythme à confirmer selon la spécialisation."
-      },
-      "LISAA": {
-        level: "Bac+3 à Bac+5",
-        stageDuration: "2 à 6 mois",
-        contact: "entreprises@lisaa.com",
-        url: "lisaa.com",
-        stage:      [0,0,0,0,0,2,2,2,2,0,0,0],
-        alternance: [0,0,0,0,0,0,0,0,1,1,0,0],
-        stageNote: "Les profils création LISAA sont surtout disponibles en stage entre juin et septembre, dans la logique des fins de bachelors et des stages de professionnalisation.",
-        altNote: "Sur le versant création, l'alternance n'est pas la norme sur l'ensemble des parcours. La disponibilité existe surtout sur certains niveaux et se cale globalement sur la rentrée d'automne."
-      },
-      "ESMOD": {
-        level: "Bac à Bac+5",
-        stageDuration: "2 à 6 mois selon l'année",
-        contact: "esmod.com",
-        url: "esmod.com",
-        stage:      [0,0,0,0,1,2,2,2,1,0,0,0],
-        alternance: [0,0,0,0,0,0,0,0,0,0,0,0],
-        stageNote: "Les stages ESMOD en création démarrent surtout entre mai et juin selon l'année d'étude, avec des formats allant d'environ 5 à 10 semaines à plusieurs mois pour les niveaux supérieurs.",
-        altNote: "À date, ESMOD indique que seule la formation Postgraduate Fashion Business est éligible à l'alternance. Les profils création doivent donc être considérés comme disponibles principalement en stage."
-      },
-      "MOD'SPE": {
-        level: "Bac+3 à Bac+5",
-        stageDuration: "2 à 6 mois",
-        contact: "modspeparis.com",
-        url: "modspeparis.com",
-        stage:      [0,0,0,0,1,2,2,2,1,0,0,0],
-        alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
-        stageNote: "MOD'SPE met en avant des périodes de stage en 1re et 2e année de Bachelor. Pour les profils création, la disponibilité stage est donc surtout pertinente de mai/juin à septembre.",
-        altNote: "L'alternance démarre à partir de la 3e année de Bachelor et se poursuit tout au long du MBA. Le rythme annoncé par l'école est de 1 jour à l'école pour 4 jours en entreprise, avec une rentrée surtout concentrée en septembre."
-      }
+/* ══ DATA ══ */
+let DATA={
+  "CRÉA":{fullLabel:"Profils Création",tagline:"Stylisme · Modélisme · Design textile · Studio · Direction artistique",context:"Les profils création sont principalement disponibles en stage de fin d'année académique, avec un pic de juin à septembre. En alternance, la majorité des rentrées se concentrent en septembre–octobre.",
+    schools:{
+      "MODART":{level:"Bac+3 à Bac+5",stageDuration:"2 à 10 mois",email:"contact@modart-paris.com",phone:"+33 1 44 07 47 00",contact:"Service Relations Entreprises",url:"https://modart-paris.com",stage:[0,0,0,0,1,2,2,2,2,0,0,1],alternance:[0,0,0,0,0,0,0,0,2,2,0,0],stageNote:"Selon les cursus, les étudiants réalisent un à deux stages par an. Pour les profils création, la fenêtre la plus crédible reste mai–juin → septembre, avec quelques créneaux ponctuels en fin d'année.",altNote:"L'alternance est possible dès la 4e année. Sur les profils créatifs, le démarrage se concentre à la rentrée de septembre–octobre, avec un rythme à confirmer selon la spécialisation."},
+      "LISAA":{level:"Bac+3 à Bac+5",stageDuration:"2 à 6 mois",email:"entreprises@lisaa.com",phone:"+33 1 42 26 27 27",contact:"Service Relations Entreprises",url:"https://lisaa.com",stage:[0,0,0,0,0,2,2,2,2,0,0,0],alternance:[0,0,0,0,0,0,0,0,1,1,0,0],stageNote:"Les profils création LISAA sont disponibles en stage entre juin et septembre, dans la logique des fins de bachelors et des stages de professionnalisation.",altNote:"Sur le versant création, l'alternance existe sur certains niveaux et se cale globalement sur la rentrée d'automne."},
+      "ESMOD":{level:"Bac à Bac+5",stageDuration:"5 semaines à 6 mois",email:"relations.entreprises@esmod.com",phone:"+33 1 44 83 81 50",contact:"Relations Entreprises",url:"https://esmod.com/fr/entreprises",stage:[0,0,0,0,1,2,2,2,1,0,0,0],alternance:[0,0,0,0,0,0,0,0,0,0,0,0],stageNote:"Les stages ESMOD en création démarrent entre mai et juin selon l'année d'étude. Formats allant de 5–10 semaines pour les premières années à plusieurs mois pour les niveaux supérieurs.",altNote:"Seule la formation Postgraduate Fashion Business est éligible à l'alternance chez ESMOD. Les profils création sont disponibles principalement en stage."},
+      "MOD'SPE":{level:"Bac+3 à Bac+5",stageDuration:"2 à 6 mois",email:"entreprises@modspeparis.com",phone:"+33 1 44 07 31 88",contact:"Service Relations Entreprises",url:"https://modspeparis.com/entreprises",stage:[0,0,0,0,1,2,2,2,1,0,0,0],alternance:[0,0,0,0,0,0,0,0,2,2,0,0],stageNote:"Stages en 1re et 2e année de Bachelor. Pour les profils création, la disponibilité est surtout pertinente de mai–juin à septembre.",altNote:"L'alternance démarre à partir de la 3e année de Bachelor et se poursuit tout au long du MBA. Rythme : 1 jour école / 4 jours entreprise, rentrée concentrée en septembre."}
     }
   },
-  "RETAIL": {
-    fullLabel: "Profils Retail",
-    tagline: "Vente · Wholesale · Visual Merchandising · Commerce en ligne · Réseau boutiques · Expérience client",
-    context: "Les profils retail offrent des fenêtres plus souples selon les écoles. MODART et MOD'SPE permettent d'identifier des recrutements plus étalés, tandis que LISAA reste davantage concentrée sur l'été et l'automne.",
-    schools: {
-      "MODART": {
-        level: "Bac+2 à Bac+5",
-        stageDuration: "2 à 6 mois",
-        contact: "contact@modart-paris.com",
-        url: "modart-paris.com",
-        stage:      [2,2,2,1,1,2,2,2,2,0,0,1],
-        alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
-        stageNote: "MODART indique un à deux stages par an selon les cursus. Sur les profils retail, cela permet de viser à la fois des besoins de début d'année et de pic estival, ce qui en fait l'école la plus souple du panel.",
-        altNote: "L'alternance est possible dès la 4e année. Les profils retail/wholesale/VM sont particulièrement pertinents pour une rentrée septembre–octobre."
-      },
-      "LISAA": {
-        level: "Bac+3 à Bac+5",
-        stageDuration: "2 à 4 mois",
-        contact: "entreprises@lisaa.com",
-        url: "lisaa.com",
-        stage:      [0,0,0,0,0,1,1,1,1,0,0,0],
-        alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
-        stageNote: "Les profils Fashion Business à dominante retail sont surtout disponibles en stage entre juin et septembre.",
-        altNote: "LISAA annonce de l'alternance en 3e année sur le Bachelor Fashion Business. La rentrée principale reste à l'automne."
-      },
-      "MOD'SPE": {
-        level: "Bac+3 à Bac+5",
-        stageDuration: "2 à 6 mois",
-        contact: "modspeparis.com",
-        url: "modspeparis.com",
-        stage:      [0,0,0,0,1,2,2,2,1,0,0,0],
-        alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
-        stageNote: "Les stages ont lieu en 1re et 2e année de Bachelor ; pour des besoins retail, les créneaux les plus réalistes restent la fin de printemps et l'été.",
-        altNote: "L'alternance est proposée à partir de la 3e année de Bachelor puis tout au long du MBA, avec un rythme 4 jours entreprise / 1 jour école."
-      }
+  "RETAIL":{fullLabel:"Profils Retail",tagline:"Vente · Wholesale · Visual Merchandising · Commerce en ligne · Réseau boutiques",context:"Les profils retail offrent des fenêtres de recrutement plus souples. MODART est l'école la plus flexible du panel, avec des disponibilités quasi toute l'année.",
+    schools:{
+      "MODART":{level:"Bac+2 à Bac+5",stageDuration:"2 à 6 mois",email:"contact@modart-paris.com",phone:"+33 1 44 07 47 00",contact:"Service Relations Entreprises",url:"https://modart-paris.com",stage:[2,2,2,1,1,2,2,2,2,0,0,1],alternance:[0,0,0,0,0,0,0,0,2,2,0,0],stageNote:"MODART propose un à deux stages par an selon les cursus. Sur les profils retail, cela permet de viser des besoins de début d'année et de pic estival — l'école la plus souple du panel.",altNote:"L'alternance est possible dès la 4e année. Les profils retail, wholesale et VM sont particulièrement pertinents pour une rentrée septembre–octobre."},
+      "LISAA":{level:"Bac+3 à Bac+5",stageDuration:"2 à 4 mois",email:"entreprises@lisaa.com",phone:"+33 1 42 26 27 27",contact:"Service Relations Entreprises",url:"https://lisaa.com",stage:[0,0,0,0,0,1,1,1,1,0,0,0],alternance:[0,0,0,0,0,0,0,0,2,2,0,0],stageNote:"Les profils Fashion Business à dominante retail sont surtout disponibles en stage entre juin et septembre.",altNote:"LISAA propose de l'alternance en 3e année sur le Bachelor Fashion Business. La rentrée principale reste à l'automne."},
+      "MOD'SPE":{level:"Bac+3 à Bac+5",stageDuration:"2 à 6 mois",email:"entreprises@modspeparis.com",phone:"+33 1 44 07 31 88",contact:"Service Relations Entreprises",url:"https://modspeparis.com/entreprises",stage:[0,0,0,0,1,2,2,2,1,0,0,0],alternance:[0,0,0,0,0,0,0,0,2,2,0,0],stageNote:"Stages en 1re et 2e année de Bachelor. Pour des besoins retail, les créneaux les plus réalistes restent la fin de printemps et l'été.",altNote:"L'alternance est proposée à partir de la 3e année de Bachelor puis tout au long du MBA, avec un rythme 4 jours entreprise / 1 jour école."}
     }
   },
-  "BUSINESS": {
-    fullLabel: "Profils Business",
-    tagline: "Communication · Marketing · Gestion de marque · Achats · Influence · Développement commercial · Merchandising",
-    context: "Les profils business sont les plus recrutables. LISAA permet une entrée en alternance dès la 3e année du Bachelor Fashion Business, MODART ouvre l'alternance dès la 4e année, ESMOD la réserve à son Postgraduate Fashion Business, et MOD'SPE la déploie dès la 3e année puis sur tout le MBA.",
-    schools: {
-      "MODART": {
-        level: "Bac+2 à Bac+5",
-        stageDuration: "3 à 6 mois",
-        contact: "contact@modart-paris.com",
-        url: "modart-paris.com",
-        stage:      [2,2,2,0,0,2,2,2,2,0,0,1],
-        alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
-        stageNote: "Grâce à son système d'un à deux stages par an selon les cursus, MODART permet de couvrir à la fois des besoins business de début d'année et de milieu d'année. C'est l'école la plus flexible du panel pour communication, marketing et développement commercial.",
-        altNote: "L'alternance est ouverte dès la 4e année. Le Mastère Communication de Mode mentionne un parcours en alternance, avec un volume minimum obligatoire de 110 jours."
-      },
-      "LISAA": {
-        level: "Bac+3 à Bac+5",
-        stageDuration: "2 à 6 mois",
-        contact: "entreprises@lisaa.com",
-        url: "lisaa.com",
-        stage:      [0,0,0,0,0,2,2,2,2,0,0,0],
-        alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
-        stageNote: "Les stages business LISAA se concentrent surtout de juin à septembre sur les bachelors.",
-        altNote: "Le Bachelor Fashion Business est proposé en classique et alternance en 3e année. Des mastères mode et luxe existent aussi en rythme alterné selon les parcours."
-      },
-      "ESMOD": {
-        level: "Bac+3 à Bac+5",
-        stageDuration: "2 à 6 mois",
-        contact: "esmod.com",
-        url: "esmod.com",
-        stage:      [0,0,0,0,1,2,2,2,1,0,0,0],
-        alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
-        stageNote: "Les stages business ESMOD démarrent principalement entre mai et juin selon le niveau. Ils restent très intéressants sur les fonctions marketing, communication et développement international.",
-        altNote: "ESMOD précise qu'à date seule la formation Postgraduate Fashion Business est éligible à l'alternance. Son rythme officiel est de 3 semaines en entreprise et 1 semaine à l'école, sur 2 ans."
-      },
-      "MOD'SPE": {
-        level: "Bac+3 à Bac+5",
-        stageDuration: "2 à 6 mois",
-        contact: "modspeparis.com",
-        url: "modspeparis.com",
-        stage:      [0,0,0,0,1,2,2,2,1,0,0,0],
-        alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
-        stageNote: "Les profils business de MOD'SPE sont disponibles en stage sur les premières années de Bachelor, avec un pic de disponibilité en fin d'année académique.",
-        altNote: "MOD'SPE annonce l'alternance à partir de la 3e année de Bachelor et pendant tout le MBA. Le rythme officiel communiqué par l'école est de 1 jour école / 4 jours entreprise."
-      }
+  "BUSINESS":{fullLabel:"Profils Business",tagline:"Communication · Marketing · Achats · Développement commercial · Influence · Merchandising",context:"Les profils business sont les plus accessibles à l'alternance. LISAA et MOD'SPE ouvrent l'alternance dès la 3e année, MODART dès la 4e, ESMOD la réserve à son Postgraduate Fashion Business.",
+    schools:{
+      "MODART":{level:"Bac+2 à Bac+5",stageDuration:"3 à 6 mois",email:"contact@modart-paris.com",phone:"+33 1 44 07 47 00",contact:"Service Relations Entreprises",url:"https://modart-paris.com",stage:[2,2,2,0,0,2,2,2,2,0,0,1],alternance:[0,0,0,0,0,0,0,0,2,2,0,0],stageNote:"Grâce à un à deux stages par an, MODART couvre des besoins business de début et milieu d'année — la plus flexible du panel pour communication, marketing et développement commercial.",altNote:"L'alternance est ouverte dès la 4e année. Le Mastère Communication de Mode propose un parcours alterné avec un minimum de 110 jours obligatoires en entreprise."},
+      "LISAA":{level:"Bac+3 à Bac+5",stageDuration:"2 à 6 mois",email:"entreprises@lisaa.com",phone:"+33 1 42 26 27 27",contact:"Service Relations Entreprises",url:"https://lisaa.com",stage:[0,0,0,0,0,2,2,2,2,0,0,0],alternance:[0,0,0,0,0,0,0,0,2,2,0,0],stageNote:"Les stages business LISAA se concentrent de juin à septembre sur les bachelors.",altNote:"Le Bachelor Fashion Business est proposé en classique et alternance en 3e année. Des mastères mode et luxe existent aussi en rythme alterné selon les parcours."},
+      "ESMOD":{level:"Bac+3 à Bac+5",stageDuration:"2 à 6 mois",email:"relations.entreprises@esmod.com",phone:"+33 1 44 83 81 50",contact:"Relations Entreprises",url:"https://esmod.com/fr/entreprises",stage:[0,0,0,0,1,2,2,2,1,0,0,0],alternance:[0,0,0,0,0,0,0,0,2,2,0,0],stageNote:"Les stages business ESMOD démarrent principalement entre mai et juin selon le niveau, sur les fonctions marketing, communication et développement international.",altNote:"Seule la formation Postgraduate Fashion Business est éligible à l'alternance. Rythme : 3 semaines entreprise / 1 semaine école, sur 2 ans."},
+      "MOD'SPE":{level:"Bac+3 à Bac+5",stageDuration:"2 à 6 mois",email:"entreprises@modspeparis.com",phone:"+33 1 44 07 31 88",contact:"Service Relations Entreprises",url:"https://modspeparis.com/entreprises",stage:[0,0,0,0,1,2,2,2,1,0,0,0],alternance:[0,0,0,0,0,0,0,0,2,2,0,0],stageNote:"Les profils business de MOD'SPE sont disponibles en stage sur les premières années de Bachelor, avec un pic en fin d'année académique.",altNote:"MOD'SPE propose l'alternance à partir de la 3e année de Bachelor et pendant tout le MBA. Rythme officiel : 1 jour école / 4 jours entreprise."}
     }
   }
 };
 
-/* ─── STATE ─── */
-let activeProfile = "CRÉA";
-let activeType    = "both";
-let showPublish   = false;
-let expandedSchool = null;
-let adminDraft    = null;
-let adminTab      = "CRÉA";
-let adminExpanded = null;
+/* ══ ÉTAT ══ */
+let actProf="CRÉA",actType="both",showPub=false,expanded=null;
+let admDraft=null,admTab="CRÉA",admExp=null;
 
-/* ─── PUBLISH TIMING ─── */
-function computePublish(avail, type) {
-  const r = Array(12).fill(0);
-  const lp = type === "alternance" ? 4 : 1;
-  const lq = type === "alternance" ? 5 : 2;
-  for (let i = 0; i < 12; i++) {
-    if (avail[i] > 0 && (i === 0 || avail[i-1] === 0)) {
-      if (i - lp >= 0 && !r[i-lp]) r[i-lp] = 2;
-      if (i - lq >= 0 && !r[i-lq]) r[i-lq] = 1;
-    }
-  }
+/* ══ TOOLTIP ══ */
+const tipEl=document.getElementById("tip");let tipOn=false;
+document.addEventListener("mousemove",e=>{if(!tipOn)return;tipEl.style.left=(e.clientX+14)+"px";tipEl.style.top=(e.clientY-42)+"px";});
+const showTip=t=>{tipEl.textContent=t;tipEl.style.display="block";tipOn=true;};
+const hideTip=()=>{tipEl.style.display="none";tipOn=false;};
+
+/* ══ THÈME ══ */
+let curTheme="beige";
+document.getElementById("theme-btn").addEventListener("click",()=>{
+  curTheme=curTheme==="beige"?"white":"beige";
+  document.documentElement.setAttribute("data-theme",curTheme);
+  document.getElementById("th-dot").style.background=curTheme==="beige"?"#F8F5EE":"#ffffff";
+});
+
+/* ══ HELPERS ══ */
+function pubCalc(avail,type){
+  const r=Array(12).fill(0),lp=type==="alternance"?4:1,lq=type==="alternance"?5:2;
+  for(let i=0;i<12;i++){if(avail[i]>0&&(i===0||avail[i-1]===0)){if(i-lp>=0&&!r[i-lp])r[i-lp]=2;if(i-lq>=0&&!r[i-lq])r[i-lq]=1;}}
   return r;
 }
-
-function clone(o) { return JSON.parse(JSON.stringify(o)); }
-
-/* ─── RENDER CALENDAR ─── */
-function renderCalendar() {
-  const profile    = DATA[activeProfile];
-  const showStage  = activeType !== "alternance";
-  const showAlt    = activeType !== "stage";
-
-  // Context
-  document.getElementById("cal-context").textContent = profile.context;
-
-  // Month header
-  const hdr = document.getElementById("month-header");
-  hdr.innerHTML = "<div></div>";
-  MONTHS.forEach((m, i) => {
-    const d = document.createElement("div");
-    d.className = "month-label" + (i === CUR ? " current" : "");
-    d.textContent = m;
-    hdr.appendChild(d);
-  });
-
-  // School rows
-  const container = document.getElementById("school-rows");
-  container.innerHTML = "";
-
-  Object.entries(profile.schools).forEach(([school, info]) => {
-    const isOpen  = expandedSchool === school;
-    const stageP  = computePublish(info.stage, "stage");
-    const altP    = computePublish(info.alternance, "alternance");
-    const hasStage = info.stage.some(v => v > 0);
-    const hasAlt   = info.alternance.some(v => v > 0);
-
-    const card = document.createElement("div");
-    card.className = "school-card" + (isOpen ? " open" : "");
-    card.id = "card-" + school;
-
-    // ── Row ──
-    const row = document.createElement("div");
-    row.className = "school-row";
-    row.addEventListener("click", () => {
-      expandedSchool = expandedSchool === school ? null : school;
-      renderCalendar();
-    });
-
-    // Label
-    const lbl = document.createElement("div");
-    lbl.className = "school-label";
-    lbl.innerHTML = `
-      <div class="school-name-row">
-        <div class="school-dot"></div>
-        <span class="school-name">${school}</span>
-        <span class="school-chevron">${isOpen ? "▲" : "▼"}</span>
-      </div>
-      <div class="school-level">${info.level}</div>
-      <div class="school-tags">
-        ${showStage && hasStage ? '<span class="tag tag-solid">STAGE</span>' : ""}
-        ${showAlt && hasAlt ? '<span class="tag tag-outline">ALTERNANCE</span>' : ""}
-      </div>`;
-    row.appendChild(lbl);
-
-    // Bars
-    const bars = document.createElement("div");
-    bars.className = "school-bars";
-
-    const rowDefs = [];
-    if (showStage) rowDefs.push({ key: "stage",      label: "Stage",      data: info.stage,      pub: stageP });
-    if (showAlt)   rowDefs.push({ key: "alternance", label: "Alternance", data: info.alternance, pub: altP   });
-
-    rowDefs.forEach(rd => {
-      const grp = document.createElement("div");
-      grp.className = "bar-group";
-
-      // Grid
-      const grid = document.createElement("div");
-      grid.className = "bar-grid";
-
-      rd.data.forEach((v, mi) => {
-        const p = rd.pub[mi];
-        const cell = document.createElement("div");
-        cell.className = "cal-cell";
-
-        // Avail bar
-        const ab = document.createElement("div");
-        ab.className = "avail-bar";
-        if (v === 2) { ab.classList.add("strong"); if (mi === CUR) ab.classList.add("current-filled"); }
-        else if (v === 1) { ab.classList.add("possible"); if (mi === CUR) ab.classList.add("current-filled"); }
-        else if (mi === CUR) { ab.classList.add("current-empty"); }
-
-        if (v > 0) {
-          const lt = document.createElement("span");
-          lt.className = "bar-letter " + (v === 2 ? "white" : "dark");
-          lt.textContent = rd.key === "stage" ? (v === 2 ? "S" : "s") : (v === 2 ? "A" : "a");
-          ab.appendChild(lt);
-        }
-        cell.appendChild(ab);
-
-        // Publish bar
-        if (showPublish) {
-          const pb = document.createElement("div");
-          pb.className = "pub-bar";
-          if (v === 0 && p === 2) pb.classList.add("now");
-          else if (v === 0 && p === 1) pb.classList.add("prep");
-          cell.appendChild(pb);
-        }
-
-        grid.appendChild(cell);
-      });
-      grp.appendChild(grid);
-
-      // Row label
-      const rl = document.createElement("div");
-      rl.className = "bar-row-label";
-      rl.textContent = rd.label;
-      if (showPublish && rd.pub.some(p => p > 0)) {
-        const hint = document.createElement("span");
-        hint.className = "pub-hint";
-        hint.textContent = "· ⏱ publication";
-        rl.appendChild(hint);
-      }
-      grp.appendChild(rl);
-      bars.appendChild(grp);
-    });
-
-    row.appendChild(bars);
-    card.appendChild(row);
-
-    // ── Detail ──
-    const detail = document.createElement("div");
-    detail.className = "school-detail";
-
-    // Meta
-    const meta = document.createElement("div");
-    meta.className = "detail-meta";
-    meta.innerHTML = `<div class="detail-meta-title">Informations</div>
-      ${[
-        ["Niveau", info.level],
-        ["Durée stage", info.stageDuration],
-        ["Contact", info.contact],
-        ["Site web", info.url]
-      ].map(([k,v]) => `<div class="meta-row"><div class="meta-key">${k}</div><div class="meta-val">${v}</div></div>`).join("")}`;
-    detail.appendChild(meta);
-
-    // Notes
-    const notes = document.createElement("div");
-    notes.className = "detail-notes";
-    notes.style.gridTemplateColumns = showStage && showAlt ? "1fr 1fr" : "1fr";
-
-    const makePubBox = (type, pubArr) => {
-      if (!showPublish || !pubArr.some(p => p > 0)) return "";
-      const msg = type === "stage"
-        ? "Publiez vos offres de stage <strong>4 à 6 semaines avant</strong> la période de disponibilité."
-        : "Pour une rentrée <strong>septembre–octobre</strong>, publiez vos offres d'alternance <strong>dès avril–mai</strong>. Les meilleurs profils sont souvent engagés avant l'été.";
-      return `<div class="pub-box"><div class="pub-box-title">⏱ Publication</div><div class="pub-box-text">${msg}</div></div>`;
-    };
-
-    if (showStage) {
-      notes.innerHTML += `
-        <div class="note-block">
-          <div class="note-title"><div class="note-dot-solid"></div>Stage</div>
-          <p class="note-text">${info.stageNote}</p>
-          ${makePubBox("stage", stageP)}
-        </div>`;
-    }
-    if (showAlt) {
-      notes.innerHTML += `
-        <div class="note-block">
-          <div class="note-title"><div class="note-dot-outline"></div>Alternance</div>
-          <p class="note-text">${info.altNote}</p>
-          ${makePubBox("alternance", altP)}
-        </div>`;
-    }
-
-    detail.appendChild(notes);
-    card.appendChild(detail);
-    container.appendChild(card);
-  });
-
-  // Legend pub items
-  document.querySelectorAll(".pub-legend").forEach(el => {
-    el.style.display = showPublish ? "flex" : "none";
-  });
+const clone=o=>JSON.parse(JSON.stringify(o));
+function mkMailto(email,school,profKey){
+  const pl=DATA[profKey]?.fullLabel||profKey;
+  const s=encodeURIComponent(`Recrutement d'étudiant(e) — ${school}`);
+  const b=encodeURIComponent(`Bonjour,\n\nJe me permets de vous contacter au sujet du recrutement d'un(e) étudiant(e) de votre école pour un stage ou une alternance au sein de notre structure, dans le domaine ${pl}.\n\nPourriez-vous nous indiquer la procédure à suivre ainsi que le contact référent pour les entreprises souhaitant recruter vos étudiants ?\n\nEn vous remerciant par avance,\nCordialement`);
+  return `mailto:${email}?subject=${s}&body=${b}`;
 }
 
-/* ─── RENDER TABS ─── */
-function renderTabs() {
-  const tc = document.getElementById("tab-container");
-  tc.innerHTML = "";
-  Object.keys(DATA).forEach(key => {
-    const btn = document.createElement("button");
-    btn.className = "tab-btn" + (key === activeProfile ? " active" : "");
-    btn.textContent = DATA[key].fullLabel;
-    btn.addEventListener("click", () => {
-      activeProfile = key;
-      expandedSchool = null;
-      renderTabs();
-      document.getElementById("cal-tagline").textContent = DATA[activeProfile].tagline;
-      renderCalendar();
+/* ══ RENDER CALENDAR ══ */
+function render(){
+  const prof=DATA[actProf],showS=actType!=="alternance",showA=actType!=="stage";
+  // Month strip
+  const strip=document.getElementById("ms");strip.innerHTML="<div></div>";
+  MO.forEach((m,i)=>{const d=document.createElement("div");d.className="ms-cell"+(i===CUR?" cur":"");d.textContent=m;strip.appendChild(d);});
+  // Cards
+  const cont=document.getElementById("school-rows");cont.innerHTML="";
+  Object.entries(prof.schools).forEach(([school,info])=>{
+    const isOpen=expanded===school;
+    const sp=pubCalc(info.stage,"stage"),ap=pubCalc(info.alternance,"alternance");
+    const hasS=info.stage.some(v=>v>0),hasA=info.alternance.some(v=>v>0);
+    const card=document.createElement("div");card.className="sc"+(isOpen?" open":"");
+
+    /* Header */
+    const hdr=document.createElement("div");hdr.className="sc-hdr";
+    // Logo
+    const lz=document.createElement("div");lz.className="logo-z";
+    const logo=LOGOS[school]||"";
+    if(logo){const img=document.createElement("img");img.className="sc-logo";img.src=logo;img.alt=school;img.onerror=function(){this.style.display="none";this.nextElementSibling.style.display="block";};const fb=document.createElement("span");fb.className="sc-logo-fb";fb.textContent=school;lz.appendChild(img);lz.appendChild(fb);}
+    else{const fb=document.createElement("span");fb.className="sc-logo-fb";fb.style.display="block";fb.textContent=school;lz.appendChild(fb);}
+    hdr.appendChild(lz);
+    // Info
+    const iz=document.createElement("div");iz.className="sc-info";
+    const nm=document.createElement("span");nm.className="sc-name";nm.textContent=school;
+    const sb=document.createElement("div");sb.className="sc-sub";
+    const lv=document.createElement("span");lv.className="sc-lvl";lv.textContent=info.level;sb.appendChild(lv);
+    if(showS&&hasS){const t=document.createElement("span");t.className="tag tag-s";t.textContent="Stage";sb.appendChild(t);}
+    if(showA&&hasA){const t=document.createElement("span");t.className="tag tag-a";t.textContent="Alternance";sb.appendChild(t);}
+    iz.appendChild(nm);iz.appendChild(sb);hdr.appendChild(iz);
+    // Contact
+    const cz=document.createElement("div");cz.className="sc-cz";
+    const mb=document.createElement("a");mb.className="btn-mail";mb.href=mkMailto(info.email,school,actProf);mb.title=info.email;
+    mb.innerHTML=`<svg width="11" height="9" viewBox="0 0 22 16" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="1" y="1" width="20" height="14" rx="2"/><path d="M1 4l10 7 10-7"/></svg> Contacter`;
+    mb.addEventListener("click",e=>e.stopPropagation());cz.appendChild(mb);
+    const et=document.createElement("span");et.className="sc-email";et.textContent=info.email;cz.appendChild(et);
+    hdr.appendChild(cz);
+    const chev=document.createElement("div");chev.className="sc-chev";
+    chev.innerHTML=`<svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8l5 5 5-5"/></svg>`;
+    hdr.appendChild(chev);
+    hdr.addEventListener("click",()=>{expanded=expanded===school?null:school;render();});
+    card.appendChild(hdr);
+
+    /* Bars */
+    const be=document.createElement("div");be.className="sc-bars";
+    const rds=[];
+    if(showS)rds.push({key:"stage",lbl:"Stage",data:info.stage,pub:sp});
+    if(showA)rds.push({key:"alternance",lbl:"Altern.",data:info.alternance,pub:ap});
+    rds.forEach(rd=>{
+      const row=document.createElement("div");row.className="bar-row";
+      const lbl=document.createElement("div");lbl.className="bar-lbl";lbl.textContent=rd.lbl;row.appendChild(lbl);
+      rd.data.forEach((v,mi)=>{
+        const wrap=document.createElement("div");wrap.className="cell-w";
+        const cell=document.createElement("div");
+        let cls="bar-cell";if(v===2)cls+=" av2";else if(v===1)cls+=" av1";if(mi===CUR)cls+=" cur-col";
+        cell.className=cls;
+        const stat=v===2?"Période idéale":v===1?"Période possible":"Non disponible";
+        cell.addEventListener("mouseenter",()=>showTip(`${MOF[mi]} · ${rd.lbl} · ${stat}`));
+        cell.addEventListener("mouseleave",hideTip);
+        wrap.appendChild(cell);
+        if(showPub){const pb=document.createElement("div");pb.className="pub-sub";if(v===0&&rd.pub[mi]===2)pb.classList.add("p-now");else if(v===0&&rd.pub[mi]===1)pb.classList.add("p-prep");wrap.appendChild(pb);}
+        row.appendChild(wrap);
+      });
+      be.appendChild(row);
     });
+    card.appendChild(be);
+
+    /* Detail */
+    const det=document.createElement("div");det.className="sc-det";
+    // Contact bar
+    const cb=document.createElement("div");cb.className="det-cbar";
+    cb.innerHTML=`<span class="det-clbl">Contact recrutement</span>`;
+    const dtg=document.createElement("div");dtg.className="det-tags";
+    if(showS&&hasS){const t=document.createElement("span");t.className="tag tag-s";t.textContent="Stage";dtg.appendChild(t);}
+    if(showA&&hasA){const t=document.createElement("span");t.className="tag tag-a";t.textContent="Alternance";dtg.appendChild(t);}
+    cb.appendChild(dtg);
+    const eL=document.createElement("a");eL.className="det-link";eL.href=mkMailto(info.email,school,actProf);eL.textContent=`✉ ${info.email}`;cb.appendChild(eL);
+    if(info.phone){const pL=document.createElement("a");pL.className="det-link";pL.href=`tel:${info.phone.replace(/\s/g,"")}`;pL.textContent=`📞 ${info.phone}`;cb.appendChild(pL);}
+    const sL=document.createElement("a");sL.className="det-site";sL.href=info.url;sL.target="_blank";sL.rel="noopener noreferrer";sL.innerHTML="↗ Site";cb.appendChild(sL);
+    det.appendChild(cb);
+    // Notes
+    const mkPN=(type,pb)=>{if(!showPub||!pb.some(p=>p>0))return"";const msg=type==="stage"?"Publiez vos offres <strong>4 à 6 semaines avant</strong> la période de disponibilité.":"Pour une rentrée <strong>sept.–oct.</strong>, publiez dès <strong>avril–mai</strong>. Les meilleurs profils sont souvent engagés avant l'été.";return`<div class="pub-note"><div class="pub-note-t">⏱ Publication conseillée</div><div class="pub-note-b">${msg}</div></div>`;};
+    const isDual=showS&&showA;
+    const notes=document.createElement("div");notes.className="det-notes "+(isDual?"dual":"single");
+    notes.style.gridTemplateColumns=isDual?"1fr 1fr":"1fr";
+    if(showS){const b=document.createElement("div");b.className="det-blk";b.innerHTML=`<div class="det-head"><div class="det-dot ds"></div>Stage — ${info.stageDuration}</div><p class="det-txt">${info.stageNote}</p>${mkPN("stage",sp)}`;notes.appendChild(b);}
+    if(showA){const b=document.createElement("div");b.className="det-blk";b.innerHTML=`<div class="det-head"><div class="det-dot da"></div>Alternance</div><p class="det-txt">${info.altNote}</p>${mkPN("alternance",ap)}`;notes.appendChild(b);}
+    det.appendChild(notes);
+    card.appendChild(det);
+    cont.appendChild(card);
+  });
+  document.querySelectorAll(".pub-leg").forEach(el=>{el.style.display=showPub?"flex":"none";});
+}
+
+/* ══ TABS ══ */
+function renderTabs(){
+  const tc=document.getElementById("tab-container");tc.innerHTML="";
+  Object.keys(DATA).forEach(key=>{
+    const btn=document.createElement("button");btn.className="tab"+(key===actProf?" on":"");btn.textContent=DATA[key].fullLabel;
+    btn.addEventListener("click",()=>{actProf=key;expanded=null;renderTabs();document.getElementById("tagline").textContent=DATA[actProf].tagline;render();});
     tc.appendChild(btn);
   });
 }
 
-/* ─── TYPE PILLS ─── */
-document.querySelectorAll(".pill[data-type]").forEach(btn => {
-  btn.addEventListener("click", () => {
-    activeType = btn.dataset.type;
-    document.querySelectorAll(".pill[data-type]").forEach(b => b.classList.toggle("active", b === btn));
-    renderCalendar();
-  });
+/* ══ FILTRE ══ */
+document.querySelectorAll(".seg-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{actType=btn.dataset.type;document.querySelectorAll(".seg-btn").forEach(b=>b.classList.toggle("on",b===btn));render();});
 });
 
-/* ─── PUBLISH TOGGLE ─── */
-document.getElementById("pub-toggle").addEventListener("click", function() {
-  showPublish = !showPublish;
-  this.classList.toggle("active", showPublish);
-  document.getElementById("pub-banner").style.display = showPublish ? "block" : "none";
-  renderCalendar();
+/* ══ QUAND PUBLIER ══ */
+document.getElementById("pub-cta").addEventListener("click",function(){
+  showPub=!showPub;
+  this.classList.toggle("on",showPub);
+  document.getElementById("pub-banner").style.display=showPub?"block":"none";
+  render();
 });
 
-/* ─── ADMIN TRIGGER ─── */
-const trigger = document.getElementById("admin-trigger");
-document.getElementById("admin-trigger").addEventListener("click", () => {
-  document.getElementById("pw-modal").classList.add("open");
-  setTimeout(() => document.getElementById("pw-input").focus(), 50);
-});
+/* ══ PDF — A4 PORTRAIT ══ */
+document.getElementById("pdf-btn").addEventListener("click",()=>{
+  const prof=DATA[actProf];
+  const showS=actType!=="alternance",showA=actType!=="stage";
+  const today=new Date().toLocaleDateString("fr-FR",{year:"numeric",month:"long",day:"numeric"});
+  const typeLabel=actType==="both"?"Stages & Alternance":actType==="stage"?"Stages uniquement":"Alternance uniquement";
 
-/* ─── PASSWORD MODAL ─── */
-function closeModal() {
-  document.getElementById("pw-modal").classList.remove("open");
-  document.getElementById("pw-input").value = "";
-  document.getElementById("pw-error").style.display = "none";
-  document.getElementById("pw-input").classList.remove("error");
-}
-
-function tryUnlock() {
-  if (document.getElementById("pw-input").value === PW) {
-    closeModal();
-    adminDraft = clone(DATA);
-    adminTab = activeProfile;
-    adminExpanded = null;
-    document.getElementById("admin-overlay").classList.add("open");
-    renderAdmin();
-  } else {
-    document.getElementById("pw-error").style.display = "block";
-    document.getElementById("pw-input").classList.add("error");
-    document.getElementById("pw-input").value = "";
-    document.getElementById("pw-input").focus();
+  // Cellules de barres
+  function cells(arr){
+    return arr.map((v,i)=>{
+      const bg=v===2?"#16a34a":v===1?"#c27803":"#ebebf0";
+      const brd=v===2?"#16a34a":v===1?"#c27803":"#d5d5e0";
+      const cur=i===CUR?`outline:2px solid #4e36ff;outline-offset:1px;position:relative;z-index:1;`:"";
+      return `<div style="flex:1;height:18px;border-radius:3px;background:${bg};border:1px solid ${brd};${cur}"></div>`;
+    }).join("");
   }
+
+  // En-tête des mois — colonne label (44px) + gap (2px) pour s'aligner avec les barres
+  const moHdr=`<div style="display:flex;gap:2px;margin-bottom:4px">
+    <div style="width:44px;flex-shrink:0"></div>
+    ${MO.map((m,i)=>`<div style="flex:1;text-align:center;font-size:6.5px;font-weight:${i===CUR?800:600};letter-spacing:.08em;text-transform:uppercase;color:${i===CUR?"#fff":"#888"};background:${i===CUR?"#4e36ff":"transparent"};border-radius:2px;padding:2px 0">${m}</div>`).join("")}
+  </div>`;
+
+  // Fiche école
+  function schoolBlock(school,info){
+    const hasS=info.stage.some(v=>v>0),hasA=info.alternance.some(v=>v>0);
+    const tagS=hasS&&showS?`<span style="font-size:6.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:1px 5px;border-radius:2px;background:#eeeaff;color:#4e36ff;border:1px solid #c4b5ff">Stage</span>`:"";
+    const tagA=hasA&&showA?`<span style="font-size:6.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:1px 5px;border-radius:2px;background:transparent;color:#4e36ff;border:1.5px solid #4e36ff;margin-left:3px">Alternance</span>`:"";
+    const rowS=showS?`<div style="display:flex;align-items:center;gap:0;margin-bottom:2px"><div style="width:44px;font-size:6.5px;font-weight:700;color:#9494aa;text-transform:uppercase;letter-spacing:.07em;text-align:right;padding-right:5px;flex-shrink:0">Stage</div><div style="flex:1;display:flex;gap:2px">${cells(info.stage)}</div></div>`:"";
+    const rowA=showA?`<div style="display:flex;align-items:center;gap:0"><div style="width:44px;font-size:6.5px;font-weight:700;color:#9494aa;text-transform:uppercase;letter-spacing:.07em;text-align:right;padding-right:5px;flex-shrink:0">Alt.</div><div style="flex:1;display:flex;gap:2px">${cells(info.alternance)}</div></div>`:"";
+    const noteS=showS?`<div style="margin-bottom:5px"><span style="font-size:7px;font-weight:700;color:#4e36ff;text-transform:uppercase;letter-spacing:.08em">■ Stage${info.stageDuration?` — ${info.stageDuration}`:""} · </span><span style="font-size:8px;color:#555;line-height:1.6">${info.stageNote}</span></div>`:"";
+    const noteA=showA?`<div><span style="font-size:7px;font-weight:700;color:#4e36ff;text-transform:uppercase;letter-spacing:.08em;border:1px solid #4e36ff;padding:0 3px;border-radius:2px;margin-right:4px">▫ Alt.</span><span style="font-size:8px;color:#555;line-height:1.6">${info.altNote}</span></div>`:"";
+    return `<div style="border:1px solid #ddd;border-radius:5px;overflow:hidden;margin-bottom:10px;break-inside:avoid;page-break-inside:avoid">
+      <div style="display:flex;align-items:center;padding:7px 10px;background:#fafafa;border-bottom:1px solid #e8e8e8;gap:0">
+        <div style="width:64px;padding-right:9px;border-right:1px solid #e0e0e0;margin-right:10px;height:26px;display:flex;align-items:center;flex-shrink:0">
+          <img src="${LOGOS[school]||""}" style="max-width:54px;max-height:22px;object-fit:contain" onerror="this.style.display='none'">
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11px;font-weight:700">${school}</div>
+          <div style="font-size:8px;color:#888;margin-top:1px;display:flex;align-items:center;gap:5px">${info.level}${tagS}${tagA}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:8px">
+          <div style="font-size:8px;color:#333;font-weight:500">✉ ${info.email}</div>
+          ${info.phone?`<div style="font-size:7.5px;color:#888;margin-top:1px">📞 ${info.phone}</div>`:""}
+        </div>
+      </div>
+      <div style="padding:6px 10px 5px;border-bottom:1px solid #f0f0f0">
+        ${moHdr}${rowS}${rowA}
+      </div>
+      <div style="padding:7px 10px 8px;background:#fcfcfc">
+        ${noteS}${noteA}
+      </div>
+    </div>`;
+  }
+
+  let schoolsHTML="";
+  Object.entries(prof.schools).forEach(([s,i])=>{schoolsHTML+=schoolBlock(s,i);});
+
+  const legend=`<div style="display:flex;align-items:center;gap:12px;padding:7px 10px;background:#f8f8fc;border:1px solid #e2e2ea;border-radius:4px;margin-bottom:12px;flex-wrap:wrap">
+    <span style="font-size:7px;font-weight:800;color:#4e36ff;letter-spacing:.12em;text-transform:uppercase">Légende</span>
+    <div style="display:flex;align-items:center;gap:4px;font-size:8.5px;color:#444"><div style="width:14px;height:8px;border-radius:2px;background:#16a34a"></div>Période idéale</div>
+    <div style="display:flex;align-items:center;gap:4px;font-size:8.5px;color:#444"><div style="width:14px;height:8px;border-radius:2px;background:#c27803"></div>Période possible</div>
+    <div style="display:flex;align-items:center;gap:4px;font-size:8.5px;color:#444"><div style="width:14px;height:8px;border-radius:2px;background:#ebebf0;border:1px solid #d5d5e0"></div>Non disponible</div>
+    <div style="display:flex;align-items:center;gap:4px;font-size:8.5px;color:#444"><div style="width:12px;height:12px;border-radius:2px;background:#4e36ff"></div>${MO[CUR]} = mois en cours</div>
+    <span style="margin-left:auto;font-size:7.5px;color:#bbb;font-style:italic">* À confirmer avec chaque école</span>
+  </div>`;
+
+  const html=`<!DOCTYPE html>
+<html lang="fr"><head>
+<meta charset="UTF-8"><title>Calendrier — ${prof.fullLabel}</title>
+<style>
+@page{size:A4 portrait;margin:12mm 14mm}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,'Helvetica Neue',Helvetica,Arial,sans-serif;background:#fff;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-size:10px}
+</style>
+</head><body>
+<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid #111">
+  <div>
+    <div style="font-size:18px;font-weight:800;letter-spacing:-.02em;line-height:1.1">Calendrier Recrutement<br><span style="color:#4e36ff">Écoles de Mode</span></div>
+    <div style="font-size:9px;color:#666;margin-top:5px;line-height:1.6">${prof.fullLabel} · ${typeLabel}<br>${prof.tagline}</div>
+  </div>
+  <div style="text-align:right;font-size:8.5px;color:#999;line-height:1.6">
+    Généré le ${today}<br><span style="font-style:italic">Données indicatives 2026</span>
+  </div>
+</div>
+${legend}
+${schoolsHTML}
+<div style="margin-top:14px;padding-top:10px;border-top:1px solid #ddd;font-size:7.5px;color:#bbb;line-height:1.6">
+  Les contacts e-mail et téléphoniques sont fournis à titre indicatif. Merci de confirmer les disponibilités directement auprès de chaque service Relations Entreprises avant tout recrutement.
+</div>
+</body></html>`;
+
+  const w=window.open("","_blank");
+  if(!w){alert("Autorisez les popups pour générer le PDF.");return;}
+  w.document.write(html);
+  w.document.close();
+  setTimeout(()=>{w.focus();w.print();},700);
+});
+
+/* ══ ADMIN ══ */
+document.getElementById("adm-trig").addEventListener("click",()=>{document.getElementById("pw-modal").classList.add("open");setTimeout(()=>document.getElementById("pw-inp").focus(),50);});
+function closeModal(){document.getElementById("pw-modal").classList.remove("open");document.getElementById("pw-inp").value="";document.getElementById("pw-err").style.display="none";document.getElementById("pw-inp").classList.remove("err");}
+function tryUnlock(){
+  if(document.getElementById("pw-inp").value===PW){closeModal();admDraft=clone(DATA);admTab=actProf;admExp=null;document.getElementById("adm-ov").classList.add("open");renderAdmin();}
+  else{document.getElementById("pw-err").style.display="block";document.getElementById("pw-inp").classList.add("err");document.getElementById("pw-inp").value="";document.getElementById("pw-inp").focus();}
+}
+document.getElementById("pw-modal").addEventListener("click",e=>{if(e.target===document.getElementById("pw-modal"))closeModal();});
+document.getElementById("pw-no").addEventListener("click",closeModal);
+document.getElementById("pw-ok").addEventListener("click",tryUnlock);
+document.getElementById("pw-inp").addEventListener("keydown",e=>{if(e.key==="Enter")tryUnlock();});
+document.getElementById("adm-save").addEventListener("click",()=>{DATA=clone(admDraft);document.getElementById("adm-ov").classList.remove("open");document.getElementById("tagline").textContent=DATA[actProf].tagline;render();});
+document.getElementById("adm-can").addEventListener("click",()=>{document.getElementById("adm-ov").classList.remove("open");});
+
+function renderAdmin(){
+  const at=document.getElementById("adm-tabs");at.innerHTML="";
+  Object.keys(admDraft).forEach(key=>{const btn=document.createElement("button");btn.className="adm-t"+(key===admTab?" on":"");btn.textContent=admDraft[key].fullLabel;btn.addEventListener("click",()=>{admTab=key;admExp=null;renderAdmin();});at.appendChild(btn);});
+  const pf=document.getElementById("adm-pf");pf.innerHTML="";
+  [["tagline","Tagline"],["context","Contexte"]].forEach(([k,l])=>{const d=document.createElement("div");d.className="adm-f";const lb=document.createElement("label");lb.textContent=l;const ta=document.createElement("textarea");ta.value=admDraft[admTab][k];ta.style.minHeight="56px";ta.addEventListener("input",()=>{admDraft[admTab][k]=ta.value;});d.appendChild(lb);d.appendChild(ta);pf.appendChild(d);});
+  const sc=document.getElementById("adm-schools");sc.innerHTML="";
+  Object.entries(admDraft[admTab].schools).forEach(([school,info])=>{
+    const isOpen=admExp===school;
+    const card=document.createElement("div");card.className="adm-sc"+(isOpen?" on":"");
+    const hdr=document.createElement("div");hdr.className="adm-sh";
+    hdr.innerHTML=`<span style="font-size:12px;font-weight:700">${school}</span><span style="font-size:10px;color:var(--g400)">${info.level}</span><span style="margin-left:auto;font-size:10px;color:var(--g400)">${isOpen?"▲":"▼"}</span>`;
+    hdr.addEventListener("click",()=>{admExp=isOpen?null:school;renderAdmin();});card.appendChild(hdr);
+    const body=document.createElement("div");body.className="adm-sb";
+    ["stage","alternance"].forEach(type=>{
+      const sec=document.createElement("div");sec.className="adm-bst";
+      sec.innerHTML=`<div class="adm-bt">${type==="stage"?"Stage":"Alternance"}<span>Clic cyclique : ○ non dispo → ◐ possible → ● idéale</span></div>`;
+      const grid=document.createElement("div");grid.className="adm-g";
+      MO.forEach((m,mi)=>{const col=document.createElement("div");const ml=document.createElement("div");ml.className="adm-ml";ml.textContent=m;const v=admDraft[admTab].schools[school][type][mi];const cell=document.createElement("div");cell.className="adm-c"+(v===1?" v1":v===2?" v2":"");cell.textContent=v===2?"●":v===1?"◐":"○";cell.addEventListener("click",()=>{admDraft[admTab].schools[school][type][mi]=(v+1)%3;renderAdmin();});col.appendChild(ml);col.appendChild(cell);grid.appendChild(col);});
+      sec.appendChild(grid);body.appendChild(sec);
+    });
+    const tf=document.createElement("div");tf.className="adm-tf";
+    [["stageNote","Note stage"],["altNote","Note alternance"],["level","Niveaux"],["stageDuration","Durée stage"],["email","E-mail"],["phone","Téléphone"],["contact","Contact"],["url","URL"]].forEach(([k,l])=>{
+      const d=document.createElement("div");d.className="adm-f";const lb=document.createElement("label");lb.textContent=l;const isLong=k==="stageNote"||k==="altNote";const el=document.createElement(isLong?"textarea":"input");el.value=info[k]||"";if(isLong)el.style.minHeight="70px";el.addEventListener("input",()=>{admDraft[admTab].schools[school][k]=el.value;});d.appendChild(lb);d.appendChild(el);tf.appendChild(d);
+    });
+    body.appendChild(tf);card.appendChild(body);sc.appendChild(card);
+  });
 }
 
-document.getElementById("pw-modal").addEventListener("click", e => { if (e.target === document.getElementById("pw-modal")) closeModal(); });
-document.getElementById("pw-cancel").addEventListener("click", closeModal);
-document.getElementById("pw-submit").addEventListener("click", tryUnlock);
-document.getElementById("pw-input").addEventListener("keydown", e => { if (e.key === "Enter") tryUnlock(); });
-
-/* ─── ADMIN SAVE / CANCEL ─── */
-document.getElementById("admin-save").addEventListener("click", () => {
-  DATA = clone(adminDraft);
-  document.getElementById("admin-overlay").classList.remove("open");
-  document.getElementById("cal-tagline").textContent = DATA[activeProfile].tagline;
-  renderCalendar();
-});
-document.getElementById("admin-cancel").addEventListener("click", () => {
-  document.getElementById("admin-overlay").classList.remove("open");
-});
-
-/* ─── RENDER ADMIN ─── */
-function renderAdmin() {
-  // Tabs
-  const at = document.getElementById("admin-tabs");
-  at.innerHTML = "";
-  Object.keys(adminDraft).forEach(key => {
-    const btn = document.createElement("button");
-    btn.className = "admin-tab" + (key === adminTab ? " active" : "");
-    btn.textContent = adminDraft[key].fullLabel;
-    btn.addEventListener("click", () => { adminTab = key; adminExpanded = null; renderAdmin(); });
-    at.appendChild(btn);
-  });
-
-  // Profile-level fields
-  const pf = document.getElementById("admin-profile-fields");
-  pf.innerHTML = "";
-  [["tagline","Tagline (métiers)"],["context","Texte de contexte"]].forEach(([key, lbl]) => {
-    const div = document.createElement("div");
-    div.className = "admin-field";
-    const label = document.createElement("label");
-    label.textContent = lbl;
-    const ta = document.createElement("textarea");
-    ta.value = adminDraft[adminTab][key];
-    ta.style.minHeight = "60px";
-    ta.addEventListener("input", () => { adminDraft[adminTab][key] = ta.value; });
-    div.appendChild(label); div.appendChild(ta);
-    pf.appendChild(div);
-  });
-
-  // School editors
-  const sc = document.getElementById("admin-schools");
-  sc.innerHTML = "";
-  Object.entries(adminDraft[adminTab].schools).forEach(([school, info]) => {
-    const isOpen = adminExpanded === school;
-    const card = document.createElement("div");
-    card.className = "admin-school-card" + (isOpen ? " open" : "");
-
-    const hdr = document.createElement("div");
-    hdr.className = "admin-school-header";
-    hdr.innerHTML = `
-      <div style="width:7px;height:7px;background:#000;border-radius:1px"></div>
-      <span style="font-size:13px;font-weight:700">${school}</span>
-      <span style="font-size:11px;color:var(--g500)">${info.level}</span>
-      <span style="margin-left:auto;font-size:10px;color:var(--g500)">${isOpen ? "▲" : "▼"}</span>`;
-    hdr.addEventListener("click", () => { adminExpanded = isOpen ? null : school; renderAdmin(); });
-    card.appendChild(hdr);
-
-    const body = document.createElement("div");
-    body.className = "admin-school-body";
-
-    // Bar grids
-    ["stage","alternance"].forEach(type => {
-      const sec = document.createElement("div");
-      sec.className = "admin-bar-section";
-      sec.innerHTML = `<div class="admin-bar-title">${type === "stage" ? "Stage" : "Alternance"}<span>Cliquer pour modifier · ○ indisponible · ◐ possible · ● forte</span></div>`;
-      const grid = document.createElement("div");
-      grid.className = "admin-grid";
-      MONTHS.forEach((m, mi) => {
-        const col = document.createElement("div");
-        const ml = document.createElement("div");
-        ml.className = "admin-month-label";
-        ml.textContent = m;
-        const v = adminDraft[adminTab].schools[school][type][mi];
-        const cell = document.createElement("div");
-        cell.className = "admin-cell" + (v === 1 ? " v1" : v === 2 ? " v2" : "");
-        cell.textContent = v === 2 ? "●" : v === 1 ? "◐" : "○";
-        cell.addEventListener("click", () => {
-          adminDraft[adminTab].schools[school][type][mi] = (adminDraft[adminTab].schools[school][type][mi] + 1) % 3;
-          renderAdmin();
-        });
-        col.appendChild(ml); col.appendChild(cell);
-        grid.appendChild(col);
-      });
-      sec.appendChild(grid);
-      body.appendChild(sec);
-    });
-
-    // Text fields
-    const tf = document.createElement("div");
-    tf.className = "admin-text-fields";
-    [
-      ["stageNote","Note stage"], ["altNote","Note alternance"],
-      ["level","Niveaux d'étude"], ["stageDuration","Durée de stage"],
-      ["contact","Contact entreprises"], ["url","Site web"]
-    ].forEach(([key, lbl]) => {
-      const div = document.createElement("div");
-      div.className = "admin-field";
-      const label = document.createElement("label");
-      label.textContent = lbl;
-      const isLong = key === "stageNote" || key === "altNote";
-      const input = isLong ? document.createElement("textarea") : document.createElement("input");
-      input.value = info[key];
-      if (isLong) input.style.minHeight = "80px";
-      input.addEventListener("input", () => { adminDraft[adminTab].schools[school][key] = input.value; });
-      div.appendChild(label); div.appendChild(input);
-      tf.appendChild(div);
-    });
-    body.appendChild(tf);
-    card.appendChild(body);
-    sc.appendChild(card);
-  });
-}
-
-/* ─── INIT ─── */
+/* ══ INIT ══ */
 renderTabs();
-document.getElementById("cal-tagline").textContent = DATA[activeProfile].tagline;
-renderCalendar();
+document.getElementById("tagline").textContent=DATA[actProf].tagline;
+render();
 </script>
 </body>
 </html>
