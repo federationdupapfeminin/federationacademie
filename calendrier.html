@@ -8,36 +8,51 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --f: 'Neue Haas Grotesk Display Pro', 'Neue Haas Grotesk Text Pro', 'Neue Haas Grotesk', Helvetica, Arial, sans-serif;
-    --black:    #000000;
-    --white:    #FFFFFF;
-    --g100:     #F2F2F2;
-    --g200:     #E5E5E5;
-    --g300:     #CCCCCC;
-    --g500:     #888888;
-    --g700:     #444444;
+    --f: 'Neue Haas Grotesk Display Pro', 'Neue Haas Grotesk Text Pro', Helvetica, Arial, sans-serif;
+    --black:   #000000;
+    --white:   #FFFFFF;
+    --g50:     #FAFAFA;
+    --g100:    #F2F2F2;
+    --g200:    #E5E5E5;
+    --g300:    #CCCCCC;
+    --g400:    #AAAAAA;
+    --g500:    #888888;
+    --g700:    #444444;
+
+    /* Stage = bleu */
+    --stage:    #1d4ed8;
+    --stageL:   #eff6ff;
+    --stageM:   #bfdbfe;
+    --stageDark:#1e3a8a;
+
+    /* Alternance = vert */
+    --alt:      #15803d;
+    --altL:     #f0fdf4;
+    --altM:     #bbf7d0;
+    --altDark:  #14532d;
+
+    /* Accent UI */
     --accent:   #4e36ff;
     --accentL:  #ede9ff;
     --accentM:  #cfc7ff;
+
+    /* Publish */
     --pub:      #4e36ff;
     --pubL:     #cfc7ff;
   }
 
   body { font-family: var(--f); background: var(--white); color: var(--black); }
-
   button { font-family: var(--f); cursor: pointer; }
-  input, textarea { font-family: var(--f); }
+  input, textarea, select { font-family: var(--f); }
 
   /* ── TABS ── */
-  #cal-tabs {
-    border-bottom: 1px solid var(--g200);
-  }
+  #cal-tabs { border-bottom: 1px solid var(--g200); }
   #cal-tabs .inner {
-    max-width: 1060px; margin: 0 auto; padding: 0 32px;
+    max-width: 1100px; margin: 0 auto; padding: 0 32px;
     display: flex;
   }
   .tab-btn {
-    padding: 16px 28px;
+    padding: 15px 24px;
     font-size: 11px; font-weight: 400;
     letter-spacing: .08em; text-transform: uppercase;
     border: none; background: transparent;
@@ -51,12 +66,12 @@
   /* ── CONTROLS ── */
   #cal-controls {
     border-bottom: 1px solid var(--g200);
-    padding: 12px 32px;
+    padding: 10px 32px;
   }
   #cal-controls .inner {
-    max-width: 1060px; margin: 0 auto;
+    max-width: 1100px; margin: 0 auto;
     display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 12px;
+    flex-wrap: wrap; gap: 10px;
   }
   #cal-tagline { font-size: 11px; color: var(--g500); font-style: italic; }
   .ctrl-group { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
@@ -72,8 +87,8 @@
   }
   .pill.active { font-weight: 700; background: var(--black); color: var(--white); border-color: var(--black); }
   .pill-pub { display: flex; align-items: center; gap: 5px; }
-  .pill-pub span { color: var(--accent); }
-  .pill-pub.active { background: var(--g100); color: var(--black); border-color: var(--black); }
+  .pill-pub .ico { color: var(--accent); }
+  .pill-pub.active { background: var(--accentL); color: var(--accent); border-color: var(--accent); font-weight: 700; }
 
   /* ── PUBLISH BANNER ── */
   #pub-banner {
@@ -83,7 +98,7 @@
     background: linear-gradient(90deg, var(--accentL) 0%, #ffffff 100%);
   }
   #pub-banner .inner {
-    max-width: 1060px; margin: 0 auto;
+    max-width: 1100px; margin: 0 auto;
     display: flex; gap: 24px; flex-wrap: wrap; align-items: center;
   }
   .pub-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
@@ -93,13 +108,13 @@
   .pub-swatch { width: 18px; height: 5px; border-radius: 1px; flex-shrink: 0; }
 
   /* ── CALENDAR BODY ── */
-  #cal-body { max-width: 1060px; margin: 0 auto; padding: 28px 32px; }
-  #cal-context { font-size: 12px; color: var(--g700); line-height: 1.7; max-width: 680px; margin-bottom: 24px; }
+  #cal-body { max-width: 1100px; margin: 0 auto; padding: 24px 32px; }
+  #cal-context { font-size: 12px; color: var(--g700); line-height: 1.7; max-width: 680px; margin-bottom: 20px; }
 
   /* Month header */
   .month-header {
     display: grid;
-    grid-template-columns: 172px repeat(12, 1fr);
+    grid-template-columns: 200px repeat(12, 1fr);
     gap: 4px;
     margin-bottom: 4px;
   }
@@ -115,133 +130,251 @@
   /* School card */
   .school-card {
     border: 1px solid var(--g200);
-    border-radius: 4px;
+    border-radius: 6px;
     overflow: hidden;
-    margin-bottom: 3px;
-    transition: border-color .12s;
+    margin-bottom: 4px;
+    transition: border-color .15s, box-shadow .15s;
   }
-  .school-card.open { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(78,54,255,.06); }
+  .school-card.open { border-color: var(--g300); box-shadow: 0 2px 10px rgba(0,0,0,.07); }
 
   .school-row {
     display: grid;
-    grid-template-columns: 172px 1fr;
+    grid-template-columns: 200px 1fr;
     cursor: pointer;
     background: var(--white);
     transition: background .1s;
   }
-  .school-card.open .school-row { background: var(--g100); }
+  .school-card.open .school-row { background: var(--g50); }
+  .school-row:hover { background: var(--g50); }
 
+  /* School label */
   .school-label {
-    padding: 14px 16px;
+    padding: 10px 14px;
     border-right: 1px solid var(--g200);
-    display: flex; flex-direction: column; justify-content: center; gap: 4px;
+    display: flex; flex-direction: column; justify-content: center; gap: 5px;
   }
-  .school-name-row { display: flex; align-items: center; gap: 8px; }
-  .school-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 1px; flex-shrink: 0; }
-  .school-name { font-size: 13px; font-weight: 700; }
-  .school-chevron { margin-left: auto; font-size: 10px; color: var(--g500); }
-  .school-level { font-size: 9px; color: var(--g500); margin-left: 15px; letter-spacing: .05em; }
-  .school-tags { display: flex; gap: 4px; margin-left: 15px; margin-top: 1px; flex-wrap: wrap; }
+  .school-logo-wrap {
+    display: flex; align-items: center; justify-content: flex-start;
+    height: 28px; margin-bottom: 2px;
+  }
+  .school-logo {
+    max-height: 24px; max-width: 100px;
+    width: auto; object-fit: contain; object-position: left center;
+    display: block;
+  }
+  .school-logo-fallback {
+    font-size: 13px; font-weight: 700; color: var(--black);
+  }
+  .school-meta-row {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .school-level { font-size: 9px; color: var(--g500); letter-spacing: .04em; }
+  .school-chevron {
+    font-size: 9px; color: var(--g400);
+    transition: transform .2s;
+  }
+  .school-card.open .school-chevron { transform: rotate(180deg); }
+  .school-tags { display: flex; gap: 4px; flex-wrap: wrap; }
   .tag {
-    font-size: 8px; padding: 1px 6px; border-radius: 2px;
-    font-weight: 700; letter-spacing: .06em;
+    font-size: 8px; padding: 2px 7px; border-radius: 3px;
+    font-weight: 700; letter-spacing: .04em;
   }
-  .tag-solid { background: var(--black); color: var(--white); }
-  .tag-outline { background: var(--white); color: var(--accent); border: 1px solid var(--accent); }
+  .tag-stage { background: var(--stageL); color: var(--stageDark); border: 1px solid var(--stageM); }
+  .tag-alt   { background: var(--altL);   color: var(--altDark);   border: 1px solid var(--altM);   }
 
-  /* Bars */
-  .school-bars { padding: 10px 8px 8px; display: flex; flex-direction: column; gap: 8px; }
-  .bar-group { display: flex; flex-direction: column; }
+  /* Bars area */
+  .school-bars { padding: 10px 10px 8px; display: flex; flex-direction: column; gap: 9px; }
+  .bar-group { display: flex; flex-direction: column; gap: 3px; }
   .bar-grid {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
     gap: 4px;
   }
   .cal-cell { display: flex; flex-direction: column; gap: 2px; }
+
   .avail-bar {
-    height: 24px; border-radius: 2px;
+    height: 22px; border-radius: 3px;
     position: relative;
     background: var(--g100);
     border: 1px solid var(--g200);
   }
-  .avail-bar.strong { background: var(--black); border: none; }
-  .avail-bar.possible { background: var(--g300); border: none; }
-  .avail-bar.current-empty::after {
+  /* Stage */
+  .avail-bar.stage-strong   { background: var(--stage);  border-color: var(--stage);  }
+  .avail-bar.stage-possible { background: var(--stageL); border-color: var(--stageM); }
+  /* Alternance */
+  .avail-bar.alt-strong     { background: var(--alt);    border-color: var(--alt);    }
+  .avail-bar.alt-possible   { background: var(--altL);   border-color: var(--altM);   }
+  /* Current month */
+  .avail-bar.cur { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .avail-bar.cur-empty::after {
     content: '';
     position: absolute; top: 50%; left: 50%;
     transform: translate(-50%,-50%);
     width: 4px; height: 4px; border-radius: 50%;
-    background: var(--g500);
+    background: var(--g400);
   }
-  .avail-bar.current-filled { outline: 2px solid var(--accent); outline-offset: 1px; }
+
   .bar-letter {
     position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
-    font-size: 8px; font-weight: 700; letter-spacing: .06em;
+    font-size: 8px; font-weight: 700;
   }
-  .bar-letter.white { color: var(--white); }
-  .bar-letter.dark { color: var(--g700); font-weight: 600; }
-  .pub-bar {
-    height: 5px; border-radius: 1px;
-    background: transparent;
-  }
-  .pub-bar.now { background: var(--pub); box-shadow: 0 0 0 1px rgba(78,54,255,.12); }
+  .bar-letter.white       { color: var(--white); }
+  .bar-letter.stage-color { color: var(--stageDark); }
+  .bar-letter.alt-color   { color: var(--altDark);   }
+
+  .pub-bar { height: 4px; border-radius: 1px; background: transparent; }
+  .pub-bar.now  { background: var(--pub); }
   .pub-bar.prep { background: var(--pubL); border: 1px dashed var(--accent); }
+
   .bar-row-label {
-    font-size: 8px; color: var(--g500); margin-top: 3px;
-    letter-spacing: .09em; text-transform: uppercase;
-    display: flex; align-items: center; gap: 6px;
+    font-size: 8px; color: var(--g500); letter-spacing: .07em; text-transform: uppercase;
+    display: flex; align-items: center; gap: 5px;
   }
+  .bar-type-dot { width: 6px; height: 6px; border-radius: 1px; flex-shrink: 0; }
   .pub-hint { color: var(--accent); font-weight: 700; }
 
   /* Expanded detail */
   .school-detail {
     display: none;
     border-top: 1px solid var(--g200);
-    grid-template-columns: 172px 1fr;
+    grid-template-columns: 200px 1fr;
   }
   .school-card.open .school-detail { display: grid; }
+
   .detail-meta {
-    padding: 18px 16px;
+    padding: 16px 14px;
     border-right: 1px solid var(--g200);
-    background: var(--g100);
+    background: var(--g50);
+    display: flex; flex-direction: column; gap: 0;
   }
   .detail-meta-title {
     font-size: 9px; font-weight: 700; letter-spacing: .1em;
-    text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+    text-transform: uppercase; color: var(--g400); margin-bottom: 12px;
   }
-  .meta-row { margin-bottom: 10px; }
-  .meta-key { font-size: 9px; color: var(--g500); text-transform: uppercase; letter-spacing: .07em; }
+  .meta-row { margin-bottom: 9px; }
+  .meta-key { font-size: 9px; color: var(--g500); text-transform: uppercase; letter-spacing: .06em; }
   .meta-val { font-size: 11px; color: var(--black); margin-top: 2px; line-height: 1.4; }
-  .detail-notes { padding: 18px 22px; display: grid; gap: 24px; }
+  .meta-val a { color: var(--accent); text-decoration: none; }
+  .meta-val a:hover { text-decoration: underline; }
+
+  .btn-contact {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    margin-top: auto; padding: 8px 12px;
+    font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    background: var(--black); color: var(--white);
+    border: none; border-radius: 4px;
+    text-decoration: none; cursor: pointer;
+    width: 100%;
+  }
+  .btn-contact:hover { background: var(--g700); }
+  .btn-contact-web {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    margin-top: auto; padding: 8px 12px;
+    font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    background: var(--white); color: var(--accent);
+    border: 1px solid var(--accentM); border-radius: 4px;
+    text-decoration: none; cursor: pointer;
+    width: 100%;
+  }
+  .btn-contact-web:hover { background: var(--accentL); }
+
+  .detail-notes { padding: 16px 20px; display: grid; gap: 20px; }
   .note-block {}
   .note-title {
     font-size: 9px; font-weight: 700; letter-spacing: .12em;
     text-transform: uppercase; margin-bottom: 8px;
     display: flex; align-items: center; gap: 6px;
   }
-  .note-dot-solid { width: 7px; height: 7px; background: var(--black); border-radius: 1px; }
-  .note-dot-outline { width: 7px; height: 7px; border: 2px solid var(--accent); border-radius: 1px; }
+  .note-dot { width: 7px; height: 7px; border-radius: 1px; }
   .note-text { font-size: 12px; color: var(--g700); line-height: 1.75; }
   .pub-box {
-    margin-top: 12px; padding: 10px 12px;
-    background: linear-gradient(90deg, var(--accentL) 0%, #ffffff 100%); border: 1px solid var(--accentM); border-radius: 3px;
-    box-shadow: inset 3px 0 0 var(--accent);
+    margin-top: 10px; padding: 10px 12px;
+    background: var(--accentL); border: 1px solid var(--accentM); border-radius: 3px;
+    border-left: 3px solid var(--accent);
   }
   .pub-box-title { font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; color: var(--accent); }
-  .pub-box-text { font-size: 11px; color: var(--g700); line-height: 1.6; }
+  .pub-box-text  { font-size: 11px; color: var(--g700); line-height: 1.6; }
 
-  /* Legend */
+  /* ── LEGEND ── */
   #cal-legend {
-    margin-top: 20px; padding: 12px 16px;
-    border: 1px solid var(--g200); border-radius: 4px;
-    display: flex; gap: 20px; flex-wrap: wrap; align-items: center;
+    margin-top: 16px; padding: 12px 16px;
+    border: 1px solid var(--g200); border-radius: 6px;
+    display: flex; gap: 16px; flex-wrap: wrap; align-items: center;
+    background: var(--g50);
   }
-  .legend-title { font-size: 9px; font-weight: 700; color: var(--accent); letter-spacing: .1em; text-transform: uppercase; }
-  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--g700); }
-  .legend-swatch { width: 18px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+  .legend-title { font-size: 9px; font-weight: 700; color: var(--g700); letter-spacing: .1em; text-transform: uppercase; flex-shrink: 0; }
+  .legend-item  { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--g700); }
+  .legend-swatch { width: 20px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+  .legend-sep   { width: 1px; height: 16px; background: var(--g200); flex-shrink: 0; }
   .legend-current { margin-left: auto; display: flex; align-items: center; gap: 5px; font-size: 9px; color: var(--g500); }
   .legend-current-bar { width: 2px; height: 14px; background: var(--accent); border-radius: 1px; }
+
+  /* ── VALIDATION SECTION ── */
+  #val-section {
+    margin-top: 24px;
+    border: 1px solid var(--g200); border-radius: 6px;
+    overflow: hidden;
+  }
+  #val-header {
+    padding: 14px 20px;
+    background: var(--g50); border-bottom: 1px solid var(--g200);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    cursor: pointer; user-select: none;
+  }
+  #val-header-left { display: flex; flex-direction: column; gap: 2px; }
+  .val-title { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .val-sub   { font-size: 11px; color: var(--g500); }
+  #val-toggle-btn {
+    padding: 7px 14px;
+    font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    background: var(--black); color: var(--white);
+    border: none; border-radius: 4px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  #val-body { display: none; padding: 20px; }
+  #val-body.open { display: block; }
+  .val-schools { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+  .val-card {
+    padding: 16px;
+    background: var(--white); border: 1px solid var(--g200); border-radius: 6px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .val-card-head { display: flex; align-items: center; gap: 10px; }
+  .val-card-logo { max-height: 20px; max-width: 80px; object-fit: contain; }
+  .val-card-name { font-size: 12px; font-weight: 700; }
+  .val-card-contact { font-size: 10px; color: var(--g500); }
+  .val-card-contact a { color: var(--accent); text-decoration: none; }
+  .val-card-contact a:hover { text-decoration: underline; }
+  .val-card-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .btn-vmail {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 10px;
+    font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    background: var(--black); color: var(--white);
+    border: none; border-radius: 3px;
+    text-decoration: none; cursor: pointer; white-space: nowrap;
+  }
+  .btn-vmail:hover { background: var(--g700); }
+  .btn-vcopy {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 10px;
+    font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    background: var(--white); color: var(--g700);
+    border: 1px solid var(--g300); border-radius: 3px;
+    cursor: pointer;
+  }
+  .btn-vcopy:hover { background: var(--g100); }
+  .btn-vcopy.copied { color: var(--alt); border-color: var(--altM); background: var(--altL); }
+  .btn-vweb {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 10px;
+    font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    background: var(--white); color: var(--accent);
+    border: 1px solid var(--accentM); border-radius: 3px;
+    text-decoration: none;
+  }
+  .btn-vweb:hover { background: var(--accentL); }
 
   #cal-note { margin-top: 12px; margin-bottom: 40px; font-size: 10px; color: var(--g500); line-height: 1.7; }
 
@@ -255,50 +388,42 @@
   }
   #admin-trigger:hover { opacity: .35; }
 
-  /* ── MODAL ── */
+  /* ── MODAL (password) ── */
   .modal-overlay {
-    display: none;
-    position: fixed; inset: 0;
+    display: none; position: fixed; inset: 0;
     background: rgba(0,0,0,.4);
     align-items: center; justify-content: center;
     z-index: 300;
   }
   .modal-overlay.open { display: flex; }
   .modal-box {
-    background: var(--white); border-radius: 6px;
-    padding: 32px 36px; width: 320px;
+    background: var(--white); border-radius: 8px;
+    padding: 32px 36px; width: 340px;
     border: 1px solid var(--g200);
     box-shadow: 0 8px 40px rgba(0,0,0,.14);
   }
   .modal-title { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 6px; }
-  .modal-sub { font-size: 12px; color: var(--g500); margin-bottom: 20px; }
+  .modal-sub   { font-size: 12px; color: var(--g500); margin-bottom: 20px; }
   .modal-input {
-    width: 100%; padding: 10px 12px;
-    font-size: 13px;
+    width: 100%; padding: 10px 12px; font-size: 13px;
     border: 1px solid var(--g300); border-radius: 3px; outline: none;
     margin-bottom: 14px;
   }
-  .modal-input.error { border-color: var(--black); margin-bottom: 6px; }
-  .modal-error { font-size: 11px; margin-bottom: 10px; }
-  .modal-btns { display: flex; gap: 8px; }
+  .modal-input.error { border-color: #dc2626; margin-bottom: 6px; }
+  .modal-error { font-size: 11px; color: #dc2626; margin-bottom: 10px; }
+  .modal-btns  { display: flex; gap: 8px; }
   .btn-primary {
     flex: 1; padding: 9px 0;
     font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
     background: var(--black); color: var(--white); border: none; border-radius: 3px;
   }
   .btn-secondary {
-    padding: 9px 16px;
-    font-size: 11px; color: var(--g700);
+    padding: 9px 16px; font-size: 11px; color: var(--g700);
     background: var(--g100); border: 1px solid var(--g200); border-radius: 3px;
   }
 
   /* ── ADMIN OVERLAY ── */
-  #admin-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: var(--white);
-    z-index: 400; overflow-y: auto;
-  }
+  #admin-overlay { display: none; position: fixed; inset: 0; background: var(--white); z-index: 400; overflow-y: auto; }
   #admin-overlay.open { display: block; }
   #admin-topbar {
     position: sticky; top: 0; z-index: 10;
@@ -309,32 +434,26 @@
   #admin-topbar-title { font-size: 11px; font-weight: 700; color: var(--white); letter-spacing: .12em; text-transform: uppercase; }
   .admin-topbar-btns { display: flex; gap: 8px; }
   .btn-save {
-    padding: 7px 18px;
-    font-size: 11px; font-weight: 700; letter-spacing: .08em;
+    padding: 7px 18px; font-size: 11px; font-weight: 700; letter-spacing: .08em;
     background: var(--white); color: var(--black); border: none; border-radius: 3px;
   }
   .btn-cancel-admin {
-    padding: 7px 14px;
-    font-size: 11px; color: rgba(255,255,255,.6);
+    padding: 7px 14px; font-size: 11px; color: rgba(255,255,255,.6);
     background: transparent; border: 1px solid rgba(255,255,255,.2); border-radius: 3px;
   }
-  #admin-body { max-width: 1060px; margin: 0 auto; padding: 28px 32px; }
+  #admin-body { max-width: 1100px; margin: 0 auto; padding: 28px 32px; }
   .admin-tabs { display: flex; border-bottom: 2px solid var(--g200); margin-bottom: 24px; }
   .admin-tab {
-    padding: 10px 24px;
-    font-size: 11px; font-weight: 400; letter-spacing: .08em; text-transform: uppercase;
-    border: none; background: transparent; cursor: pointer;
-    color: var(--g500);
+    padding: 10px 24px; font-size: 11px; font-weight: 400; letter-spacing: .08em; text-transform: uppercase;
+    border: none; background: transparent; cursor: pointer; color: var(--g500);
     border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .1s;
   }
   .admin-tab.active { font-weight: 700; color: var(--accent); border-bottom-color: var(--accent); }
   .admin-profile-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
   .admin-field label { font-size: 9px; color: var(--g500); text-transform: uppercase; letter-spacing: .1em; display: block; margin-bottom: 4px; }
   .admin-field input, .admin-field textarea {
-    width: 100%; padding: 8px 10px;
-    font-size: 11px;
-    border: 1px solid var(--g200); border-radius: 3px;
-    resize: vertical; line-height: 1.6;
+    width: 100%; padding: 8px 10px; font-size: 11px;
+    border: 1px solid var(--g200); border-radius: 3px; resize: vertical; line-height: 1.6;
   }
   .admin-school-card { border: 1px solid var(--g200); border-radius: 4px; margin-bottom: 6px; overflow: hidden; }
   .admin-school-card.open { border-color: var(--black); }
@@ -358,12 +477,13 @@
     width: 100%; height: 28px; border-radius: 2px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     font-size: 9px; font-weight: 700;
-    border: 1px solid var(--g200);
-    background: var(--g100); color: var(--g700);
+    border: 1px solid var(--g200); background: var(--g100); color: var(--g500);
     user-select: none;
   }
-  .admin-cell.v1 { background: var(--g300); border-color: var(--g500); }
-  .admin-cell.v2 { background: var(--black); color: var(--white); border-color: var(--black); }
+  .admin-cell.stage-v1 { background: var(--stageL); border-color: var(--stageM); color: var(--stageDark); }
+  .admin-cell.stage-v2 { background: var(--stage);  border-color: var(--stage);  color: var(--white); }
+  .admin-cell.alt-v1   { background: var(--altL);   border-color: var(--altM);   color: var(--altDark); }
+  .admin-cell.alt-v2   { background: var(--alt);    border-color: var(--alt);    color: var(--white); }
   .admin-text-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
 </style>
 </head>
@@ -382,7 +502,7 @@
       <button class="pill" data-type="alternance">Alternance uniquement</button>
       <div class="sep"></div>
       <button class="pill pill-pub" id="pub-toggle">
-        <span>⏱</span> Quand publier mes offres ?
+        <span class="ico">⏱</span> Quand publier mes offres ?
       </button>
     </div>
   </div>
@@ -398,7 +518,7 @@
         Publier maintenant — <strong>1 mois avant</strong> (stage) · <strong>4 mois avant</strong> (alternance)
       </div>
       <div class="pub-item">
-        <div class="pub-swatch" style="background:var(--pubL);border:1px dashed var(--pubL)"></div>
+        <div class="pub-swatch" style="background:var(--pubL);border:1px dashed var(--accent)"></div>
         Commencer à préparer — <strong>2 mois avant</strong> (stage) · <strong>5 mois avant</strong> (alternance)
       </div>
     </div>
@@ -409,29 +529,54 @@
 <div id="cal-body">
   <p id="cal-context"></p>
 
-  <!-- Month header -->
-  <div class="month-header" id="month-header">
-    <div></div><!-- spacer -->
-  </div>
-
-  <!-- School rows -->
+  <div class="month-header" id="month-header"><div></div></div>
   <div id="school-rows"></div>
 
   <!-- Legend -->
   <div id="cal-legend">
     <span class="legend-title">Légende</span>
-    <div class="legend-item"><div class="legend-swatch" style="background:var(--black)"></div>Période forte</div>
-    <div class="legend-item"><div class="legend-swatch" style="background:var(--g300)"></div>Période possible</div>
-    <div id="legend-pub-items" style="display:none; display:contents">
-      <div class="legend-item pub-legend"><div class="legend-swatch" style="background:var(--pub)"></div>⏱ Publier maintenant</div>
-      <div class="legend-item pub-legend"><div class="legend-swatch" style="background:var(--pubL);border:1px dashed var(--pubL)"></div>⏱ Commencer à préparer</div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--stage)"></div>Stage confirmée
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--stageL);border:1px solid var(--stageM)"></div>Stage possible
+    </div>
+    <div class="legend-sep"></div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--alt)"></div>Alternance confirmée
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--altL);border:1px solid var(--altM)"></div>Alternance possible
+    </div>
+    <div id="legend-pub-items" style="display:contents">
+      <div class="legend-sep pub-legend" style="display:none"></div>
+      <div class="legend-item pub-legend" style="display:none">
+        <div class="legend-swatch" style="background:var(--pub)"></div>⏱ Publier maintenant
+      </div>
+      <div class="legend-item pub-legend" style="display:none">
+        <div class="legend-swatch" style="background:var(--pubL);border:1px dashed var(--accent)"></div>⏱ Préparer
+      </div>
     </div>
     <div class="legend-current">
       <div class="legend-current-bar"></div> Mois en cours
     </div>
   </div>
 
-  <p id="cal-note">* Calendriers indicatifs mis à jour pour 2026. Les dates exactes varient selon le campus, l'année d'étude et le parcours. En cas de doute, toujours valider avec le service Relations Entreprises de l'école concernée. Cliquer sur une école pour afficher la fiche détaillée.</p>
+  <!-- VALIDATION / ENVOI AUX ÉCOLES -->
+  <div id="val-section">
+    <div id="val-header">
+      <div id="val-header-left">
+        <div class="val-title">📩 Envoyer pour validation</div>
+        <div class="val-sub">Contactez chaque école pour confirmer ou corriger les informations du calendrier</div>
+      </div>
+      <button id="val-toggle-btn">Afficher les contacts</button>
+    </div>
+    <div id="val-body">
+      <div class="val-schools" id="val-schools"></div>
+    </div>
+  </div>
+
+  <p id="cal-note">* Calendriers indicatifs mis à jour pour 2026. Les dates exactes varient selon le campus, l'année d'étude et le parcours. En cas de doute, valider avec le service Relations Entreprises de l'école concernée. Cliquer sur une école pour afficher la fiche détaillée.</p>
 </div>
 
 <!-- ADMIN TRIGGER -->
@@ -439,7 +584,7 @@
 
 <!-- PASSWORD MODAL -->
 <div class="modal-overlay" id="pw-modal">
-  <div class="modal-box" id="pw-box">
+  <div class="modal-box">
     <div class="modal-title">Accès administration</div>
     <p class="modal-sub">Entrez le mot de passe pour accéder au backoffice.</p>
     <input type="password" class="modal-input" id="pw-input" placeholder="Mot de passe">
@@ -468,79 +613,96 @@
 </div>
 
 <script>
-/* ─── DATA ─── */
+/* ─── CONSTANTS ─── */
 const MONTHS = ["Jan","Fév","Mar","Avr","Mai","Juin","Juil","Août","Sep","Oct","Nov","Déc"];
 const CUR = new Date().getMonth();
-const PW = "FFPAPF";
+const PW  = "FFPAPF";
 
+/* ─── SCHOOL META (logos + contacts centralisés) ─── */
+const SCHOOL_META = {
+  "MODART": {
+    displayName: "MODART Paris",
+    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQPcDbRwWbQ8sgtfq57q1rSDr_6AEwl1HgzGg&s",
+    email: "contact@modart-paris.com",
+    url:   "https://modart-paris.com"
+  },
+  "LISAA": {
+    displayName: "LISAA",
+    logo: "https://upload.wikimedia.org/wikipedia/en/c/cd/LISAA_School_of_Art_%26_Design_logo.png",
+    email: "entreprises@lisaa.com",
+    url:   "https://lisaa.com"
+  },
+  "ESMOD": {
+    displayName: "ESMOD",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/1/1a/Logo_ESMOD_2024.svg",
+    email: "",
+    url:   "https://esmod.com"
+  },
+  "MOD'SPE": {
+    displayName: "MOD'SPÉ Paris",
+    logo: "https://www.modspeparis.com/wp-content/uploads/2024/05/t1_logo1.png",
+    email: "",
+    url:   "https://modspeparis.com"
+  }
+};
+
+/* ─── DATA ─── */
 let DATA = {
   "CRÉA": {
     fullLabel: "Profils Création",
     tagline: "Stylisme · Modélisme · Design textile · Studio · Direction artistique",
-    context: "Les profils création restent surtout disponibles en stage de fin d'année académique, avec un pic de juin à septembre. Côté alternance, la majorité des rentrées se concentrent en septembre–octobre, à l'exception de quelques parcours plus souples selon les écoles.",
+    context: "Les profils création sont surtout disponibles en stage de fin d'année académique, avec un pic de juin à septembre. Côté alternance, la majorité des rentrées se concentrent en septembre–octobre, à l'exception de quelques parcours plus souples.",
     schools: {
       "MODART": {
         level: "Bac+3 à Bac+5",
         stageDuration: "2 à 10 mois",
-        contact: "contact@modart-paris.com",
-        url: "modart-paris.com",
         stage:      [0,0,0,0,1,2,2,2,2,0,0,1],
         alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
-        stageNote: "Selon les cursus, les étudiants réalisent un à deux stages par an. Pour les profils création, la fenêtre la plus crédible reste mai/juin → septembre, avec quelques créneaux plus ponctuels en fin d'année selon les spécialisations.",
-        altNote: "L'alternance est possible dès la 4e année. Sur les profils créatifs, le démarrage se concentre surtout à la rentrée de septembre–octobre, avec un rythme à confirmer selon la spécialisation."
+        stageNote: "Selon les cursus, les étudiants réalisent un à deux stages par an. Pour les profils création, la fenêtre la plus crédible reste mai/juin → septembre, avec quelques créneaux plus ponctuels en fin d'année.",
+        altNote: "L'alternance est possible dès la 4e année. Sur les profils créatifs, le démarrage se concentre surtout à la rentrée de septembre–octobre."
       },
       "LISAA": {
         level: "Bac+3 à Bac+5",
         stageDuration: "2 à 6 mois",
-        contact: "entreprises@lisaa.com",
-        url: "lisaa.com",
         stage:      [0,0,0,0,0,2,2,2,2,0,0,0],
         alternance: [0,0,0,0,0,0,0,0,1,1,0,0],
         stageNote: "Les profils création LISAA sont surtout disponibles en stage entre juin et septembre, dans la logique des fins de bachelors et des stages de professionnalisation.",
-        altNote: "Sur le versant création, l'alternance n'est pas la norme sur l'ensemble des parcours. La disponibilité existe surtout sur certains niveaux et se cale globalement sur la rentrée d'automne."
+        altNote: "Sur le versant création, l'alternance n'est pas la norme sur l'ensemble des parcours. La disponibilité existe surtout sur certains niveaux et se cale sur la rentrée d'automne."
       },
       "ESMOD": {
         level: "Bac à Bac+5",
-        stageDuration: "2 à 6 mois selon l'année",
-        contact: "esmod.com",
-        url: "esmod.com",
+        stageDuration: "5 semaines à 6 mois selon l'année",
         stage:      [0,0,0,0,1,2,2,2,1,0,0,0],
         alternance: [0,0,0,0,0,0,0,0,0,0,0,0],
-        stageNote: "Les stages ESMOD en création démarrent surtout entre mai et juin selon l'année d'étude, avec des formats allant d'environ 5 à 10 semaines à plusieurs mois pour les niveaux supérieurs.",
-        altNote: "À date, ESMOD indique que seule la formation Postgraduate Fashion Business est éligible à l'alternance. Les profils création doivent donc être considérés comme disponibles principalement en stage."
+        stageNote: "Les stages ESMOD en création démarrent surtout entre mai et juin selon l'année d'étude, avec des formats allant d'environ 5 semaines à plusieurs mois pour les niveaux supérieurs.",
+        altNote: "Seule la formation Postgraduate Fashion Business est éligible à l'alternance à ESMOD. Les profils création sont donc principalement disponibles en stage."
       },
       "MOD'SPE": {
         level: "Bac+3 à Bac+5",
         stageDuration: "2 à 6 mois",
-        contact: "modspeparis.com",
-        url: "modspeparis.com",
         stage:      [0,0,0,0,1,2,2,2,1,0,0,0],
         alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
-        stageNote: "MOD'SPE met en avant des périodes de stage en 1re et 2e année de Bachelor. Pour les profils création, la disponibilité stage est donc surtout pertinente de mai/juin à septembre.",
-        altNote: "L'alternance démarre à partir de la 3e année de Bachelor et se poursuit tout au long du MBA. Le rythme annoncé par l'école est de 1 jour à l'école pour 4 jours en entreprise, avec une rentrée surtout concentrée en septembre."
+        stageNote: "MOD'SPE propose des stages en 1re et 2e année de Bachelor. Pour les profils création, la disponibilité est surtout pertinente de mai/juin à septembre.",
+        altNote: "L'alternance démarre à partir de la 3e année de Bachelor et se poursuit tout au long du MBA (rythme : 1 jour école / 4 jours entreprise), avec une rentrée concentrée en septembre."
       }
     }
   },
   "RETAIL": {
     fullLabel: "Profils Retail",
     tagline: "Vente · Wholesale · Visual Merchandising · Commerce en ligne · Réseau boutiques · Expérience client",
-    context: "Les profils retail offrent des fenêtres plus souples selon les écoles. MODART et MOD'SPE permettent d'identifier des recrutements plus étalés, tandis que LISAA reste davantage concentrée sur l'été et l'automne.",
+    context: "Les profils retail offrent des fenêtres plus souples selon les écoles. MODART permet des recrutements étalés sur l'année, tandis que LISAA reste davantage concentrée sur l'été et l'automne.",
     schools: {
       "MODART": {
         level: "Bac+2 à Bac+5",
         stageDuration: "2 à 6 mois",
-        contact: "contact@modart-paris.com",
-        url: "modart-paris.com",
         stage:      [2,2,2,1,1,2,2,2,2,0,0,1],
         alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
-        stageNote: "MODART indique un à deux stages par an selon les cursus. Sur les profils retail, cela permet de viser à la fois des besoins de début d'année et de pic estival, ce qui en fait l'école la plus souple du panel.",
+        stageNote: "MODART indique un à deux stages par an selon les cursus. Sur les profils retail, cela permet de viser des besoins de début d'année et de pic estival, ce qui en fait l'école la plus souple du panel.",
         altNote: "L'alternance est possible dès la 4e année. Les profils retail/wholesale/VM sont particulièrement pertinents pour une rentrée septembre–octobre."
       },
       "LISAA": {
         level: "Bac+3 à Bac+5",
         stageDuration: "2 à 4 mois",
-        contact: "entreprises@lisaa.com",
-        url: "lisaa.com",
         stage:      [0,0,0,0,0,1,1,1,1,0,0,0],
         alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
         stageNote: "Les profils Fashion Business à dominante retail sont surtout disponibles en stage entre juin et septembre.",
@@ -549,76 +711,74 @@ let DATA = {
       "MOD'SPE": {
         level: "Bac+3 à Bac+5",
         stageDuration: "2 à 6 mois",
-        contact: "modspeparis.com",
-        url: "modspeparis.com",
         stage:      [0,0,0,0,1,2,2,2,1,0,0,0],
         alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
-        stageNote: "Les stages ont lieu en 1re et 2e année de Bachelor ; pour des besoins retail, les créneaux les plus réalistes restent la fin de printemps et l'été.",
-        altNote: "L'alternance est proposée à partir de la 3e année de Bachelor puis tout au long du MBA, avec un rythme 4 jours entreprise / 1 jour école."
+        stageNote: "Les stages ont lieu en 1re et 2e année de Bachelor. Pour des besoins retail, les créneaux les plus réalistes restent la fin de printemps et l'été.",
+        altNote: "L'alternance est proposée à partir de la 3e année de Bachelor puis tout au long du MBA (rythme : 4 jours entreprise / 1 jour école)."
       }
     }
   },
   "BUSINESS": {
     fullLabel: "Profils Business",
-    tagline: "Communication · Marketing · Gestion de marque · Achats · Influence · Développement commercial · Merchandising",
-    context: "Les profils business sont les plus recrutables. LISAA permet une entrée en alternance dès la 3e année du Bachelor Fashion Business, MODART ouvre l'alternance dès la 4e année, ESMOD la réserve à son Postgraduate Fashion Business, et MOD'SPE la déploie dès la 3e année puis sur tout le MBA.",
+    tagline: "Communication · Marketing · Gestion de marque · Achats · Influence · Développement commercial",
+    context: "Les profils business sont les plus polyvalents. LISAA ouvre l'alternance dès la 3e année du Bachelor Fashion Business, MODART dès la 4e année, ESMOD sur son Postgraduate Fashion Business uniquement, et MOD'SPE dès la 3e année puis sur tout le MBA.",
     schools: {
       "MODART": {
         level: "Bac+2 à Bac+5",
         stageDuration: "3 à 6 mois",
-        contact: "contact@modart-paris.com",
-        url: "modart-paris.com",
         stage:      [2,2,2,0,0,2,2,2,2,0,0,1],
         alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
-        stageNote: "Grâce à son système d'un à deux stages par an selon les cursus, MODART permet de couvrir à la fois des besoins business de début d'année et de milieu d'année. C'est l'école la plus flexible du panel pour communication, marketing et développement commercial.",
-        altNote: "L'alternance est ouverte dès la 4e année. Le Mastère Communication de Mode mentionne un parcours en alternance, avec un volume minimum obligatoire de 110 jours."
+        stageNote: "Grâce à son système d'un à deux stages par an, MODART permet de couvrir des besoins business de début et de milieu d'année. C'est l'école la plus flexible du panel pour communication, marketing et développement commercial.",
+        altNote: "L'alternance est ouverte dès la 4e année. Le Mastère Communication de Mode propose un parcours en alternance avec un minimum obligatoire de 110 jours en entreprise."
       },
       "LISAA": {
         level: "Bac+3 à Bac+5",
         stageDuration: "2 à 6 mois",
-        contact: "entreprises@lisaa.com",
-        url: "lisaa.com",
         stage:      [0,0,0,0,0,2,2,2,2,0,0,0],
         alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
         stageNote: "Les stages business LISAA se concentrent surtout de juin à septembre sur les bachelors.",
-        altNote: "Le Bachelor Fashion Business est proposé en classique et alternance en 3e année. Des mastères mode et luxe existent aussi en rythme alterné selon les parcours."
+        altNote: "Le Bachelor Fashion Business est proposé en classique et alternance dès la 3e année. Des mastères mode et luxe existent aussi en rythme alterné selon les parcours."
       },
       "ESMOD": {
         level: "Bac+3 à Bac+5",
         stageDuration: "2 à 6 mois",
-        contact: "esmod.com",
-        url: "esmod.com",
         stage:      [0,0,0,0,1,2,2,2,1,0,0,0],
         alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
-        stageNote: "Les stages business ESMOD démarrent principalement entre mai et juin selon le niveau. Ils restent très intéressants sur les fonctions marketing, communication et développement international.",
-        altNote: "ESMOD précise qu'à date seule la formation Postgraduate Fashion Business est éligible à l'alternance. Son rythme officiel est de 3 semaines en entreprise et 1 semaine à l'école, sur 2 ans."
+        stageNote: "Les stages business ESMOD démarrent principalement entre mai et juin selon le niveau. Très pertinents sur les fonctions marketing, communication et développement international.",
+        altNote: "Seule la formation Postgraduate Fashion Business est éligible à l'alternance (rythme : 3 semaines entreprise / 1 semaine école, sur 2 ans)."
       },
       "MOD'SPE": {
         level: "Bac+3 à Bac+5",
         stageDuration: "2 à 6 mois",
-        contact: "modspeparis.com",
-        url: "modspeparis.com",
         stage:      [0,0,0,0,1,2,2,2,1,0,0,0],
         alternance: [0,0,0,0,0,0,0,0,2,2,0,0],
         stageNote: "Les profils business de MOD'SPE sont disponibles en stage sur les premières années de Bachelor, avec un pic de disponibilité en fin d'année académique.",
-        altNote: "MOD'SPE annonce l'alternance à partir de la 3e année de Bachelor et pendant tout le MBA. Le rythme officiel communiqué par l'école est de 1 jour école / 4 jours entreprise."
+        altNote: "MOD'SPE annonce l'alternance à partir de la 3e année de Bachelor et pendant tout le MBA (rythme : 1 jour école / 4 jours entreprise)."
       }
     }
   }
 };
 
 /* ─── STATE ─── */
-let activeProfile = "CRÉA";
-let activeType    = "both";
-let showPublish   = false;
+let activeProfile  = "CRÉA";
+let activeType     = "both";
+let showPublish    = false;
 let expandedSchool = null;
-let adminDraft    = null;
-let adminTab      = "CRÉA";
-let adminExpanded = null;
+let adminDraft     = null;
+let adminTab       = "CRÉA";
+let adminExpanded  = null;
+let valOpen        = false;
 
-/* ─── PUBLISH TIMING ─── */
+/* ─── HELPERS ─── */
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+function monthsLabel(arr) {
+  const active = arr.map((v,i) => v > 0 ? MONTHS[i] : null).filter(Boolean);
+  return active.length ? active.join(", ") : "Aucun";
+}
+
 function computePublish(avail, type) {
-  const r = Array(12).fill(0);
+  const r  = Array(12).fill(0);
   const lp = type === "alternance" ? 4 : 1;
   const lq = type === "alternance" ? 5 : 2;
   for (let i = 0; i < 12; i++) {
@@ -630,15 +790,41 @@ function computePublish(avail, type) {
   return r;
 }
 
-function clone(o) { return JSON.parse(JSON.stringify(o)); }
+/* ─── VALIDATION EMAIL GENERATOR ─── */
+function buildValidationEmail(school) {
+  const meta = SCHOOL_META[school];
+  const profiles = Object.entries(DATA).map(([pk, pv]) => {
+    const s = pv.schools[school];
+    if (!s) return null;
+    return `=== ${pv.fullLabel} ===\n` +
+      `Stage disponible       : ${monthsLabel(s.stage)}\n` +
+      `Alternance disponible  : ${monthsLabel(s.alternance)}`;
+  }).filter(Boolean).join("\n\n");
+
+  const subject = encodeURIComponent(`Validation du calendrier stages & alternances — ${meta.displayName} · Fédération Académie`);
+  const body = encodeURIComponent(
+`Bonjour,
+
+Dans le cadre de la plateforme Fédération Académie, nous avons compilé les périodes indicatives de stages et d'alternance de votre école (${meta.displayName}).
+
+Pourriez-vous vérifier les informations ci-dessous et nous confirmer qu'elles sont correctes, ou nous indiquer les corrections nécessaires ?
+
+${profiles}
+
+Merci de nous retourner vos corrections ou votre confirmation à cette adresse.
+
+Cordialement,
+L'équipe Fédération Académie`
+  );
+  return { subject, body };
+}
 
 /* ─── RENDER CALENDAR ─── */
 function renderCalendar() {
-  const profile    = DATA[activeProfile];
-  const showStage  = activeType !== "alternance";
-  const showAlt    = activeType !== "stage";
+  const profile   = DATA[activeProfile];
+  const showStage = activeType !== "alternance";
+  const showAlt   = activeType !== "stage";
 
-  // Context
   document.getElementById("cal-context").textContent = profile.context;
 
   // Month header
@@ -656,17 +842,17 @@ function renderCalendar() {
   container.innerHTML = "";
 
   Object.entries(profile.schools).forEach(([school, info]) => {
-    const isOpen  = expandedSchool === school;
-    const stageP  = computePublish(info.stage, "stage");
-    const altP    = computePublish(info.alternance, "alternance");
+    const meta   = SCHOOL_META[school] || {};
+    const isOpen = expandedSchool === school;
+    const stageP = computePublish(info.stage, "stage");
+    const altP   = computePublish(info.alternance, "alternance");
     const hasStage = info.stage.some(v => v > 0);
     const hasAlt   = info.alternance.some(v => v > 0);
 
     const card = document.createElement("div");
     card.className = "school-card" + (isOpen ? " open" : "");
-    card.id = "card-" + school;
 
-    // ── Row ──
+    /* ── School Row ── */
     const row = document.createElement("div");
     row.className = "school-row";
     row.addEventListener("click", () => {
@@ -678,15 +864,18 @@ function renderCalendar() {
     const lbl = document.createElement("div");
     lbl.className = "school-label";
     lbl.innerHTML = `
-      <div class="school-name-row">
-        <div class="school-dot"></div>
-        <span class="school-name">${school}</span>
-        <span class="school-chevron">${isOpen ? "▲" : "▼"}</span>
+      <div class="school-logo-wrap">
+        <img class="school-logo" src="${meta.logo || ''}" alt="${meta.displayName || school}"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span class="school-logo-fallback" style="display:none">${school}</span>
       </div>
-      <div class="school-level">${info.level}</div>
+      <div class="school-meta-row">
+        <span class="school-level">${info.level}</span>
+        <span class="school-chevron">▼</span>
+      </div>
       <div class="school-tags">
-        ${showStage && hasStage ? '<span class="tag tag-solid">STAGE</span>' : ""}
-        ${showAlt && hasAlt ? '<span class="tag tag-outline">ALTERNANCE</span>' : ""}
+        ${showStage && hasStage ? '<span class="tag tag-stage">STAGE</span>' : ""}
+        ${showAlt   && hasAlt   ? '<span class="tag tag-alt">ALTERNANCE</span>' : ""}
       </div>`;
     row.appendChild(lbl);
 
@@ -695,38 +884,42 @@ function renderCalendar() {
     bars.className = "school-bars";
 
     const rowDefs = [];
-    if (showStage) rowDefs.push({ key: "stage",      label: "Stage",      data: info.stage,      pub: stageP });
-    if (showAlt)   rowDefs.push({ key: "alternance", label: "Alternance", data: info.alternance, pub: altP   });
+    if (showStage) rowDefs.push({ key: "stage",      label: "Stage",      data: info.stage,      pub: stageP, color: "stage" });
+    if (showAlt)   rowDefs.push({ key: "alternance", label: "Alternance", data: info.alternance, pub: altP,   color: "alt"   });
 
     rowDefs.forEach(rd => {
-      const grp = document.createElement("div");
+      const grp  = document.createElement("div");
       grp.className = "bar-group";
-
-      // Grid
       const grid = document.createElement("div");
       grid.className = "bar-grid";
 
       rd.data.forEach((v, mi) => {
-        const p = rd.pub[mi];
+        const p    = rd.pub[mi];
         const cell = document.createElement("div");
         cell.className = "cal-cell";
 
-        // Avail bar
         const ab = document.createElement("div");
         ab.className = "avail-bar";
-        if (v === 2) { ab.classList.add("strong"); if (mi === CUR) ab.classList.add("current-filled"); }
-        else if (v === 1) { ab.classList.add("possible"); if (mi === CUR) ab.classList.add("current-filled"); }
-        else if (mi === CUR) { ab.classList.add("current-empty"); }
 
-        if (v > 0) {
+        if (v === 2) {
+          ab.classList.add(`${rd.color}-strong`);
+          if (mi === CUR) ab.classList.add("cur");
           const lt = document.createElement("span");
-          lt.className = "bar-letter " + (v === 2 ? "white" : "dark");
-          lt.textContent = rd.key === "stage" ? (v === 2 ? "S" : "s") : (v === 2 ? "A" : "a");
+          lt.className = "bar-letter white";
+          lt.textContent = rd.key === "stage" ? "S" : "A";
           ab.appendChild(lt);
+        } else if (v === 1) {
+          ab.classList.add(`${rd.color}-possible`);
+          if (mi === CUR) ab.classList.add("cur");
+          const lt = document.createElement("span");
+          lt.className = `bar-letter ${rd.color}-color`;
+          lt.textContent = rd.key === "stage" ? "s" : "a";
+          ab.appendChild(lt);
+        } else if (mi === CUR) {
+          ab.classList.add("cur-empty");
         }
         cell.appendChild(ab);
 
-        // Publish bar
         if (showPublish) {
           const pb = document.createElement("div");
           pb.className = "pub-bar";
@@ -734,7 +927,6 @@ function renderCalendar() {
           else if (v === 0 && p === 1) pb.classList.add("prep");
           cell.appendChild(pb);
         }
-
         grid.appendChild(cell);
       });
       grp.appendChild(grid);
@@ -742,7 +934,11 @@ function renderCalendar() {
       // Row label
       const rl = document.createElement("div");
       rl.className = "bar-row-label";
-      rl.textContent = rd.label;
+      const dot = document.createElement("span");
+      dot.className = "bar-type-dot";
+      dot.style.background = `var(--${rd.color})`;
+      rl.appendChild(dot);
+      rl.appendChild(document.createTextNode(rd.label));
       if (showPublish && rd.pub.some(p => p > 0)) {
         const hint = document.createElement("span");
         hint.className = "pub-hint";
@@ -756,23 +952,33 @@ function renderCalendar() {
     row.appendChild(bars);
     card.appendChild(row);
 
-    // ── Detail ──
+    /* ── Detail ── */
     const detail = document.createElement("div");
     detail.className = "school-detail";
 
-    // Meta
-    const meta = document.createElement("div");
-    meta.className = "detail-meta";
-    meta.innerHTML = `<div class="detail-meta-title">Informations</div>
-      ${[
-        ["Niveau", info.level],
-        ["Durée stage", info.stageDuration],
-        ["Contact", info.contact],
-        ["Site web", info.url]
-      ].map(([k,v]) => `<div class="meta-row"><div class="meta-key">${k}</div><div class="meta-val">${v}</div></div>`).join("")}`;
-    detail.appendChild(meta);
+    // Meta column
+    const metaCol = document.createElement("div");
+    metaCol.className = "detail-meta";
 
-    // Notes
+    // Build contact button
+    let contactBtn = "";
+    if (meta.email) {
+      const { subject, body } = buildValidationEmail(school);
+      contactBtn = `<a class="btn-contact" href="mailto:${meta.email}?subject=${subject}&body=${body}">✉ Envoyer un e-mail</a>`;
+    } else if (meta.url) {
+      contactBtn = `<a class="btn-contact-web" href="${meta.url}/contact" target="_blank" rel="noopener">↗ Contacter via le site</a>`;
+    }
+
+    metaCol.innerHTML = `
+      <div class="detail-meta-title">Informations</div>
+      <div class="meta-row"><div class="meta-key">Niveau</div><div class="meta-val">${info.level}</div></div>
+      <div class="meta-row"><div class="meta-key">Durée stage</div><div class="meta-val">${info.stageDuration}</div></div>
+      ${meta.email ? `<div class="meta-row"><div class="meta-key">Contact</div><div class="meta-val"><a href="mailto:${meta.email}">${meta.email}</a></div></div>` : ""}
+      <div class="meta-row"><div class="meta-key">Site web</div><div class="meta-val"><a href="${meta.url}" target="_blank" rel="noopener">${(meta.url || "").replace("https://","")}</a></div></div>
+      ${contactBtn}`;
+    detail.appendChild(metaCol);
+
+    // Notes column
     const notes = document.createElement("div");
     notes.className = "detail-notes";
     notes.style.gridTemplateColumns = showStage && showAlt ? "1fr 1fr" : "1fr";
@@ -782,13 +988,13 @@ function renderCalendar() {
       const msg = type === "stage"
         ? "Publiez vos offres de stage <strong>4 à 6 semaines avant</strong> la période de disponibilité."
         : "Pour une rentrée <strong>septembre–octobre</strong>, publiez vos offres d'alternance <strong>dès avril–mai</strong>. Les meilleurs profils sont souvent engagés avant l'été.";
-      return `<div class="pub-box"><div class="pub-box-title">⏱ Publication</div><div class="pub-box-text">${msg}</div></div>`;
+      return `<div class="pub-box"><div class="pub-box-title">⏱ Publication conseillée</div><div class="pub-box-text">${msg}</div></div>`;
     };
 
     if (showStage) {
       notes.innerHTML += `
         <div class="note-block">
-          <div class="note-title"><div class="note-dot-solid"></div>Stage</div>
+          <div class="note-title"><div class="note-dot" style="background:var(--stage)"></div>Stage</div>
           <p class="note-text">${info.stageNote}</p>
           ${makePubBox("stage", stageP)}
         </div>`;
@@ -796,7 +1002,7 @@ function renderCalendar() {
     if (showAlt) {
       notes.innerHTML += `
         <div class="note-block">
-          <div class="note-title"><div class="note-dot-outline"></div>Alternance</div>
+          <div class="note-title"><div class="note-dot" style="background:var(--alt)"></div>Alternance</div>
           <p class="note-text">${info.altNote}</p>
           ${makePubBox("alternance", altP)}
         </div>`;
@@ -809,7 +1015,7 @@ function renderCalendar() {
 
   // Legend pub items
   document.querySelectorAll(".pub-legend").forEach(el => {
-    el.style.display = showPublish ? "flex" : "none";
+    el.style.display = showPublish ? (el.classList.contains("legend-sep") ? "block" : "flex") : "none";
   });
 }
 
@@ -822,13 +1028,59 @@ function renderTabs() {
     btn.className = "tab-btn" + (key === activeProfile ? " active" : "");
     btn.textContent = DATA[key].fullLabel;
     btn.addEventListener("click", () => {
-      activeProfile = key;
+      activeProfile  = key;
       expandedSchool = null;
       renderTabs();
       document.getElementById("cal-tagline").textContent = DATA[activeProfile].tagline;
       renderCalendar();
     });
     tc.appendChild(btn);
+  });
+}
+
+/* ─── RENDER VALIDATION SECTION ─── */
+function renderValidation() {
+  const container = document.getElementById("val-schools");
+  container.innerHTML = "";
+
+  Object.entries(SCHOOL_META).forEach(([school, meta]) => {
+    const card = document.createElement("div");
+    card.className = "val-card";
+
+    const hasEmail = !!meta.email;
+    const { subject, body } = hasEmail ? buildValidationEmail(school) : { subject: "", body: "" };
+
+    card.innerHTML = `
+      <div class="val-card-head">
+        <img class="val-card-logo" src="${meta.logo}" alt="${meta.displayName}"
+          onerror="this.style.display='none'">
+        <span class="val-card-name">${meta.displayName}</span>
+      </div>
+      <div class="val-card-contact">
+        ${hasEmail
+          ? `Contact : <a href="mailto:${meta.email}">${meta.email}</a>`
+          : `Pas d'e-mail direct — <a href="${meta.url}" target="_blank" rel="noopener">contacter via le site</a>`
+        }
+      </div>
+      <div class="val-card-btns">
+        ${hasEmail
+          ? `<a class="btn-vmail" href="mailto:${meta.email}?subject=${subject}&body=${body}">✉ Envoyer</a>
+             <button class="btn-vcopy" data-email="${meta.email}">Copier l'adresse</button>`
+          : `<a class="btn-vweb" href="${meta.url}" target="_blank" rel="noopener">↗ Site web</a>`
+        }
+      </div>`;
+    container.appendChild(card);
+  });
+
+  // Copy buttons
+  container.querySelectorAll(".btn-vcopy").forEach(btn => {
+    btn.addEventListener("click", () => {
+      navigator.clipboard.writeText(btn.dataset.email).then(() => {
+        btn.textContent = "✓ Copié";
+        btn.classList.add("copied");
+        setTimeout(() => { btn.textContent = "Copier l'adresse"; btn.classList.remove("copied"); }, 2000);
+      });
+    });
   });
 }
 
@@ -849,8 +1101,14 @@ document.getElementById("pub-toggle").addEventListener("click", function() {
   renderCalendar();
 });
 
+/* ─── VALIDATION SECTION TOGGLE ─── */
+document.getElementById("val-header").addEventListener("click", () => {
+  valOpen = !valOpen;
+  document.getElementById("val-body").classList.toggle("open", valOpen);
+  document.getElementById("val-toggle-btn").textContent = valOpen ? "Masquer les contacts" : "Afficher les contacts";
+});
+
 /* ─── ADMIN TRIGGER ─── */
-const trigger = document.getElementById("admin-trigger");
 document.getElementById("admin-trigger").addEventListener("click", () => {
   document.getElementById("pw-modal").classList.add("open");
   setTimeout(() => document.getElementById("pw-input").focus(), 50);
@@ -863,12 +1121,11 @@ function closeModal() {
   document.getElementById("pw-error").style.display = "none";
   document.getElementById("pw-input").classList.remove("error");
 }
-
 function tryUnlock() {
   if (document.getElementById("pw-input").value === PW) {
     closeModal();
-    adminDraft = clone(DATA);
-    adminTab = activeProfile;
+    adminDraft    = clone(DATA);
+    adminTab      = activeProfile;
     adminExpanded = null;
     document.getElementById("admin-overlay").classList.add("open");
     renderAdmin();
@@ -879,8 +1136,9 @@ function tryUnlock() {
     document.getElementById("pw-input").focus();
   }
 }
-
-document.getElementById("pw-modal").addEventListener("click", e => { if (e.target === document.getElementById("pw-modal")) closeModal(); });
+document.getElementById("pw-modal").addEventListener("click", e => {
+  if (e.target === document.getElementById("pw-modal")) closeModal();
+});
 document.getElementById("pw-cancel").addEventListener("click", closeModal);
 document.getElementById("pw-submit").addEventListener("click", tryUnlock);
 document.getElementById("pw-input").addEventListener("keydown", e => { if (e.key === "Enter") tryUnlock(); });
@@ -891,6 +1149,7 @@ document.getElementById("admin-save").addEventListener("click", () => {
   document.getElementById("admin-overlay").classList.remove("open");
   document.getElementById("cal-tagline").textContent = DATA[activeProfile].tagline;
   renderCalendar();
+  renderValidation();
 });
 document.getElementById("admin-cancel").addEventListener("click", () => {
   document.getElementById("admin-overlay").classList.remove("open");
@@ -913,12 +1172,12 @@ function renderAdmin() {
   const pf = document.getElementById("admin-profile-fields");
   pf.innerHTML = "";
   [["tagline","Tagline (métiers)"],["context","Texte de contexte"]].forEach(([key, lbl]) => {
-    const div = document.createElement("div");
+    const div   = document.createElement("div");
     div.className = "admin-field";
     const label = document.createElement("label");
     label.textContent = lbl;
-    const ta = document.createElement("textarea");
-    ta.value = adminDraft[adminTab][key];
+    const ta  = document.createElement("textarea");
+    ta.value  = adminDraft[adminTab][key];
     ta.style.minHeight = "60px";
     ta.addEventListener("input", () => { adminDraft[adminTab][key] = ta.value; });
     div.appendChild(label); div.appendChild(ta);
@@ -930,7 +1189,7 @@ function renderAdmin() {
   sc.innerHTML = "";
   Object.entries(adminDraft[adminTab].schools).forEach(([school, info]) => {
     const isOpen = adminExpanded === school;
-    const card = document.createElement("div");
+    const card   = document.createElement("div");
     card.className = "admin-school-card" + (isOpen ? " open" : "");
 
     const hdr = document.createElement("div");
@@ -946,21 +1205,23 @@ function renderAdmin() {
     const body = document.createElement("div");
     body.className = "admin-school-body";
 
-    // Bar grids
-    ["stage","alternance"].forEach(type => {
+    // Bar grids — stage then alternance
+    [["stage","Stage"],["alternance","Alternance"]].forEach(([type, typeLabel]) => {
       const sec = document.createElement("div");
       sec.className = "admin-bar-section";
-      sec.innerHTML = `<div class="admin-bar-title">${type === "stage" ? "Stage" : "Alternance"}<span>Cliquer pour modifier · ○ indisponible · ◐ possible · ● forte</span></div>`;
+      const colorVar = type === "stage" ? "stage" : "alt";
+      sec.innerHTML = `<div class="admin-bar-title">${typeLabel}<span>Cliquer pour changer · ○ indisponible · ◐ possible · ● confirmée</span></div>`;
       const grid = document.createElement("div");
       grid.className = "admin-grid";
       MONTHS.forEach((m, mi) => {
         const col = document.createElement("div");
-        const ml = document.createElement("div");
+        const ml  = document.createElement("div");
         ml.className = "admin-month-label";
         ml.textContent = m;
-        const v = adminDraft[adminTab].schools[school][type][mi];
+        const v    = adminDraft[adminTab].schools[school][type][mi];
         const cell = document.createElement("div");
-        cell.className = "admin-cell" + (v === 1 ? " v1" : v === 2 ? " v2" : "");
+        cell.className = "admin-cell"
+          + (v === 1 ? ` ${colorVar}-v1` : v === 2 ? ` ${colorVar}-v2` : "");
         cell.textContent = v === 2 ? "●" : v === 1 ? "◐" : "○";
         cell.addEventListener("click", () => {
           adminDraft[adminTab].schools[school][type][mi] = (adminDraft[adminTab].schools[school][type][mi] + 1) % 3;
@@ -978,16 +1239,15 @@ function renderAdmin() {
     tf.className = "admin-text-fields";
     [
       ["stageNote","Note stage"], ["altNote","Note alternance"],
-      ["level","Niveaux d'étude"], ["stageDuration","Durée de stage"],
-      ["contact","Contact entreprises"], ["url","Site web"]
+      ["level","Niveaux d'étude"], ["stageDuration","Durée de stage"]
     ].forEach(([key, lbl]) => {
-      const div = document.createElement("div");
+      const div   = document.createElement("div");
       div.className = "admin-field";
       const label = document.createElement("label");
       label.textContent = lbl;
       const isLong = key === "stageNote" || key === "altNote";
-      const input = isLong ? document.createElement("textarea") : document.createElement("input");
-      input.value = info[key];
+      const input  = isLong ? document.createElement("textarea") : document.createElement("input");
+      input.value  = info[key];
       if (isLong) input.style.minHeight = "80px";
       input.addEventListener("input", () => { adminDraft[adminTab].schools[school][key] = input.value; });
       div.appendChild(label); div.appendChild(input);
@@ -1003,6 +1263,7 @@ function renderAdmin() {
 renderTabs();
 document.getElementById("cal-tagline").textContent = DATA[activeProfile].tagline;
 renderCalendar();
+renderValidation();
 </script>
 </body>
 </html>
