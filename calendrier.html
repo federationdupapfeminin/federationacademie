@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="beige">
+<html lang="fr" data-theme="white">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,7 +18,7 @@
   --grn:#16a34a;   /* barres seulement */
   --amb:#c27803;   /* barres seulement */
   /* thème beige */
-  --bg:#F8F5EE; --bg-card:#fff;
+  --bg:#fbf6eb; --bg-card:#fff;
   --bg-hdr-open:#faf7f1; --bg-detail:#f3ede0;
   --border:#e5dfd0; --border-card:#ddd8c8;
   --bar:32px; --left:60px; --r:7px;
@@ -95,19 +95,6 @@ button,a,input,textarea{font-family:var(--f)}
   transition:all .12s
 }
 .util:hover{background:var(--bg-hdr-open);border-color:var(--g300);color:var(--g700)}
-.th-dot{width:11px;height:11px;border-radius:3px;border:1px solid var(--g300);flex-shrink:0;transition:background .2s}
-
-/* Bouton thème — discret, coin inférieur gauche */
-#theme-btn{
-  position:fixed;bottom:14px;left:14px;z-index:100;
-  display:inline-flex;align-items:center;gap:5px;
-  padding:5px 9px;font-size:8.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
-  border:1px solid var(--border);background:var(--bg-card);color:var(--g400);
-  border-radius:20px;cursor:pointer;white-space:nowrap;
-  box-shadow:0 2px 8px rgba(0,0,0,.08);
-  transition:all .12s
-}
-#theme-btn:hover{background:var(--bg-hdr-open);border-color:var(--g300);color:var(--g700)}
 
 /* ══════════════════════════════════════
    BANDEAU PUBLICATION
@@ -365,6 +352,28 @@ button,a,input,textarea{font-family:var(--f)}
 .adm-c.v1{background:#c27803;border-color:#c27803;color:#fff}
 .adm-c.v2{background:#16a34a;border-color:#16a34a;color:#fff}
 .adm-tf{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+.adm-sc.dragging{opacity:.4}
+.adm-sc.drag-over{border-color:var(--acc);box-shadow:0 0 0 2px var(--accL)}
+.adm-sc.hidden-sc{opacity:.55;border-style:dashed}
+/* Toggle visibilité */
+.tgl{position:relative;width:34px;height:18px;flex-shrink:0}
+.tgl input{opacity:0;width:0;height:0;position:absolute}
+.tgl-sl{position:absolute;inset:0;border-radius:9px;background:var(--g200);cursor:pointer;transition:background .15s}
+.tgl-sl::after{content:'';position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.tgl input:checked+.tgl-sl{background:var(--grn)}
+.tgl input:checked+.tgl-sl::after{transform:translateX(16px)}
+/* Bouton ajouter école */
+.btn-add-school{display:flex;align-items:center;gap:8px;width:100%;padding:12px 16px;border:2px dashed var(--border);border-radius:6px;background:transparent;color:var(--g400);font-size:11px;font-weight:600;cursor:pointer;transition:all .12s;margin-top:4px}
+.btn-add-school:hover{border-color:var(--acc);color:var(--acc);background:var(--accL)}
+/* Form inline ajout école */
+.adm-add-form{border:1px solid var(--acc);border-radius:6px;padding:16px;margin-top:4px;background:var(--accL)}
+.adm-add-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.adm-add-actions{display:flex;gap:8px}
+.btn-create{padding:8px 18px;font-size:10px;font-weight:700;background:var(--acc);color:#fff;border:none;border-radius:4px;cursor:pointer}
+.btn-create:disabled{opacity:.5;cursor:not-allowed}
+.btn-cancel-add{padding:8px 14px;font-size:10px;color:var(--g500);background:transparent;border:1px solid var(--border);border-radius:4px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -456,9 +465,13 @@ button,a,input,textarea{font-family:var(--f)}
   <p id="cal-note">* Calendriers indicatifs 2026. Les dates varient selon le campus, l'année d'étude et la spécialisation. À confirmer directement avec chaque établissement avant tout recrutement.</p>
 </div>
 
-<button class="util" id="theme-btn">
-  <span class="th-dot" id="th-dot" style="background:#F8F5EE"></span>Fond
-</button>
+
+<!-- Overlay de chargement -->
+<div id="loading" style="display:none;position:fixed;inset:0;background:rgba(251,246,235,.92);backdrop-filter:blur(4px);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+  <div style="width:34px;height:34px;border:3px solid #eeeaff;border-top-color:#4e36ff;border-radius:50%;animation:spin .8s linear infinite"></div>
+  <div style="font-size:11px;color:#9494a8;letter-spacing:.05em">Chargement depuis Airtable…</div>
+</div>
+
 <div id="adm-trig">🔒</div>
 
 <!-- Modal mot de passe -->
@@ -489,21 +502,54 @@ button,a,input,textarea{font-family:var(--f)}
 </div>
 
 <script>
-/* ══ CONSTANTES ══ */
-const LOGOS={
-  "MODART":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQPcDbRwWbQ8sgtfq57q1rSDr_6AEwl1HgzGg&s",
-  "LISAA":"https://upload.wikimedia.org/wikipedia/en/c/cd/LISAA_School_of_Art_%26_Design_logo.png",
-  "ESMOD":"https://upload.wikimedia.org/wikipedia/commons/1/1a/Logo_ESMOD_2024.svg",
-  "MOD'SPE":"https://www.modspeparis.com/wp-content/uploads/2024/05/t1_logo1.png"
+/* ══ CONFIG AIRTABLE ══ */
+const AT = {
+  token: 'patVXQu3sBbPJZHwi.e63b0f7f3464027ca9ddba3169c7b4897ea16c3a51530a9bd3183ac1d1bdada2',
+  base: 'apptRDwsl2a34opMQ',
+  eco: 'tblqmKjSbG8kucHhd',   // table Écoles
+  cal: 'tbl7bu4sNHienKp34',   // table Calendriers
+  prof: 'tblDT9OR6ZcTZ1WYD'   // table Profils
 };
+// Noms de champs — Écoles
+const FE = {
+  nom:'Nom', logo:'Logo URL', email:'Email',
+  tel:'Téléphone', ordre:'Ordre', visible:'Visible'
+};
+// Noms de champs — Calendriers
+const FC = {
+  profil:'Profil', type:'Type', duree:'Durée',
+  note:'Note', ecole:'École', niveau:'Niveau',
+  mo:['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc']
+};
+// Noms de champs — Profils
+const FP = { nom:'Nom', fullLabel:'FullLabel', tagline:'Tagline', contexte:'Contexte' };
+let ecoIds  = {}; // { "MODART": "recXXX" }
+let calIds  = {}; // { "MODART|CRÉA|Stage": "recXXX" }
+let profIds = {}; // { "CRÉA": "recXXX" }
+let LOGOS   = {}; // populated from Airtable
+
+/* ══ MÉTADONNÉES STATIQUES ══ */
+const PROF_META = {
+  'CRÉA':    { fullLabel:'Profils Création',  tagline:'Stylisme · Modélisme · Design textile · Studio · Direction artistique', context:'Les profils création sont principalement disponibles en stage de fin d\'année académique, avec un pic de juin à septembre. En alternance, la majorité des rentrées se concentrent en septembre–octobre.' },
+  'RETAIL':  { fullLabel:'Profils Retail',    tagline:'Vente · Wholesale · Visual Merchandising · Commerce en ligne · Réseau boutiques', context:'Les profils retail offrent des fenêtres de recrutement plus souples. MODART est l\'école la plus flexible du panel, avec des disponibilités quasi toute l\'année.' },
+  'BUSINESS':{ fullLabel:'Profils Business',  tagline:'Communication · Marketing · Achats · Développement commercial · Influence · Merchandising', context:'Les profils business sont les plus accessibles à l\'alternance. LISAA et MOD\'SPE ouvrent l\'alternance dès la 3e année, MODART dès la 4e, ESMOD la réserve à son Postgraduate Fashion Business.' }
+};
+const SCHOOL_META = {
+  'MODART':  { levels:{'CRÉA':'Bac+3 à Bac+5','RETAIL':'Bac+2 à Bac+5','BUSINESS':'Bac+2 à Bac+5'}, url:'https://modart-paris.com',            contact:'Service Relations Entreprises' },
+  'LISAA':   { level:'Bac+3 à Bac+5',  url:'https://lisaa.com',                              contact:'Service Relations Entreprises' },
+  'ESMOD':   { level:'Bac à Bac+5',    url:'https://esmod.com/fr/entreprises',                contact:'Relations Entreprises'          },
+  "MOD'SPE": { level:'Bac+3 à Bac+5',  url:'https://modspeparis.com/entreprises',             contact:'Service Relations Entreprises' }
+};
+
+/* ══ CONSTANTES ══ */
 const MO=["Jan","Fév","Mar","Avr","Mai","Juin","Juil","Août","Sep","Oct","Nov","Déc"];
 const MOF=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
 const CUR=new Date().getMonth();
 const PW="FFPAPF";
 document.getElementById("leg-mo").textContent=MO[CUR];
 
-/* ══ DATA ══ */
-let DATA={
+/* ══ DATA (fallback hardcodé) ══ */
+const FALLBACK_DATA={
   "CRÉA":{fullLabel:"Profils Création",tagline:"Stylisme · Modélisme · Design textile · Studio · Direction artistique",context:"Les profils création sont principalement disponibles en stage de fin d'année académique, avec un pic de juin à septembre. En alternance, la majorité des rentrées se concentrent en septembre–octobre.",
     schools:{
       "MODART":{level:"Bac+3 à Bac+5",stageDuration:"2 à 10 mois",email:"contact@modart-paris.com",phone:"+33 1 44 07 47 00",contact:"Service Relations Entreprises",url:"https://modart-paris.com",stage:[0,0,0,0,1,2,2,2,2,0,0,1],alternance:[0,0,0,0,0,0,0,0,2,2,0,0],stageNote:"Selon les cursus, les étudiants réalisent un à deux stages par an. Pour les profils création, la fenêtre la plus crédible reste mai–juin → septembre, avec quelques créneaux ponctuels en fin d'année.",altNote:"L'alternance est possible dès la 4e année. Sur les profils créatifs, le démarrage se concentre à la rentrée de septembre–octobre, avec un rythme à confirmer selon la spécialisation."},
@@ -528,10 +574,11 @@ let DATA={
     }
   }
 };
+let DATA=JSON.parse(JSON.stringify(FALLBACK_DATA));
 
 /* ══ ÉTAT ══ */
 let actProf="CRÉA",actType="both",showPub=false,expanded=null;
-let admDraft=null,admTab="CRÉA",admExp=null;
+let admDraft=null,admTab="CRÉA",admExp=null,draggedSchool=null;
 
 /* ══ TOOLTIP ══ */
 const tipEl=document.getElementById("tip");let tipOn=false;
@@ -540,12 +587,6 @@ const showTip=t=>{tipEl.textContent=t;tipEl.style.display="block";tipOn=true;};
 const hideTip=()=>{tipEl.style.display="none";tipOn=false;};
 
 /* ══ THÈME ══ */
-let curTheme="beige";
-document.getElementById("theme-btn").addEventListener("click",()=>{
-  curTheme=curTheme==="beige"?"white":"beige";
-  document.documentElement.setAttribute("data-theme",curTheme);
-  document.getElementById("th-dot").style.background=curTheme==="beige"?"#F8F5EE":"#ffffff";
-});
 
 /* ══ HELPERS ══ */
 function pubCalc(avail,type){
@@ -554,11 +595,129 @@ function pubCalc(avail,type){
   return r;
 }
 const clone=o=>JSON.parse(JSON.stringify(o));
+
+/* ══ OVERRIDES LOCAUX (localStorage) ══ */
+function applyLocalOverrides(){
+  try{
+    const ovr=JSON.parse(localStorage.getItem('cal_ovr')||'null');
+    if(!ovr)return;
+    Object.entries(ovr).forEach(([profil,pd])=>{
+      if(!DATA[profil])return;
+      if(pd.tagline!==undefined)DATA[profil].tagline=pd.tagline;
+      if(pd.context!==undefined)DATA[profil].context=pd.context;
+      if(pd.fullLabel!==undefined)DATA[profil].fullLabel=pd.fullLabel;
+      Object.entries(pd.schools||{}).forEach(([school,si])=>{
+        if(!DATA[profil].schools[school])return;
+        if(si.logo!==undefined)DATA[profil].schools[school].logo=si.logo;
+        if(si.ordre!==undefined)DATA[profil].schools[school].ordre=si.ordre;
+        if(si.level!==undefined)DATA[profil].schools[school].level=si.level;
+      });
+    });
+  }catch(e){}
+}
+
 function mkMailto(email,school,profKey){
   const pl=DATA[profKey]?.fullLabel||profKey;
   const s=encodeURIComponent(`Recrutement d'étudiant(e) — ${school}`);
   const b=encodeURIComponent(`Bonjour,\n\nJe me permets de vous contacter au sujet du recrutement d'un(e) étudiant(e) de votre école pour un stage ou une alternance au sein de notre structure, dans le domaine ${pl}.\n\nPourriez-vous nous indiquer la procédure à suivre ainsi que le contact référent pour les entreprises souhaitant recruter vos étudiants ?\n\nEn vous remerciant par avance,\nCordialement`);
   return `mailto:${email}?subject=${s}&body=${b}`;
+}
+
+/* ══ CHARGEMENT AIRTABLE ══ */
+async function loadAirtable() {
+  document.getElementById('loading').style.display = 'flex';
+  try {
+    const h = { 'Authorization': `Bearer ${AT.token}` };
+    const [eR, cR, pR] = await Promise.all([
+      fetch(`https://api.airtable.com/v0/${AT.base}/${AT.eco}?sort[0][field]=Ordre&sort[0][direction]=asc`, { headers: h }),
+      fetch(`https://api.airtable.com/v0/${AT.base}/${AT.cal}`, { headers: h }),
+      fetch(`https://api.airtable.com/v0/${AT.base}/${AT.prof}`, { headers: h })
+    ]);
+    const eData = await eR.json();
+    const cData = await cR.json();
+    const pData = await pR.json();
+
+    // Écoles
+    const allSchools = {}; // recordId → { name, email, phone, logo, visible }
+    eData.records.forEach(r => {
+      const f = r.fields;
+      const name = f[FE.nom];
+      ecoIds[name] = r.id;
+      LOGOS[name] = f[FE.logo] || '';
+      allSchools[r.id] = { name, email: f[FE.email]||'', phone: f[FE.tel]||'', logo: f[FE.logo]||'', visible: !!f[FE.visible], ordre: f[FE.ordre]||999 };
+    });
+
+    // Build DATA from PROF_META (fallback values)
+    const data = {};
+    Object.entries(PROF_META).forEach(([k, v]) => { data[k] = { ...v, schools: {} }; });
+
+    // Profils — fullLabel, tagline, contexte (3 records, source unique)
+    pData.records.forEach(r => {
+      const f = r.fields;
+      const nom = f[FP.nom];
+      if (!nom || !data[nom]) return;
+      profIds[nom] = r.id;
+      if (f[FP.fullLabel]) data[nom].fullLabel = f[FP.fullLabel];
+      if (f[FP.tagline])   data[nom].tagline   = f[FP.tagline];
+      if (f[FP.contexte])  data[nom].context   = f[FP.contexte];
+    });
+
+    // Calendriers — disponibilités, notes, durée, niveau
+    cData.records.forEach(r => {
+      const f = r.fields;
+      const profil = typeof f[FC.profil] === 'object' ? (f[FC.profil]||{}).name : f[FC.profil];
+      const type   = typeof f[FC.type]   === 'object' ? (f[FC.type]  ||{}).name : f[FC.type];
+      const ecoRaw = (f[FC.ecole] || [])[0];
+      const ecoId  = typeof ecoRaw === 'object' ? ecoRaw.id : ecoRaw;
+      const sch    = allSchools[ecoId];
+      if (!sch || !data[profil]) return;
+      const name = sch.name;
+      calIds[`${name}|${profil}|${type}`] = r.id;
+      if (!data[profil].schools[name]) {
+        const m = SCHOOL_META[name] || {};
+        data[profil].schools[name] = {
+          visible: sch.visible, email: sch.email, phone: sch.phone, logo: sch.logo, ordre: sch.ordre,
+          level: '', url: m.url || '', contact: m.contact || '',
+          stage: Array(12).fill(0), alternance: Array(12).fill(0),
+          stageNote: '', altNote: '', stageDuration: ''
+        };
+      }
+      const avail = FC.mo.map(fid => f[fid] || 0);
+      const s = data[profil].schools[name];
+      const fb = (FALLBACK_DATA[profil]||{schools:{}}).schools[name] || {};
+      if (f[FC.niveau]) s.level = f[FC.niveau];
+      if (type === 'Stage') { s.stage = avail; s.stageNote = f[FC.note]||fb.stageNote||''; s.stageDuration = f[FC.duree]||fb.stageDuration||''; }
+      else { s.alternance = avail; s.altNote = f[FC.note]||fb.altNote||''; }
+    });
+
+    DATA = data;
+  } catch(e) {
+    console.warn('Airtable indisponible, données locales utilisées', e);
+  }
+  document.getElementById('loading').style.display = 'none';
+  renderTabs();
+  document.getElementById('tagline').textContent = DATA[actProf].tagline;
+  render();
+}
+
+/* ══ PATCH / POST AIRTABLE ══ */
+async function atPatch(table, recId, fields) {
+  const res = await fetch(`https://api.airtable.com/v0/${AT.base}/${table}/${recId}`, {
+    method: 'PATCH',
+    headers: { 'Authorization': `Bearer ${AT.token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields })
+  });
+  if (!res.ok) throw new Error(`AT ${res.status}`);
+  return res.json();
+}
+async function atPost(table, fields) {
+  const res = await fetch(`https://api.airtable.com/v0/${AT.base}/${table}`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${AT.token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields })
+  });
+  if (!res.ok) throw new Error(`AT ${res.status}`);
+  return res.json();
 }
 
 /* ══ RENDER CALENDAR ══ */
@@ -569,7 +728,8 @@ function render(){
   MO.forEach((m,i)=>{const d=document.createElement("div");d.className="ms-cell"+(i===CUR?" cur":"");d.textContent=m;strip.appendChild(d);});
   // Cards
   const cont=document.getElementById("school-rows");cont.innerHTML="";
-  Object.entries(prof.schools).forEach(([school,info])=>{
+  const sortedSchools=Object.entries(prof.schools).filter(([,s])=>s.visible!==false).sort(([,a],[,b])=>(a.ordre||999)-(b.ordre||999));
+  sortedSchools.forEach(([school,info])=>{
     const isOpen=expanded===school;
     const sp=pubCalc(info.stage,"stage"),ap=pubCalc(info.alternance,"alternance");
     const hasS=info.stage.some(v=>v>0),hasA=info.alternance.some(v=>v>0);
@@ -579,7 +739,7 @@ function render(){
     const hdr=document.createElement("div");hdr.className="sc-hdr";
     // Logo
     const lz=document.createElement("div");lz.className="logo-z";
-    const logo=LOGOS[school]||"";
+    const logo=info.logo||LOGOS[school]||"";
     if(logo){const img=document.createElement("img");img.className="sc-logo";img.src=logo;img.alt=school;img.onerror=function(){this.style.display="none";this.nextElementSibling.style.display="block";};const fb=document.createElement("span");fb.className="sc-logo-fb";fb.textContent=school;lz.appendChild(img);lz.appendChild(fb);}
     else{const fb=document.createElement("span");fb.className="sc-logo-fb";fb.style.display="block";fb.textContent=school;lz.appendChild(fb);}
     hdr.appendChild(lz);
@@ -617,7 +777,7 @@ function render(){
         const cell=document.createElement("div");
         let cls="bar-cell";if(v===2)cls+=" av2";else if(v===1)cls+=" av1";if(mi===CUR)cls+=" cur-col";
         cell.className=cls;
-        const stat=v===2?"Période idéale":v===1?"Période possible":"Non disponible";
+        const stat=v===2?"Période idéale":v===1?"Période possible":(showPub&&rd.pub&&rd.pub[mi]>0?"Période de recrutement":"Non disponible");
         cell.addEventListener("mouseenter",()=>showTip(`${MOF[mi]} · ${rd.lbl} · ${stat}`));
         cell.addEventListener("mouseleave",hideTip);
         wrap.appendChild(cell);
@@ -710,10 +870,11 @@ document.getElementById("pdf-btn").addEventListener("click",()=>{
     const rowA=showA?`<div style="display:flex;align-items:center;gap:0"><div style="width:44px;font-size:6.5px;font-weight:700;color:#9494aa;text-transform:uppercase;letter-spacing:.07em;text-align:right;padding-right:5px;flex-shrink:0">Alt.</div><div style="flex:1;display:flex;gap:2px">${cells(info.alternance)}</div></div>`:"";
     const noteS=showS?`<div style="margin-bottom:5px"><span style="font-size:7px;font-weight:700;color:#4e36ff;text-transform:uppercase;letter-spacing:.08em">■ Stage${info.stageDuration?` — ${info.stageDuration}`:""} · </span><span style="font-size:8px;color:#555;line-height:1.6">${info.stageNote}</span></div>`:"";
     const noteA=showA?`<div><span style="font-size:7px;font-weight:700;color:#4e36ff;text-transform:uppercase;letter-spacing:.08em;border:1px solid #4e36ff;padding:0 3px;border-radius:2px;margin-right:4px">▫ Alt.</span><span style="font-size:8px;color:#555;line-height:1.6">${info.altNote}</span></div>`:"";
+    const logoSrc=info.logo||LOGOS[school]||"";
     return `<div style="border:1px solid #ddd;border-radius:5px;overflow:hidden;margin-bottom:10px;break-inside:avoid;page-break-inside:avoid">
       <div style="display:flex;align-items:center;padding:7px 10px;background:#fafafa;border-bottom:1px solid #e8e8e8;gap:0">
         <div style="width:64px;padding-right:9px;border-right:1px solid #e0e0e0;margin-right:10px;height:26px;display:flex;align-items:center;flex-shrink:0">
-          <img src="${LOGOS[school]||""}" style="max-width:54px;max-height:22px;object-fit:contain" onerror="this.style.display='none'">
+          <img src="${logoSrc}" style="max-width:54px;max-height:22px;object-fit:contain" onerror="this.style.display='none'">
         </div>
         <div style="flex:1;min-width:0">
           <div style="font-size:11px;font-weight:700">${school}</div>
@@ -734,7 +895,7 @@ document.getElementById("pdf-btn").addEventListener("click",()=>{
   }
 
   let schoolsHTML="";
-  Object.entries(prof.schools).forEach(([s,i])=>{schoolsHTML+=schoolBlock(s,i);});
+  Object.entries(prof.schools).sort(([,a],[,b])=>(a.ordre||999)-(b.ordre||999)).forEach(([s,i])=>{schoolsHTML+=schoolBlock(s,i);});
 
   const legend=`<div style="display:flex;align-items:center;gap:12px;padding:7px 10px;background:#f8f8fc;border:1px solid #e2e2ea;border-radius:4px;margin-bottom:12px;flex-wrap:wrap">
     <span style="font-size:7px;font-weight:800;color:#4e36ff;letter-spacing:.12em;text-transform:uppercase">Légende</span>
@@ -788,41 +949,263 @@ document.getElementById("pw-modal").addEventListener("click",e=>{if(e.target===d
 document.getElementById("pw-no").addEventListener("click",closeModal);
 document.getElementById("pw-ok").addEventListener("click",tryUnlock);
 document.getElementById("pw-inp").addEventListener("keydown",e=>{if(e.key==="Enter")tryUnlock();});
-document.getElementById("adm-save").addEventListener("click",()=>{DATA=clone(admDraft);document.getElementById("adm-ov").classList.remove("open");document.getElementById("tagline").textContent=DATA[actProf].tagline;render();});
+
+document.getElementById("adm-save").addEventListener("click", async () => {
+  const btn = document.getElementById("adm-save");
+  btn.textContent = "⏳ Sauvegarde...";
+  btn.disabled = true;
+  try {
+    const tasks = [];
+    const doneEco   = new Set();
+    const doneProfil = new Set();
+    for (const [profil, pd] of Object.entries(admDraft)) {
+      // Profils — fullLabel/tagline/contexte (une seule fois par profil)
+      if (!doneProfil.has(profil) && profIds[profil]) {
+        doneProfil.add(profil);
+        tasks.push(atPatch(AT.prof, profIds[profil], {
+          [FP.fullLabel]: pd.fullLabel||'',
+          [FP.tagline]:   pd.tagline||'',
+          [FP.contexte]:  pd.context||''
+        }));
+      }
+      for (const [school, info] of Object.entries(pd.schools || {})) {
+        // Calendriers — Stage
+        const sId = calIds[`${school}|${profil}|Stage`];
+        if (sId) {
+          const f = { [FC.niveau]: info.level||'', [FC.note]: info.stageNote||'', [FC.duree]: info.stageDuration||'' };
+          FC.mo.forEach((fid, i) => { f[fid] = info.stage[i] || 0; });
+          tasks.push(atPatch(AT.cal, sId, f));
+        }
+        // Calendriers — Alternance
+        const aId = calIds[`${school}|${profil}|Alternance`];
+        if (aId) {
+          const f = { [FC.niveau]: info.level||'', [FC.note]: info.altNote||'' };
+          FC.mo.forEach((fid, i) => { f[fid] = info.alternance[i] || 0; });
+          tasks.push(atPatch(AT.cal, aId, f));
+        }
+        // Écoles — email/phone/logo/ordre/visible (une seule fois par école)
+        if (!doneEco.has(school) && ecoIds[school]) {
+          doneEco.add(school);
+          tasks.push(atPatch(AT.eco, ecoIds[school], {
+            [FE.email]: info.email||'',
+            [FE.tel]: info.phone||'',
+            [FE.logo]: info.logo||'',
+            [FE.ordre]: parseInt(info.ordre)||999,
+            [FE.visible]: !!info.visible
+          }));
+        }
+      }
+    }
+    await Promise.all(tasks);
+
+    DATA = clone(admDraft);
+    document.getElementById("adm-ov").classList.remove("open");
+    document.getElementById("tagline").textContent = DATA[actProf].tagline;
+    renderTabs();
+    render();
+    btn.textContent = "✓ Sauvegardé !";
+    setTimeout(() => { btn.textContent = "✓ Sauvegarder"; btn.disabled = false; }, 2000);
+  } catch(e) {
+    console.error(e);
+    btn.textContent = "✗ Erreur";
+    btn.style.background = "#ef4444";
+    setTimeout(() => { btn.textContent = "✓ Sauvegarder"; btn.disabled = false; btn.style.background = ""; }, 3000);
+  }
+});
+
 document.getElementById("adm-can").addEventListener("click",()=>{document.getElementById("adm-ov").classList.remove("open");});
+
+function mkAdmField(label,val,isLong,onChange){
+  const d=document.createElement("div");d.className="adm-f";
+  const lb=document.createElement("label");lb.textContent=label;
+  const el=document.createElement(isLong?"textarea":"input");
+  el.value=val||"";if(isLong)el.style.minHeight="70px";
+  el.addEventListener("input",()=>onChange(el.value));
+  d.appendChild(lb);d.appendChild(el);return d;
+}
 
 function renderAdmin(){
   const at=document.getElementById("adm-tabs");at.innerHTML="";
-  Object.keys(admDraft).forEach(key=>{const btn=document.createElement("button");btn.className="adm-t"+(key===admTab?" on":"");btn.textContent=admDraft[key].fullLabel;btn.addEventListener("click",()=>{admTab=key;admExp=null;renderAdmin();});at.appendChild(btn);});
+  Object.keys(admDraft).forEach(key=>{
+    const btn=document.createElement("button");btn.className="adm-t"+(key===admTab?" on":"");
+    btn.textContent=admDraft[key].fullLabel;
+    btn.addEventListener("click",()=>{admTab=key;admExp=null;renderAdmin();});
+    at.appendChild(btn);
+  });
+
+  // ── Champs du profil ──
   const pf=document.getElementById("adm-pf");pf.innerHTML="";
-  [["tagline","Tagline"],["context","Contexte"]].forEach(([k,l])=>{const d=document.createElement("div");d.className="adm-f";const lb=document.createElement("label");lb.textContent=l;const ta=document.createElement("textarea");ta.value=admDraft[admTab][k];ta.style.minHeight="56px";ta.addEventListener("input",()=>{admDraft[admTab][k]=ta.value;});d.appendChild(lb);d.appendChild(ta);pf.appendChild(d);});
+  pf.style.gridTemplateColumns="1fr 1fr 1fr";
+  [["fullLabel","Nom du profil (onglet)",false],["tagline","Tagline",false],["context","Contexte",true]].forEach(([k,l,isLong])=>{
+    pf.appendChild(mkAdmField(l,admDraft[admTab][k],isLong,v=>{admDraft[admTab][k]=v;}));
+  });
+
+  // ── Écoles ──
   const sc=document.getElementById("adm-schools");sc.innerHTML="";
-  Object.entries(admDraft[admTab].schools).forEach(([school,info])=>{
+  // Visibles en premier (par ordre), puis cachées
+  const sortedEntries=Object.entries(admDraft[admTab].schools).sort(([,a],[,b])=>{
+    if(!!a.visible===!!b.visible)return(a.ordre||999)-(b.ordre||999);
+    return a.visible?-1:1;
+  });
+  sortedEntries.forEach(([school,info])=>{
     const isOpen=admExp===school;
-    const card=document.createElement("div");card.className="adm-sc"+(isOpen?" on":"");
+    const isVisible=info.visible!==false;
+    const card=document.createElement("div");
+    card.className="adm-sc"+(isOpen?" on":"")+(isVisible?"":" hidden-sc");
+
+    // Drag & drop (visibles seulement)
+    if(isVisible){
+      card.draggable=true;card.style.cursor="grab";
+      card.addEventListener("dragstart",e=>{draggedSchool=school;e.dataTransfer.effectAllowed="move";setTimeout(()=>card.classList.add("dragging"),0);});
+      card.addEventListener("dragend",()=>{card.classList.remove("dragging");card.style.opacity="";});
+      card.addEventListener("dragover",e=>{e.preventDefault();e.dataTransfer.dropEffect="move";card.classList.add("drag-over");});
+      card.addEventListener("dragleave",()=>card.classList.remove("drag-over"));
+      card.addEventListener("drop",e=>{
+        e.preventDefault();card.classList.remove("drag-over");
+        if(!draggedSchool||draggedSchool===school)return;
+        const sorted=Object.keys(admDraft[admTab].schools).filter(s=>admDraft[admTab].schools[s].visible!==false).sort((a,b)=>(admDraft[admTab].schools[a].ordre||999)-(admDraft[admTab].schools[b].ordre||999));
+        const fi=sorted.indexOf(draggedSchool),ti=sorted.indexOf(school);
+        sorted.splice(fi,1);sorted.splice(ti,0,draggedSchool);
+        sorted.forEach((s,i)=>{Object.keys(admDraft).forEach(p=>{if(admDraft[p].schools[s])admDraft[p].schools[s].ordre=i+1;});});
+        draggedSchool=null;renderAdmin();
+      });
+    }
+
+    // Header
     const hdr=document.createElement("div");hdr.className="adm-sh";
-    hdr.innerHTML=`<span style="font-size:12px;font-weight:700">${school}</span><span style="font-size:10px;color:var(--g400)">${info.level}</span><span style="margin-left:auto;font-size:10px;color:var(--g400)">${isOpen?"▲":"▼"}</span>`;
-    hdr.addEventListener("click",()=>{admExp=isOpen?null:school;renderAdmin();});card.appendChild(hdr);
+
+    // Toggle visibilité
+    const tglWrap=document.createElement("label");tglWrap.className="tgl";tglWrap.title=isVisible?"Masquer l'école":"Afficher l'école";
+    const tglInp=document.createElement("input");tglInp.type="checkbox";tglInp.checked=isVisible;
+    const tglSl=document.createElement("span");tglSl.className="tgl-sl";
+    tglWrap.appendChild(tglInp);tglWrap.appendChild(tglSl);
+    tglInp.addEventListener("change",e=>{
+      e.stopPropagation();
+      const v=e.target.checked;
+      Object.keys(admDraft).forEach(p=>{if(admDraft[p].schools[school])admDraft[p].schools[school].visible=v;});
+      renderAdmin();
+    });
+    tglWrap.addEventListener("click",e=>e.stopPropagation());
+
+    // Ordre
+    const ordInp=document.createElement("input");
+    ordInp.type="number";ordInp.value=info.ordre||999;ordInp.min=1;ordInp.max=99;
+    ordInp.title="Ordre d'affichage";ordInp.disabled=!isVisible;
+    ordInp.style.cssText="width:46px;padding:3px 5px;font-size:11px;border:1px solid var(--border);border-radius:3px;text-align:center;flex-shrink:0";
+    ordInp.addEventListener("click",e=>e.stopPropagation());
+    ordInp.addEventListener("input",()=>{admDraft[admTab].schools[school].ordre=parseInt(ordInp.value)||999;});
+
+    const nameSpan=document.createElement("span");nameSpan.style.cssText="font-size:12px;font-weight:700";nameSpan.textContent=school;
+    const lvlSpan=document.createElement("span");lvlSpan.style.cssText="font-size:10px;color:var(--g400)";lvlSpan.textContent=info.level;
+    if(!isVisible){const badge=document.createElement("span");badge.style.cssText="font-size:8px;padding:2px 6px;background:var(--g200);color:var(--g500);border-radius:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-left:6px";badge.textContent="Masqué";lvlSpan.appendChild(badge);}
+    const chevSpan=document.createElement("span");chevSpan.style.cssText="margin-left:auto;font-size:10px;color:var(--g400)";chevSpan.textContent=isOpen?"▲":"▼";
+    hdr.appendChild(tglWrap);hdr.appendChild(ordInp);hdr.appendChild(nameSpan);hdr.appendChild(lvlSpan);hdr.appendChild(chevSpan);
+    hdr.addEventListener("click",()=>{admExp=isOpen?null:school;renderAdmin();});
+    card.appendChild(hdr);
+
     const body=document.createElement("div");body.className="adm-sb";
+
+    // Grilles disponibilité
     ["stage","alternance"].forEach(type=>{
       const sec=document.createElement("div");sec.className="adm-bst";
       sec.innerHTML=`<div class="adm-bt">${type==="stage"?"Stage":"Alternance"}<span>Clic cyclique : ○ non dispo → ◐ possible → ● idéale</span></div>`;
       const grid=document.createElement("div");grid.className="adm-g";
-      MO.forEach((m,mi)=>{const col=document.createElement("div");const ml=document.createElement("div");ml.className="adm-ml";ml.textContent=m;const v=admDraft[admTab].schools[school][type][mi];const cell=document.createElement("div");cell.className="adm-c"+(v===1?" v1":v===2?" v2":"");cell.textContent=v===2?"●":v===1?"◐":"○";cell.addEventListener("click",()=>{admDraft[admTab].schools[school][type][mi]=(v+1)%3;renderAdmin();});col.appendChild(ml);col.appendChild(cell);grid.appendChild(col);});
+      MO.forEach((m,mi)=>{
+        const col=document.createElement("div");
+        const ml=document.createElement("div");ml.className="adm-ml";ml.textContent=m;
+        const v=admDraft[admTab].schools[school][type][mi];
+        const cell=document.createElement("div");cell.className="adm-c"+(v===1?" v1":v===2?" v2":"");
+        cell.textContent=v===2?"●":v===1?"◐":"○";
+        cell.addEventListener("click",()=>{admDraft[admTab].schools[school][type][mi]=(v+1)%3;renderAdmin();});
+        col.appendChild(ml);col.appendChild(cell);grid.appendChild(col);
+      });
       sec.appendChild(grid);body.appendChild(sec);
     });
+
+    // Champs texte
     const tf=document.createElement("div");tf.className="adm-tf";
-    [["stageNote","Note stage"],["altNote","Note alternance"],["level","Niveaux"],["stageDuration","Durée stage"],["email","E-mail"],["phone","Téléphone"],["contact","Contact"],["url","URL"]].forEach(([k,l])=>{
-      const d=document.createElement("div");d.className="adm-f";const lb=document.createElement("label");lb.textContent=l;const isLong=k==="stageNote"||k==="altNote";const el=document.createElement(isLong?"textarea":"input");el.value=info[k]||"";if(isLong)el.style.minHeight="70px";el.addEventListener("input",()=>{admDraft[admTab].schools[school][k]=el.value;});d.appendChild(lb);d.appendChild(el);tf.appendChild(d);
+    tf.style.gridTemplateColumns="1fr 1fr";
+    [
+      ["level","Niveaux (ex: Bac+3 à Bac+5)",false],
+      ["logo","Logo URL",false],
+      ["stageNote","Note stage",true],
+      ["altNote","Note alternance",true],
+      ["stageDuration","Durée stage",false],
+      ["email","E-mail",false],
+      ["phone","Téléphone",false]
+    ].forEach(([k,l,isLong])=>{
+      tf.appendChild(mkAdmField(l,info[k],isLong,v=>{admDraft[admTab].schools[school][k]=v;}));
     });
     body.appendChild(tf);card.appendChild(body);sc.appendChild(card);
   });
+
+  // ── Bouton ajouter école ──
+  const addBtn=document.createElement("button");addBtn.className="btn-add-school";
+  addBtn.innerHTML="＋ Ajouter une école";
+  addBtn.addEventListener("click",()=>{
+    addBtn.style.display="none";
+    const form=document.createElement("div");form.className="adm-add-form";
+    form.innerHTML=`
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px">Nouvelle école</div>
+      <div class="adm-add-form-grid">
+        <div class="adm-f"><label>Nom *</label><input id="nec-nom" placeholder="ex: SUPMODE" /></div>
+        <div class="adm-f"><label>Logo URL</label><input id="nec-logo" placeholder="https://..." /></div>
+        <div class="adm-f"><label>E-mail</label><input id="nec-email" placeholder="contact@ecole.fr" /></div>
+        <div class="adm-f"><label>Téléphone</label><input id="nec-tel" placeholder="+33 1 ..." /></div>
+        <div class="adm-f"><label>Ordre d'affichage</label><input id="nec-ordre" type="number" value="99" min="1" max="99" /></div>
+        <div class="adm-f"><label>Niveaux</label><input id="nec-niveau" placeholder="ex: Bac+3 à Bac+5" /></div>
+      </div>
+      <div class="adm-add-actions">
+        <button class="btn-create" id="nec-ok">Créer dans Airtable</button>
+        <button class="btn-cancel-add" id="nec-cancel">Annuler</button>
+      </div>
+      <div id="nec-err" style="display:none;margin-top:8px;font-size:10px;color:#c00"></div>`;
+    sc.appendChild(form);
+    document.getElementById("nec-cancel").addEventListener("click",()=>{form.remove();addBtn.style.display="";});
+    document.getElementById("nec-ok").addEventListener("click",async()=>{
+      const nom=(document.getElementById("nec-nom").value||"").trim();
+      if(!nom){document.getElementById("nec-err").textContent="Le nom est obligatoire.";document.getElementById("nec-err").style.display="block";return;}
+      if(Object.values(admDraft).some(pd=>pd.schools[nom])){document.getElementById("nec-err").textContent="Cette école existe déjà.";document.getElementById("nec-err").style.display="block";return;}
+      const okBtn=document.getElementById("nec-ok");okBtn.textContent="Création...";okBtn.disabled=true;
+      try{
+        const logo=document.getElementById("nec-logo").value.trim();
+        const email=document.getElementById("nec-email").value.trim();
+        const tel=document.getElementById("nec-tel").value.trim();
+        const ordre=parseInt(document.getElementById("nec-ordre").value)||99;
+        const niveau=document.getElementById("nec-niveau").value.trim();
+        // Créer record dans Écoles
+        const ecoFields={[FE.nom]:nom,[FE.ordre]:ordre,[FE.visible]:true};
+        if(logo)ecoFields[FE.logo]=logo;if(email)ecoFields[FE.email]=email;if(tel)ecoFields[FE.tel]=tel;
+        const ecoRes=await atPost(AT.eco,ecoFields);
+        const ecoId=ecoRes.id;
+        ecoIds[nom]=ecoId;LOGOS[nom]=logo;
+        // Créer 6 records dans Calendriers
+        await Promise.all(Object.keys(admDraft).flatMap(profil=>["Stage","Alternance"].map(type=>{
+          const f={[FC.profil]:profil,[FC.type]:type,[FC.ecole]:[ecoId]};
+          if(niveau)f[FC.niveau]=niveau;
+          return atPost(AT.cal,f).then(r=>{calIds[`${nom}|${profil}|${type}`]=r.id;});
+        })));
+        // Ajouter dans admDraft pour tous les profils
+        Object.keys(admDraft).forEach(profil=>{
+          admDraft[profil].schools[nom]={
+            visible:true,email,phone:tel,logo,ordre,level:niveau,
+            url:'',contact:'',stage:Array(12).fill(0),alternance:Array(12).fill(0),
+            stageNote:'',altNote:'',stageDuration:''
+          };
+        });
+        form.remove();renderAdmin();
+      }catch(e){
+        document.getElementById("nec-err").textContent="Erreur : "+e.message;
+        document.getElementById("nec-err").style.display="block";
+        const okBtn=document.getElementById("nec-ok");okBtn.textContent="Créer dans Airtable";okBtn.disabled=false;
+      }
+    });
+  });
+  sc.appendChild(addBtn);
 }
 
-/* ══ INIT ══ */
-renderTabs();
-document.getElementById("tagline").textContent=DATA[actProf].tagline;
-render();
+/* ══ INIT : charge depuis Airtable (fallback sur DATA hardcodé si erreur réseau) ══ */
+loadAirtable();
 </script>
 </body>
 </html>
