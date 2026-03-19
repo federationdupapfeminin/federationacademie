@@ -350,6 +350,14 @@ button,a,input,textarea{font-family:var(--f)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .adm-sc.dragging{opacity:.4}
 .adm-sc.drag-over{border-color:var(--acc);box-shadow:0 0 0 2px var(--accL)}
+/* Section paramètres globaux */
+#adm-cfg{background:var(--g100);border:1px solid var(--border);border-radius:6px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.adm-cfg-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g500);white-space:nowrap}
+.adm-cfg-group{display:flex;align-items:center;gap:10px}
+.adm-cfg-label{font-size:10px;color:var(--g700);white-space:nowrap}
+.adm-cfg-inp{width:56px;padding:5px 8px;font-size:13px;font-weight:700;text-align:center;border:1.5px solid var(--border);border-radius:4px;outline:none;background:#fff}
+.adm-cfg-inp:focus{border-color:var(--acc)}
+.adm-cfg-hint{font-size:9px;color:var(--g400)}
 .adm-sc.hidden-sc{opacity:.55;border-style:dashed}
 /* Toggle visibilité */
 .tgl{position:relative;width:34px;height:18px;flex-shrink:0}
@@ -490,6 +498,7 @@ button,a,input,textarea{font-family:var(--f)}
   </div>
   <div id="adm-body">
     <div class="adm-ts" id="adm-tabs"></div>
+    <div id="adm-cfg"></div>
     <div class="adm-pf" id="adm-pf"></div>
     <div id="adm-schools"></div>
   </div>
@@ -502,25 +511,33 @@ const AT = {
   base: 'apptRDwsl2a34opMQ',
   eco: 'tblqmKjSbG8kucHhd',   // table Écoles
   cal: 'tbl7bu4sNHienKp34',   // table Calendriers
-  prof: 'tblDT9OR6ZcTZ1WYD'   // table Profils
+  prof: 'tblDT9OR6ZcTZ1WYD',  // table Profils
+  cfg: 'tblH3CvM9PATRL2qY'    // table Paramètres
 };
 // Noms de champs — Écoles
 const FE = {
   nom:'Nom', logo:'Logo URL', email:'Email',
-  tel:'Téléphone', ordre:'Ordre', visible:'Visible'
+  tel:'Téléphone', ordre:'Ordre', visible:'Visible',
+  url:'URL Site', contact:'Contact'
 };
 // Noms de champs — Calendriers
 const FC = {
   profil:'Profil', type:'Type', duree:'Durée',
   note:'Note', ecole:'École', niveau:'Niveau',
-  mo:['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc']
+  mo: ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'],
+  pub:['Pub Jan','Pub Fév','Pub Mar','Pub Avr','Pub Mai','Pub Juin','Pub Juil','Pub Août','Pub Sep','Pub Oct','Pub Nov','Pub Déc']
 };
 // Noms de champs — Profils
 const FP = { nom:'Nom', fullLabel:'FullLabel', tagline:'Tagline', contexte:'Contexte' };
+// Noms de champs — Paramètres
+const FG = { nom:'Nom', stage:'Anticipation Stage', alt:'Anticipation Alternance' };
 let ecoIds  = {}; // { "MODART": "recXXX" }
 let calIds  = {}; // { "MODART|CRÉA|Stage": "recXXX" }
 let profIds = {}; // { "CRÉA": "recXXX" }
+let cfgId   = 'recGupMwYhX4g3QCD'; // record unique Paramètres
 let LOGOS   = {}; // populated from Airtable
+// Paramètres globaux "Quand Publier" (fallback si Airtable indisponible)
+let pubCfg  = { stage: 1, alt: 4 };
 
 /* ══ MÉTADONNÉES STATIQUES ══ */
 const PROF_META = {
@@ -572,7 +589,7 @@ let DATA=JSON.parse(JSON.stringify(FALLBACK_DATA));
 
 /* ══ ÉTAT ══ */
 let actProf="CRÉA",actType="both",showPub=false,expanded=null;
-let admDraft=null,admTab="CRÉA",admExp=null,draggedSchool=null;
+let admDraft=null,admTab="CRÉA",admExp=null,draggedSchool=null,admCfgDraft=null;
 
 /* ══ TOOLTIP ══ */
 const tipEl=document.getElementById("tip");let tipOn=false;
@@ -584,31 +601,14 @@ const hideTip=()=>{tipEl.style.display="none";tipOn=false;};
 
 /* ══ HELPERS ══ */
 function pubCalc(avail,type){
-  const r=Array(12).fill(0),lp=type==="alternance"?4:1,lq=type==="alternance"?5:2;
+  const lp=type==="alternance"?pubCfg.alt:pubCfg.stage;
+  const lq=lp+1;
+  const r=Array(12).fill(0);
   for(let i=0;i<12;i++){if(avail[i]>0&&(i===0||avail[i-1]===0)){if(i-lp>=0&&!r[i-lp])r[i-lp]=2;if(i-lq>=0&&!r[i-lq])r[i-lq]=1;}}
   return r;
 }
 const clone=o=>JSON.parse(JSON.stringify(o));
 
-/* ══ OVERRIDES LOCAUX (localStorage) ══ */
-function applyLocalOverrides(){
-  try{
-    const ovr=JSON.parse(localStorage.getItem('cal_ovr')||'null');
-    if(!ovr)return;
-    Object.entries(ovr).forEach(([profil,pd])=>{
-      if(!DATA[profil])return;
-      if(pd.tagline!==undefined)DATA[profil].tagline=pd.tagline;
-      if(pd.context!==undefined)DATA[profil].context=pd.context;
-      if(pd.fullLabel!==undefined)DATA[profil].fullLabel=pd.fullLabel;
-      Object.entries(pd.schools||{}).forEach(([school,si])=>{
-        if(!DATA[profil].schools[school])return;
-        if(si.logo!==undefined)DATA[profil].schools[school].logo=si.logo;
-        if(si.ordre!==undefined)DATA[profil].schools[school].ordre=si.ordre;
-        if(si.level!==undefined)DATA[profil].schools[school].level=si.level;
-      });
-    });
-  }catch(e){}
-}
 
 function mkMailto(email,school,profKey){
   const pl=DATA[profKey]?.fullLabel||profKey;
@@ -622,14 +622,23 @@ async function loadAirtable() {
   document.getElementById('loading').style.display = 'flex';
   try {
     const h = { 'Authorization': `Bearer ${AT.token}` };
-    const [eR, cR, pR] = await Promise.all([
+    const [eR, cR, pR, gR] = await Promise.all([
       fetch(`https://api.airtable.com/v0/${AT.base}/${AT.eco}?sort[0][field]=Ordre&sort[0][direction]=asc`, { headers: h }),
       fetch(`https://api.airtable.com/v0/${AT.base}/${AT.cal}`, { headers: h }),
-      fetch(`https://api.airtable.com/v0/${AT.base}/${AT.prof}`, { headers: h })
+      fetch(`https://api.airtable.com/v0/${AT.base}/${AT.prof}`, { headers: h }),
+      fetch(`https://api.airtable.com/v0/${AT.base}/${AT.cfg}`, { headers: h })
     ]);
     const eData = await eR.json();
     const cData = await cR.json();
     const pData = await pR.json();
+    const gData = await gR.json();
+    // Paramètres "Quand Publier"
+    if (gData.records && gData.records[0]) {
+      const gf = gData.records[0].fields;
+      cfgId = gData.records[0].id;
+      if (gf[FG.stage] != null) pubCfg.stage = gf[FG.stage];
+      if (gf[FG.alt]   != null) pubCfg.alt   = gf[FG.alt];
+    }
 
     // Écoles
     const allSchools = {}; // recordId → { name, email, phone, logo, visible }
@@ -638,7 +647,7 @@ async function loadAirtable() {
       const name = f[FE.nom];
       ecoIds[name] = r.id;
       LOGOS[name] = f[FE.logo] || '';
-      allSchools[r.id] = { name, email: f[FE.email]||'', phone: f[FE.tel]||'', logo: f[FE.logo]||'', visible: !!f[FE.visible], ordre: f[FE.ordre]||999 };
+      allSchools[r.id] = { name, email: f[FE.email]||'', phone: f[FE.tel]||'', logo: f[FE.logo]||'', visible: !!f[FE.visible], ordre: f[FE.ordre]||999, url: f[FE.url]||'', contact: f[FE.contact]||'' };
     });
 
     // Build DATA from PROF_META (fallback values)
@@ -673,6 +682,7 @@ async function loadAirtable() {
           visible: sch.visible, email: sch.email, phone: sch.phone, logo: sch.logo, ordre: sch.ordre,
           level: '', url: m.url || '', contact: m.contact || '',
           stage: Array(12).fill(0), alternance: Array(12).fill(0),
+          stagePub: Array(12).fill(0), altPub: Array(12).fill(0),
           stageNote: '', altNote: '', stageDuration: ''
         };
       }
@@ -680,8 +690,9 @@ async function loadAirtable() {
       const s = data[profil].schools[name];
       const fb = (FALLBACK_DATA[profil]||{schools:{}}).schools[name] || {};
       if (f[FC.niveau]) s.level = f[FC.niveau];
-      if (type === 'Stage') { s.stage = avail; s.stageNote = f[FC.note]||fb.stageNote||''; s.stageDuration = f[FC.duree]||fb.stageDuration||''; }
-      else { s.alternance = avail; s.altNote = f[FC.note]||fb.altNote||''; }
+      const pub = FC.pub.map(fid => f[fid] || 0);
+      if (type === 'Stage') { s.stage = avail; s.stagePub = pub; s.stageNote = f[FC.note]||fb.stageNote||''; s.stageDuration = f[FC.duree]||fb.stageDuration||''; }
+      else { s.alternance = avail; s.altPub = pub; s.altNote = f[FC.note]||fb.altNote||''; }
     });
 
     DATA = data;
@@ -725,7 +736,8 @@ function render(){
   const sortedSchools=Object.entries(prof.schools).filter(([,s])=>s.visible!==false).sort(([,a],[,b])=>(a.ordre||999)-(b.ordre||999));
   sortedSchools.forEach(([school,info])=>{
     const isOpen=expanded===school;
-    const sp=pubCalc(info.stage,"stage"),ap=pubCalc(info.alternance,"alternance");
+    const sp=(info.stagePub&&info.stagePub.some(v=>v>0))?info.stagePub:pubCalc(info.stage,"stage");
+    const ap=(info.altPub&&info.altPub.some(v=>v>0))?info.altPub:pubCalc(info.alternance,"alternance");
     const hasS=info.stage.some(v=>v>0),hasA=info.alternance.some(v=>v>0);
     const card=document.createElement("div");card.className="sc"+(isOpen?" open":"");
 
@@ -936,7 +948,7 @@ ${schoolsHTML}
 document.getElementById("adm-trig").addEventListener("click",()=>{document.getElementById("pw-modal").classList.add("open");setTimeout(()=>document.getElementById("pw-inp").focus(),50);});
 function closeModal(){document.getElementById("pw-modal").classList.remove("open");document.getElementById("pw-inp").value="";document.getElementById("pw-err").style.display="none";document.getElementById("pw-inp").classList.remove("err");}
 function tryUnlock(){
-  if(document.getElementById("pw-inp").value===PW){closeModal();admDraft=clone(DATA);admTab=actProf;admExp=null;document.getElementById("adm-ov").classList.add("open");renderAdmin();}
+  if(document.getElementById("pw-inp").value===PW){closeModal();admDraft=clone(DATA);admCfgDraft=clone(pubCfg);admTab=actProf;admExp=null;document.getElementById("adm-ov").classList.add("open");renderAdmin();}
   else{document.getElementById("pw-err").style.display="block";document.getElementById("pw-inp").classList.add("err");document.getElementById("pw-inp").value="";document.getElementById("pw-inp").focus();}
 }
 document.getElementById("pw-modal").addEventListener("click",e=>{if(e.target===document.getElementById("pw-modal"))closeModal();});
@@ -950,6 +962,13 @@ document.getElementById("adm-save").addEventListener("click", async () => {
   btn.disabled = true;
   try {
     const tasks = [];
+    // Paramètres "Quand Publier"
+    if (cfgId && admCfgDraft) {
+      tasks.push(atPatch(AT.cfg, cfgId, {
+        [FG.stage]: admCfgDraft.stage,
+        [FG.alt]:   admCfgDraft.alt
+      }));
+    }
     const doneEco   = new Set();
     const doneProfil = new Set();
     for (const [profil, pd] of Object.entries(admDraft)) {
@@ -968,6 +987,7 @@ document.getElementById("adm-save").addEventListener("click", async () => {
         if (sId) {
           const f = { [FC.niveau]: info.level||'', [FC.note]: info.stageNote||'', [FC.duree]: info.stageDuration||'' };
           FC.mo.forEach((fid, i) => { f[fid] = info.stage[i] || 0; });
+          FC.pub.forEach((fid, i) => { f[fid] = (info.stagePub||[])[i] || 0; });
           tasks.push(atPatch(AT.cal, sId, f));
         }
         // Calendriers — Alternance
@@ -975,6 +995,7 @@ document.getElementById("adm-save").addEventListener("click", async () => {
         if (aId) {
           const f = { [FC.niveau]: info.level||'', [FC.note]: info.altNote||'' };
           FC.mo.forEach((fid, i) => { f[fid] = info.alternance[i] || 0; });
+          FC.pub.forEach((fid, i) => { f[fid] = (info.altPub||[])[i] || 0; });
           tasks.push(atPatch(AT.cal, aId, f));
         }
         // Écoles — email/phone/logo/ordre/visible (une seule fois par école)
@@ -993,6 +1014,7 @@ document.getElementById("adm-save").addEventListener("click", async () => {
     await Promise.all(tasks);
 
     DATA = clone(admDraft);
+    if (admCfgDraft) pubCfg = clone(admCfgDraft);
     document.getElementById("adm-ov").classList.remove("open");
     document.getElementById("tagline").textContent = DATA[actProf].tagline;
     renderTabs();
@@ -1019,6 +1041,20 @@ function mkAdmField(label,val,isLong,onChange){
 }
 
 function renderAdmin(){
+  // ── Paramètres "Quand Publier" ──
+  const cfgEl=document.getElementById("adm-cfg");cfgEl.innerHTML="";
+  const cfgTitle=document.createElement("span");cfgTitle.className="adm-cfg-title";cfgTitle.textContent="Quand Publier";cfgEl.appendChild(cfgTitle);
+  [["stage","Stage","mois avant le début du stage"],["alt","Alternance","mois avant le début de l'alternance"]].forEach(([key,label,hint])=>{
+    const g=document.createElement("div");g.className="adm-cfg-group";
+    const lbl=document.createElement("span");lbl.className="adm-cfg-label";lbl.textContent=label+" :";
+    const inp=document.createElement("input");inp.type="number";inp.className="adm-cfg-inp";
+    inp.value=admCfgDraft[key];inp.min=1;inp.max=12;
+    inp.addEventListener("input",()=>{admCfgDraft[key]=Math.max(1,Math.min(12,parseInt(inp.value)||1));});
+    const h=document.createElement("span");h.className="adm-cfg-hint";h.textContent=inp.value+" "+hint;
+    inp.addEventListener("input",()=>{h.textContent=inp.value+" "+hint;});
+    g.appendChild(lbl);g.appendChild(inp);g.appendChild(h);cfgEl.appendChild(g);
+  });
+
   const at=document.getElementById("adm-tabs");at.innerHTML="";
   Object.keys(admDraft).forEach(key=>{
     const btn=document.createElement("button");btn.className="adm-t"+(key===admTab?" on":"");
@@ -1116,6 +1152,39 @@ function renderAdmin(){
       sec.appendChild(grid);body.appendChild(sec);
     });
 
+    // Grille Publication conseillée (une par school, auto-remplie par pubCalc si vide)
+    ["stagePub","altPub"].forEach((key,ti)=>{
+      const typeLabel=ti===0?"Stage":"Alternance";
+      const availKey=ti===0?"stage":"alternance";
+      // Initialiser avec pubCalc si tout à zéro
+      const current=admDraft[admTab].schools[school][key]||Array(12).fill(0);
+      if(!current.some(v=>v>0)){
+        const auto=pubCalc(admDraft[admTab].schools[school][availKey],ti===0?"stage":"alternance");
+        admDraft[admTab].schools[school][key]=auto.slice();
+      }
+      const sec=document.createElement("div");sec.className="adm-bst";
+      sec.innerHTML=`<div class="adm-bt">⏱ Publication conseillée — ${typeLabel}<span>Clic cyclique : ○ → ◐ → ● · Auto-calculé si vide</span></div>`;
+      const grid=document.createElement("div");grid.className="adm-g";
+      MO.forEach((m,mi)=>{
+        const col=document.createElement("div");
+        const ml=document.createElement("div");ml.className="adm-ml";ml.textContent=m;
+        const v=admDraft[admTab].schools[school][key][mi];
+        const cell=document.createElement("div");cell.className="adm-c"+(v===1?" v1":v===2?" v2":"");
+        cell.textContent=v===2?"●":v===1?"◐":"○";
+        cell.addEventListener("click",()=>{admDraft[admTab].schools[school][key][mi]=(v+1)%3;renderAdmin();});
+        col.appendChild(ml);col.appendChild(cell);grid.appendChild(col);
+      });
+      // Bouton reset auto
+      const rst=document.createElement("button");rst.style.cssText="margin-top:4px;font-size:8px;padding:2px 8px;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--g400);cursor:pointer";
+      rst.textContent="↺ Recalculer auto";
+      rst.addEventListener("click",()=>{
+        const auto=pubCalc(admDraft[admTab].schools[school][availKey],ti===0?"stage":"alternance");
+        admDraft[admTab].schools[school][key]=auto.slice();
+        renderAdmin();
+      });
+      sec.appendChild(grid);sec.appendChild(rst);body.appendChild(sec);
+    });
+
     // Champs texte
     const tf=document.createElement("div");tf.className="adm-tf";
     tf.style.gridTemplateColumns="1fr 1fr";
@@ -1184,6 +1253,7 @@ function renderAdmin(){
           admDraft[profil].schools[nom]={
             visible:true,email,phone:tel,logo,ordre,level:niveau,
             url:'',contact:'',stage:Array(12).fill(0),alternance:Array(12).fill(0),
+            stagePub:Array(12).fill(0),altPub:Array(12).fill(0),
             stageNote:'',altNote:'',stageDuration:''
           };
         });
