@@ -461,9 +461,9 @@ button,a,input,textarea{font-family:var(--f)}
 
 
 <!-- Overlay de chargement -->
-<div id="loading" style="display:none;position:fixed;inset:0;background:rgba(251,246,235,.92);backdrop-filter:blur(4px);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+<div id="loading" style="display:none;position:fixed;inset:0;background:rgba(255,255,255,.92);backdrop-filter:blur(4px);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:14px">
   <div style="width:34px;height:34px;border:3px solid #eeeaff;border-top-color:#4e36ff;border-radius:50%;animation:spin .8s linear infinite"></div>
-  <div style="font-size:11px;color:#9494a8;letter-spacing:.05em">Chargement depuis Airtable…</div>
+  <div style="font-size:11px;color:#9494a8;letter-spacing:.05em">Chargement depuis la base de données…</div>
 </div>
 
 <div id="adm-trig">🔒</div>
@@ -686,7 +686,7 @@ async function loadAirtable() {
 
     DATA = data;
   } catch(e) {
-    console.warn('Airtable indisponible, données locales utilisées', e);
+    console.warn('Base de données indisponible, données locales utilisées', e);
   }
   document.getElementById('loading').style.display = 'none';
   renderTabs();
@@ -1150,7 +1150,7 @@ function renderAdmin(){
         <div class="adm-f"><label>Niveaux</label><input id="nec-niveau" placeholder="ex: Bac+3 à Bac+5" /></div>
       </div>
       <div class="adm-add-actions">
-        <button class="btn-create" id="nec-ok">Créer dans Airtable</button>
+        <button class="btn-create" id="nec-ok">Créer dans la base de données</button>
         <button class="btn-cancel-add" id="nec-cancel">Annuler</button>
       </div>
       <div id="nec-err" style="display:none;margin-top:8px;font-size:10px;color:#c00"></div>`;
@@ -1191,14 +1191,14 @@ function renderAdmin(){
       }catch(e){
         document.getElementById("nec-err").textContent="Erreur : "+e.message;
         document.getElementById("nec-err").style.display="block";
-        const okBtn=document.getElementById("nec-ok");okBtn.textContent="Créer dans Airtable";okBtn.disabled=false;
+        const okBtn=document.getElementById("nec-ok");okBtn.textContent="Créer dans la base de données";okBtn.disabled=false;
       }
     });
   });
   sc.appendChild(addBtn);
 }
 
-/* ══ INIT : charge depuis Airtable (fallback sur DATA hardcodé si erreur réseau) ══ */
+/* ══ INIT : charge depuis la base de données (fallback sur DATA hardcodé si erreur réseau) ══ */
 loadAirtable();
 </script>
 </body>
