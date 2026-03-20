@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calendrier Recrutement — Écoles de Mode</title>
+<title>Calendrier Recrutement · Écoles de Mode Partenaires</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
@@ -119,6 +119,57 @@ button,a,input,textarea{font-family:var(--f)}
   padding:6px 24px;transition:background .2s
 }
 #tagline{font-size:10px;color:var(--g400);letter-spacing:.02em}
+
+/* ══════════════════════════════════════
+   INTRO BAR — valeur prop + stats
+══════════════════════════════════════ */
+/* ══════════════════════════════════════
+   RECRUTER AUJOURD'HUI
+══════════════════════════════════════ */
+#today-box{
+  background:var(--bg-card);border:1px solid var(--border-card);
+  border-radius:var(--r);margin-bottom:10px;overflow:hidden;
+}
+#today-box.today-empty{display:none}
+.today-hdr{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 16px;
+  background:var(--blk);color:var(--wh);
+}
+.today-hdr-mo{
+  font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+}
+.today-hdr-sub{font-size:9px;color:rgba(255,255,255,.5)}
+.today-body{display:flex;flex-direction:column;gap:0}
+.today-row{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:8px 16px;border-bottom:1px solid var(--border);
+}
+.today-row:last-child{border-bottom:none}
+.today-row-lbl{
+  display:flex;align-items:center;gap:6px;
+  font-size:7.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  white-space:nowrap;min-width:160px;flex-shrink:0;
+}
+.today-dot-now{width:8px;height:8px;border-radius:50%;background:var(--acc);flex-shrink:0}
+.today-dot-prep{width:8px;height:8px;border-radius:50%;background:var(--accM);border:1.5px dashed var(--acc);flex-shrink:0}
+.today-chips{display:flex;gap:6px;flex-wrap:wrap}
+.today-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 10px;border-radius:5px;cursor:pointer;
+  border:1.5px solid var(--border);background:var(--bg-card);
+  font-size:10px;font-weight:600;color:var(--blk);
+  transition:all .12s;text-decoration:none;white-space:nowrap;
+}
+.today-chip:hover{border-color:var(--acc);background:var(--accL);color:var(--acc)}
+.today-chip-logo{height:14px;width:auto;max-width:36px;object-fit:contain;display:block}
+.today-chip-type{
+  font-size:6px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:1px 5px;border-radius:2px;
+}
+.today-chip-type.s{background:var(--accL);color:var(--acc);border:1px solid var(--accM)}
+.today-chip-type.a{background:transparent;color:var(--acc);border:1.5px solid var(--acc)}
+.today-none{padding:10px 16px;font-size:10px;color:var(--g400);font-style:italic}
 
 /* ══════════════════════════════════════
    CAL BODY
@@ -243,11 +294,12 @@ button,a,input,textarea{font-family:var(--f)}
 }
 .det-link:hover{background:var(--g100)}
 .det-site{
-  font-size:10px;color:var(--g400);text-decoration:none;
-  padding:4px 10px;border:1px solid var(--border);border-radius:4px;
-  transition:background .1s;white-space:nowrap
+  font-size:9.5px;font-weight:600;color:var(--g700);text-decoration:none;
+  padding:5px 12px;border:1.5px solid var(--border);border-radius:4px;
+  transition:all .12s;white-space:nowrap;
+  display:inline-flex;align-items:center;gap:4px
 }
-.det-site:hover{background:var(--g100);color:var(--blk)}
+.det-site:hover{background:var(--blk);color:var(--wh);border-color:var(--blk)}
 
 /* Notes */
 .det-notes{display:grid;padding:14px 16px;gap:0}
@@ -421,11 +473,11 @@ button,a,input,textarea{font-family:var(--f)}
     <div class="pub-rules">
       <div class="pub-rule">
         <div class="pub-rule-dot" style="background:#4e36ff"></div>
-        <strong>Publier maintenant</strong> — 1 mois avant la dispo (stage) · 4 mois avant (alternance)
+        <strong>Publier maintenant</strong> — <span id="pb-s1"></span> · <span id="pb-a1"></span>
       </div>
       <div class="pub-rule">
         <div class="pub-rule-dot" style="background:#c4b5ff"></div>
-        <strong>Commencer à préparer</strong> — 2 mois avant (stage) · 5 mois avant (alternance)
+        <strong>Commencer à préparer</strong> — <span id="pb-s2"></span> · <span id="pb-a2"></span>
       </div>
     </div>
   </div>
@@ -437,6 +489,7 @@ button,a,input,textarea{font-family:var(--f)}
     <div class="ms" id="ms"><div></div></div>
   </div>
 
+  <div id="today-box"></div>
   <div id="school-rows"></div>
 
   <!-- Légende -->
@@ -464,12 +517,12 @@ button,a,input,textarea{font-family:var(--f)}
     <div class="leg-now"><span class="leg-now-pill" id="leg-mo"></span>Mois en cours</div>
   </div>
 
-  <p id="cal-note">* Calendriers indicatifs 2026. Les dates varient selon le campus, l'année d'étude et la spécialisation. À confirmer directement avec chaque établissement avant tout recrutement.</p>
+  <p id="cal-note">* Calendriers indicatifs 2026 · Document réservé aux marques partenaires FFPAPF. Les dates varient selon le campus, l'année d'étude et la spécialisation. À confirmer directement avec chaque établissement avant tout recrutement.</p>
 </div>
 
 
 <!-- Overlay de chargement -->
-<div id="loading" style="display:none;position:fixed;inset:0;background:rgba(255,255,255,.92);backdrop-filter:blur(4px);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+<div id="loading" style="display:none;position:fixed;inset:0;background:#ffffff;z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:14px">
   <div style="width:34px;height:34px;border:3px solid #eeeaff;border-top-color:#4e36ff;border-radius:50%;animation:spin .8s linear infinite"></div>
   <div style="font-size:11px;color:#9494a8;letter-spacing:.05em">Chargement depuis la base de données…</div>
 </div>
@@ -524,8 +577,7 @@ const FE = {
 const FC = {
   profil:'Profil', type:'Type', duree:'Durée',
   note:'Note', ecole:'École', niveau:'Niveau',
-  mo: ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'],
-  pub:['Pub Jan','Pub Fév','Pub Mar','Pub Avr','Pub Mai','Pub Juin','Pub Juil','Pub Août','Pub Sep','Pub Oct','Pub Nov','Pub Déc']
+  mo: ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc']
 };
 // Noms de champs — Profils
 const FP = { nom:'Nom', fullLabel:'FullLabel', tagline:'Tagline', contexte:'Contexte' };
@@ -682,7 +734,6 @@ async function loadAirtable() {
           visible: sch.visible, email: sch.email, phone: sch.phone, logo: sch.logo, ordre: sch.ordre,
           level: '', url: m.url || '', contact: m.contact || '',
           stage: Array(12).fill(0), alternance: Array(12).fill(0),
-          stagePub: Array(12).fill(0), altPub: Array(12).fill(0),
           stageNote: '', altNote: '', stageDuration: ''
         };
       }
@@ -690,9 +741,8 @@ async function loadAirtable() {
       const s = data[profil].schools[name];
       const fb = (FALLBACK_DATA[profil]||{schools:{}}).schools[name] || {};
       if (f[FC.niveau]) s.level = f[FC.niveau];
-      const pub = FC.pub.map(fid => f[fid] || 0);
-      if (type === 'Stage') { s.stage = avail; s.stagePub = pub; s.stageNote = f[FC.note]||fb.stageNote||''; s.stageDuration = f[FC.duree]||fb.stageDuration||''; }
-      else { s.alternance = avail; s.altPub = pub; s.altNote = f[FC.note]||fb.altNote||''; }
+      if (type === 'Stage') { s.stage = avail; s.stageNote = f[FC.note]||fb.stageNote||''; s.stageDuration = f[FC.duree]||fb.stageDuration||''; }
+      else { s.alternance = avail; s.altNote = f[FC.note]||fb.altNote||''; }
     });
 
     DATA = data;
@@ -700,9 +750,19 @@ async function loadAirtable() {
     console.warn('Base de données indisponible, données locales utilisées', e);
   }
   document.getElementById('loading').style.display = 'none';
+  updatePubBanner();
   renderTabs();
   document.getElementById('tagline').textContent = DATA[actProf].tagline;
   render();
+}
+
+function updatePubBanner(){
+  const s=pubCfg.stage,a=pubCfg.alt;
+  const el=id=>document.getElementById(id);
+  if(el('pb-s1'))el('pb-s1').textContent=`${s} mois avant la dispo (stage)`;
+  if(el('pb-a1'))el('pb-a1').textContent=`${a} mois avant (alternance)`;
+  if(el('pb-s2'))el('pb-s2').textContent=`${s+1} mois avant (stage)`;
+  if(el('pb-a2'))el('pb-a2').textContent=`${a+1} mois avant (alternance)`;
 }
 
 /* ══ PATCH / POST AIRTABLE ══ */
@@ -725,6 +785,55 @@ async function atPost(table, fields) {
   return res.json();
 }
 
+/* ══ RECRUTER AUJOURD'HUI ══ */
+const MOF_LONG=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+function renderTodayBox(sortedSchools,showS,showA){
+  const box=document.getElementById('today-box');
+  box.innerHTML='';
+  // Calculer qui contacter ce mois-ci (CUR)
+  const now=[],prep=[];
+  sortedSchools.forEach(([school,info])=>{
+    const sp=pubCalc(info.stage,'stage'),ap=pubCalc(info.alternance,'alternance');
+    const nowS=showS&&sp[CUR]===2,nowA=showA&&ap[CUR]===2;
+    const prepS=showS&&sp[CUR]===1,prepA=showA&&ap[CUR]===1;
+    if(nowS||nowA) now.push({school,info,types:{s:nowS,a:nowA}});
+    else if(prepS||prepA) prep.push({school,info,types:{s:prepS,a:prepA}});
+  });
+  if(!now.length&&!prep.length){box.classList.add('today-empty');return;}
+  box.classList.remove('today-empty');
+  // Header
+  const hdr=document.createElement('div');hdr.className='today-hdr';
+  hdr.innerHTML=`<div class="today-hdr-mo">📅 ${MOF_LONG[CUR]} ${new Date().getFullYear()}</div><div class="today-hdr-sub">Écoles à contacter ce mois-ci pour votre recrutement</div>`;
+  box.appendChild(hdr);
+  const body=document.createElement('div');body.className='today-body';
+  const mkRow=(label,dotCls,entries)=>{
+    if(!entries.length)return;
+    const row=document.createElement('div');row.className='today-row';
+    const lbl=document.createElement('div');lbl.className='today-row-lbl';
+    const dot=document.createElement('div');dot.className=dotCls;
+    lbl.appendChild(dot);lbl.appendChild(document.createTextNode(label));
+    row.appendChild(lbl);
+    const chips=document.createElement('div');chips.className='today-chips';
+    entries.forEach(({school,info,types})=>{
+      const chip=document.createElement('div');chip.className='today-chip';
+      chip.title=info.email||school;
+      const logo=info.logo||LOGOS[school]||'';
+      if(logo){const img=document.createElement('img');img.className='today-chip-logo';img.src=logo;img.alt=school;img.onerror=function(){this.replaceWith(document.createTextNode(school));};chip.appendChild(img);}
+      else{chip.appendChild(document.createTextNode(school));}
+      if(types.s){const t=document.createElement('span');t.className='today-chip-type s';t.textContent='Stage';chip.appendChild(t);}
+      if(types.a){const t=document.createElement('span');t.className='today-chip-type a';t.textContent='Alt.';chip.appendChild(t);}
+      // Clic → ouvre la carte
+      chip.addEventListener('click',()=>{expanded=school;render();const el=document.querySelector('.sc.open');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});});
+      chips.appendChild(chip);
+    });
+    row.appendChild(chips);
+    body.appendChild(row);
+  };
+  mkRow('Contacter maintenant','today-dot-now',now);
+  mkRow('Commencer à préparer','today-dot-prep',prep);
+  box.appendChild(body);
+}
+
 /* ══ RENDER CALENDAR ══ */
 function render(){
   const prof=DATA[actProf],showS=actType!=="alternance",showA=actType!=="stage";
@@ -734,10 +843,12 @@ function render(){
   // Cards
   const cont=document.getElementById("school-rows");cont.innerHTML="";
   const sortedSchools=Object.entries(prof.schools).filter(([,s])=>s.visible!==false).sort(([,a],[,b])=>(a.ordre||999)-(b.ordre||999));
+  // ── Recruter aujourd'hui ──
+  renderTodayBox(sortedSchools,showS,showA);
   sortedSchools.forEach(([school,info])=>{
     const isOpen=expanded===school;
-    const sp=(info.stagePub&&info.stagePub.some(v=>v>0))?info.stagePub:pubCalc(info.stage,"stage");
-    const ap=(info.altPub&&info.altPub.some(v=>v>0))?info.altPub:pubCalc(info.alternance,"alternance");
+    const sp=pubCalc(info.stage,"stage");
+    const ap=pubCalc(info.alternance,"alternance");
     const hasS=info.stage.some(v=>v>0),hasA=info.alternance.some(v=>v>0);
     const card=document.createElement("div");card.className="sc"+(isOpen?" open":"");
 
@@ -805,10 +916,20 @@ function render(){
     cb.appendChild(dtg);
     const eL=document.createElement("a");eL.className="det-link";eL.href=mkMailto(info.email,school,actProf);eL.textContent=`✉ ${info.email}`;cb.appendChild(eL);
     if(info.phone){const pL=document.createElement("a");pL.className="det-link";pL.href=`tel:${info.phone.replace(/\s/g,"")}`;pL.textContent=`📞 ${info.phone}`;cb.appendChild(pL);}
-    const sL=document.createElement("a");sL.className="det-site";sL.href=info.url;sL.target="_blank";sL.rel="noopener noreferrer";sL.innerHTML="↗ Site";cb.appendChild(sL);
+    if(info.url){const sL=document.createElement("a");sL.className="det-site";sL.href=info.url;sL.target="_blank";sL.rel="noopener noreferrer";sL.innerHTML="↗ Visiter le site";cb.appendChild(sL);}
     det.appendChild(cb);
     // Notes
-    const mkPN=(type,pb)=>{if(!showPub||!pb.some(p=>p>0))return"";const msg=type==="stage"?"Publiez vos offres <strong>4 à 6 semaines avant</strong> la période de disponibilité.":"Pour une rentrée <strong>sept.–oct.</strong>, publiez dès <strong>avril–mai</strong>. Les meilleurs profils sont souvent engagés avant l'été.";return`<div class="pub-note"><div class="pub-note-t">⏱ Publication conseillée</div><div class="pub-note-b">${msg}</div></div>`;};
+    const MO_F=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+    const mkPN=(type,pb)=>{
+      if(!showPub||!pb.some(p=>p>0))return"";
+      const ideal=MO_F.filter((_,i)=>pb[i]===2);
+      const possible=MO_F.filter((_,i)=>pb[i]===1);
+      const ant=type==="stage"?pubCfg.stage:pubCfg.alt;
+      let msg=`Publiez <strong>${ant} mois avant</strong> la période de disponibilité.`;
+      if(ideal.length)msg+=` <strong>Idéal :</strong> ${ideal.join(', ')}.`;
+      if(possible.length)msg+=` <strong>Possible :</strong> ${possible.join(', ')}.`;
+      return`<div class="pub-note"><div class="pub-note-t">⏱ Publication conseillée</div><div class="pub-note-b">${msg}</div></div>`;
+    };
     const isDual=showS&&showA;
     const notes=document.createElement("div");notes.className="det-notes "+(isDual?"dual":"single");
     notes.style.gridTemplateColumns=isDual?"1fr 1fr":"1fr";
@@ -987,7 +1108,6 @@ document.getElementById("adm-save").addEventListener("click", async () => {
         if (sId) {
           const f = { [FC.niveau]: info.level||'', [FC.note]: info.stageNote||'', [FC.duree]: info.stageDuration||'' };
           FC.mo.forEach((fid, i) => { f[fid] = info.stage[i] || 0; });
-          FC.pub.forEach((fid, i) => { f[fid] = (info.stagePub||[])[i] || 0; });
           tasks.push(atPatch(AT.cal, sId, f));
         }
         // Calendriers — Alternance
@@ -995,7 +1115,6 @@ document.getElementById("adm-save").addEventListener("click", async () => {
         if (aId) {
           const f = { [FC.niveau]: info.level||'', [FC.note]: info.altNote||'' };
           FC.mo.forEach((fid, i) => { f[fid] = info.alternance[i] || 0; });
-          FC.pub.forEach((fid, i) => { f[fid] = (info.altPub||[])[i] || 0; });
           tasks.push(atPatch(AT.cal, aId, f));
         }
         // Écoles — email/phone/logo/ordre/visible (une seule fois par école)
@@ -1017,6 +1136,7 @@ document.getElementById("adm-save").addEventListener("click", async () => {
     if (admCfgDraft) pubCfg = clone(admCfgDraft);
     document.getElementById("adm-ov").classList.remove("open");
     document.getElementById("tagline").textContent = DATA[actProf].tagline;
+    updatePubBanner();
     renderTabs();
     render();
     btn.textContent = "✓ Sauvegardé !";
@@ -1152,38 +1272,6 @@ function renderAdmin(){
       sec.appendChild(grid);body.appendChild(sec);
     });
 
-    // Grille Publication conseillée (une par school, auto-remplie par pubCalc si vide)
-    ["stagePub","altPub"].forEach((key,ti)=>{
-      const typeLabel=ti===0?"Stage":"Alternance";
-      const availKey=ti===0?"stage":"alternance";
-      // Initialiser avec pubCalc si tout à zéro
-      const current=admDraft[admTab].schools[school][key]||Array(12).fill(0);
-      if(!current.some(v=>v>0)){
-        const auto=pubCalc(admDraft[admTab].schools[school][availKey],ti===0?"stage":"alternance");
-        admDraft[admTab].schools[school][key]=auto.slice();
-      }
-      const sec=document.createElement("div");sec.className="adm-bst";
-      sec.innerHTML=`<div class="adm-bt">⏱ Publication conseillée — ${typeLabel}<span>Clic cyclique : ○ → ◐ → ● · Auto-calculé si vide</span></div>`;
-      const grid=document.createElement("div");grid.className="adm-g";
-      MO.forEach((m,mi)=>{
-        const col=document.createElement("div");
-        const ml=document.createElement("div");ml.className="adm-ml";ml.textContent=m;
-        const v=admDraft[admTab].schools[school][key][mi];
-        const cell=document.createElement("div");cell.className="adm-c"+(v===1?" v1":v===2?" v2":"");
-        cell.textContent=v===2?"●":v===1?"◐":"○";
-        cell.addEventListener("click",()=>{admDraft[admTab].schools[school][key][mi]=(v+1)%3;renderAdmin();});
-        col.appendChild(ml);col.appendChild(cell);grid.appendChild(col);
-      });
-      // Bouton reset auto
-      const rst=document.createElement("button");rst.style.cssText="margin-top:4px;font-size:8px;padding:2px 8px;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--g400);cursor:pointer";
-      rst.textContent="↺ Recalculer auto";
-      rst.addEventListener("click",()=>{
-        const auto=pubCalc(admDraft[admTab].schools[school][availKey],ti===0?"stage":"alternance");
-        admDraft[admTab].schools[school][key]=auto.slice();
-        renderAdmin();
-      });
-      sec.appendChild(grid);sec.appendChild(rst);body.appendChild(sec);
-    });
 
     // Champs texte
     const tf=document.createElement("div");tf.className="adm-tf";
@@ -1253,7 +1341,6 @@ function renderAdmin(){
           admDraft[profil].schools[nom]={
             visible:true,email,phone:tel,logo,ordre,level:niveau,
             url:'',contact:'',stage:Array(12).fill(0),alternance:Array(12).fill(0),
-            stagePub:Array(12).fill(0),altPub:Array(12).fill(0),
             stageNote:'',altNote:'',stageDuration:''
           };
         });
