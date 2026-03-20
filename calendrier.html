@@ -27,154 +27,108 @@ body{font-family:var(--f);background:var(--bg);color:var(--blk);-webkit-font-smo
 button,a,input,textarea{font-family:var(--f)}
 
 /* ══════════════════════════════════════
-   TOPBAR — une seule barre, tout dedans
+   TOPBAR — 2 lignes : contrôles + tagline
 ══════════════════════════════════════ */
 #topbar{
   background:var(--bg);border-bottom:1px solid var(--border);
-  padding:0 24px;
-  display:flex;align-items:center;justify-content:space-between;
-  gap:12px;min-height:52px;
-  transition:background .2s;
   position:sticky;top:0;z-index:30;
+  transition:background .2s;
+}
+.topbar-main{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;gap:12px;min-height:50px;
+}
+.topbar-sub{
+  padding:7px 24px;
+  font-size:10.5px;color:var(--g500);letter-spacing:.01em;line-height:1;
+  border-top:1px solid var(--g100);
 }
 
 /* Onglets profil */
 .tabs{display:flex;gap:0;align-self:stretch}
 .tab{
-  padding:0 20px;font-size:10.5px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;
+  padding:0 18px;font-size:10px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;
   border:none;background:transparent;color:var(--g400);cursor:pointer;
   border-bottom:2.5px solid transparent;
   transition:color .13s,border-color .13s;white-space:nowrap;align-self:stretch;
 }
-.tab:hover{color:var(--g700)}
-.tab.on{font-weight:700;color:var(--acc);border-bottom-color:var(--acc)}
+.tab:hover{color:var(--blk)}
+.tab.on{font-weight:800;color:var(--blk);border-bottom-color:var(--blk)}
 
 /* Groupe d'actions droite */
-.top-actions{display:flex;align-items:center;gap:8px}
+.top-actions{display:flex;align-items:center;gap:6px}
 
-/* ★ BOUTON PRINCIPAL — QUAND PUBLIER ★ */
-#pub-cta{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:9px 20px;
-  background:var(--acc);color:var(--wh);
-  border:none;border-radius:7px;
-  font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;
-  cursor:pointer;white-space:nowrap;
-  box-shadow:0 3px 10px rgba(78,54,255,.4);
-  transition:background .14s,box-shadow .14s,transform .1s;
-}
-#pub-cta:hover{background:var(--accD);box-shadow:0 5px 16px rgba(78,54,255,.5);transform:translateY(-1px)}
-#pub-cta.on{background:var(--blk);box-shadow:none;color:var(--wh)}
-.pub-cta-icon{font-size:14px;line-height:1}
-
-/* Séparateur vertical */
-.v-sep{width:1px;height:20px;background:var(--border);flex-shrink:0}
-
-/* Filtre Stage / Alternance — segmented */
-.seg{display:flex;border:1.5px solid var(--border);border-radius:6px;overflow:hidden;background:var(--bg-card)}
+/* Filtre Stage / Alternance — 2 pills indépendants */
+.seg{display:flex;gap:4px}
 .seg-btn{
-  padding:5px 11px;font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
-  border:none;background:transparent;color:var(--g400);cursor:pointer;
-  transition:background .1s,color .1s;white-space:nowrap
+  padding:6px 14px;font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  border:1.5px solid var(--border);border-radius:20px;background:transparent;color:var(--g400);
+  cursor:pointer;transition:all .12s;white-space:nowrap
 }
-.seg-btn:not(:last-child){border-right:1px solid var(--border)}
-.seg-btn.on{background:var(--blk);color:var(--wh)}
+.seg-btn.on{background:var(--blk);color:var(--wh);border-color:var(--blk)}
 
-/* Petits boutons utilitaires */
+/* Séparateur */
+.v-sep{width:1px;height:18px;background:var(--border);flex-shrink:0;margin:0 2px}
+
+/* Bouton ⏱ Quand publier */
+#pub-cta{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 14px;
+  background:transparent;color:var(--g500);
+  border:1.5px solid var(--border);border-radius:20px;
+  font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  cursor:pointer;white-space:nowrap;
+  transition:all .14s;
+}
+#pub-cta:hover{border-color:var(--g400);color:var(--g700)}
+#pub-cta.on{background:var(--acc);color:var(--wh);border-color:var(--acc)}
+
+/* PDF button */
 .util{
   display:inline-flex;align-items:center;gap:5px;
-  padding:6px 11px;font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
-  border:1.5px solid var(--border);background:var(--bg-card);color:var(--g500);
-  border-radius:6px;cursor:pointer;white-space:nowrap;text-decoration:none;
+  padding:7px 13px;font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  border:1.5px solid var(--border);background:transparent;color:var(--g400);
+  border-radius:20px;cursor:pointer;white-space:nowrap;text-decoration:none;
   transition:all .12s
 }
-.util:hover{background:var(--bg-hdr-open);border-color:var(--g300);color:var(--g700)}
+.util:hover{border-color:var(--g400);color:var(--g700)}
 
 /* ══════════════════════════════════════
-   BANDEAU PUBLICATION
-══════════════════════════════════════ */
-#pub-banner{
-  display:none;
-  background:var(--accL);border-bottom:1.5px solid var(--accM);
-  padding:10px 24px;
-}
-.pub-banner-inner{
-  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-  font-size:10px;color:var(--g700)
-}
-.pub-badge{
-  background:var(--acc);color:var(--wh);
-  font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
-  padding:3px 9px;border-radius:4px;flex-shrink:0
-}
-.pub-rules{display:flex;gap:18px;flex-wrap:wrap}
-.pub-rule{display:flex;align-items:center;gap:6px}
-.pub-rule-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
-
-/* ══════════════════════════════════════
-   TAGLINE BAR (slim)
-══════════════════════════════════════ */
-#tagline-bar{
-  background:var(--bg);border-bottom:1px solid var(--border);
-  padding:6px 24px;transition:background .2s
-}
-#tagline{font-size:10px;color:var(--g400);letter-spacing:.02em}
-
-/* ══════════════════════════════════════
-   INTRO BAR — valeur prop + stats
-══════════════════════════════════════ */
-/* ══════════════════════════════════════
-   RECRUTER AUJOURD'HUI
+   TODAY STRIP — bandeau recruter maintenant
 ══════════════════════════════════════ */
 #today-box{
-  background:var(--bg-card);border:1px solid var(--border-card);
-  border-radius:var(--r);margin-bottom:10px;overflow:hidden;
+  background:var(--accL);
+  border-bottom:1px solid var(--accM);
+  padding:9px 24px;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
 }
 #today-box.today-empty{display:none}
-.today-hdr{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 16px;
-  background:var(--blk);color:var(--wh);
+.today-mo{
+  font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--acc);white-space:nowrap;flex-shrink:0;
 }
-.today-hdr-mo{
-  font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+.today-vsep{width:1px;height:14px;background:var(--accM);flex-shrink:0}
+.today-grp{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.today-grp-lbl{
+  font-size:8px;font-weight:700;color:var(--g500);letter-spacing:.05em;white-space:nowrap;flex-shrink:0;
 }
-.today-hdr-sub{font-size:9px;color:rgba(255,255,255,.5)}
-.today-body{display:flex;flex-direction:column;gap:0}
-.today-row{
-  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
-  padding:8px 16px;border-bottom:1px solid var(--border);
-}
-.today-row:last-child{border-bottom:none}
-.today-row-lbl{
-  display:flex;align-items:center;gap:6px;
-  font-size:7.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
-  white-space:nowrap;min-width:160px;flex-shrink:0;
-}
-.today-dot-now{width:8px;height:8px;border-radius:50%;background:var(--acc);flex-shrink:0}
-.today-dot-prep{width:8px;height:8px;border-radius:50%;background:var(--accM);border:1.5px dashed var(--acc);flex-shrink:0}
-.today-chips{display:flex;gap:6px;flex-wrap:wrap}
 .today-chip{
   display:inline-flex;align-items:center;gap:5px;
-  padding:5px 10px;border-radius:5px;cursor:pointer;
-  border:1.5px solid var(--border);background:var(--bg-card);
-  font-size:10px;font-weight:600;color:var(--blk);
-  transition:all .12s;text-decoration:none;white-space:nowrap;
+  padding:4px 11px 4px 7px;border-radius:20px;cursor:pointer;
+  background:var(--wh);border:1.5px solid var(--accM);
+  font-size:10px;font-weight:700;color:var(--blk);
+  transition:all .12s;white-space:nowrap;
 }
-.today-chip:hover{border-color:var(--acc);background:var(--accL);color:var(--acc)}
-.today-chip-logo{height:14px;width:auto;max-width:36px;object-fit:contain;display:block}
-.today-chip-type{
-  font-size:6px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-  padding:1px 5px;border-radius:2px;
-}
-.today-chip-type.s{background:var(--accL);color:var(--acc);border:1px solid var(--accM)}
-.today-chip-type.a{background:transparent;color:var(--acc);border:1.5px solid var(--acc)}
-.today-none{padding:10px 16px;font-size:10px;color:var(--g400);font-style:italic}
+.today-chip:hover{border-color:var(--acc);color:var(--acc);background:var(--accL)}
+.today-chip-logo{height:13px;width:auto;max-width:32px;object-fit:contain;display:block;flex-shrink:0}
+.today-chip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.today-chip-dot.now{background:var(--acc)}
+.today-chip-dot.prep{background:var(--accM);border:1px solid var(--acc)}
 
 /* ══════════════════════════════════════
    CAL BODY
 ══════════════════════════════════════ */
-#cal-body{padding:16px 24px 48px}
+#cal-body{padding:14px 24px 48px}
 
 /* Month strip */
 .ms-wrap{
@@ -195,151 +149,147 @@ button,a,input,textarea{font-family:var(--f)}
 .sc{
   background:var(--bg-card);
   border:1px solid var(--border-card);border-radius:var(--r);
-  overflow:hidden;margin-bottom:4px;
-  transition:border-color .13s,box-shadow .13s;
+  overflow:hidden;margin-bottom:6px;
+  transition:border-color .15s,box-shadow .15s;
 }
-.sc:hover{border-color:var(--g300)}
-.sc.open{border-color:var(--acc);box-shadow:0 0 0 2.5px var(--accL)}
+.sc:hover{border-color:var(--g300);box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.sc.open{border-color:var(--blk);box-shadow:0 4px 20px rgba(0,0,0,.08)}
 
 /* ─ Header ─ */
 .sc-hdr{
   display:flex;align-items:center;
-  padding:10px 14px;cursor:pointer;
-  background:var(--bg-card);min-height:54px;
-  transition:background .12s
+  padding:12px 16px 12px 14px;cursor:pointer;
+  background:var(--bg-card);
+  transition:background .12s;gap:14px;
 }
-.sc.open .sc-hdr{background:var(--bg-hdr-open)}
+.sc.open .sc-hdr{background:#fafafa}
 
-/* Logo zone — strictement contenu */
+/* Logo zone */
 .logo-z{
-  flex:0 0 86px;width:86px;overflow:hidden;
-  display:flex;align-items:center;
-  border-right:1px solid var(--border);
-  padding-right:12px;margin-right:14px;
-  height:34px;flex-shrink:0
+  flex:0 0 72px;width:72px;height:30px;
+  display:flex;align-items:center;justify-content:flex-start;
+  flex-shrink:0;
 }
-.sc-logo{display:block;max-width:72px;max-height:28px;width:auto;height:auto;object-fit:contain;object-position:left}
-.sc-logo-fb{font-size:11px;font-weight:800;color:var(--blk);display:none;white-space:nowrap}
+.sc-logo{display:block;max-width:68px;max-height:26px;width:auto;height:auto;object-fit:contain;object-position:left}
+.sc-logo-fb{font-size:10px;font-weight:800;color:var(--blk);display:none;white-space:nowrap;letter-spacing:-.01em}
 
 /* Info */
-.sc-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
-.sc-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc-info{flex:1;min-width:0}
+.sc-name{font-size:14px;font-weight:800;letter-spacing:-.02em;display:block;line-height:1.1;margin-bottom:3px}
 .sc-sub{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.sc-lvl{font-size:9.5px;color:var(--g400)}
+.sc-lvl{font-size:9px;color:var(--g400)}
 
-/* Tags — même couleur que le contour des cartes actives (--acc) */
+/* Tags */
 .tag{
-  font-size:7px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
-  padding:2px 7px;border-radius:3px;flex-shrink:0;white-space:nowrap
+  font-size:7.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  padding:2px 8px;border-radius:20px;flex-shrink:0;white-space:nowrap;
+  cursor:pointer;transition:all .12s
 }
-.tag-s{background:var(--accL);color:var(--acc);border:1px solid var(--accM)}        /* Stage : fond */
-.tag-a{background:transparent;color:var(--acc);border:1.5px solid var(--acc)}      /* Alternance : contour */
+.tag-s{background:var(--accL);color:var(--acc);border:1px solid var(--accM)}
+.tag-s:hover{background:var(--acc);color:var(--wh)}
+.tag-a{background:transparent;color:var(--acc);border:1.5px solid var(--acc)}
+.tag-a:hover{background:var(--acc);color:var(--wh)}
 
-/* Contact */
-.sc-cz{flex:0 0 auto;margin-left:12px;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+/* Contact CTA dans header */
+.sc-cz{flex:0 0 auto;display:flex;align-items:center;gap:8px;margin-left:4px}
 .btn-mail{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:6px 13px;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
-  background:var(--blk);color:var(--wh);border:none;border-radius:5px;
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 16px;font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  background:var(--blk);color:var(--wh);border:none;border-radius:7px;
   text-decoration:none;cursor:pointer;white-space:nowrap;transition:background .12s;flex-shrink:0
 }
-.btn-mail:hover{background:#2d2d2d}
-.sc-email{font-size:8px;color:var(--g400);white-space:nowrap}
-
-.sc-chev{flex:0 0 auto;margin-left:10px;color:var(--g300);transition:transform .2s,color .13s}
-.sc.open .sc-chev{transform:rotate(180deg);color:var(--acc)}
+.btn-mail:hover{background:#333}
+.sc-chev{color:var(--g200);transition:transform .2s,color .15s;flex-shrink:0;margin-left:6px}
+.sc.open .sc-chev{transform:rotate(180deg);color:var(--blk)}
 
 /* ─ Bars ─ */
-.sc-bars{border-top:1px solid var(--g100);padding:5px 8px 7px}
+.sc-bars{padding:4px 14px 10px;border-top:1px solid var(--g100)}
 .bar-row{display:grid;grid-template-columns:var(--left) repeat(12,1fr);gap:3px;padding:2px 0}
 .bar-lbl{
   display:flex;align-items:center;justify-content:flex-end;padding-right:8px;
-  font-size:7px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
-  color:var(--accM)   /* cohérent avec les tags bleus */
+  font-size:7px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--g300);
 }
 .cell-w{display:flex;flex-direction:column}
 .bar-cell{
   height:var(--bar);border-radius:4px;
-  background:#dddde4;border:1px solid #c8c8d2;
-  cursor:default;transition:filter .08s
+  background:#e8e8f0;border:none;
+  cursor:default;transition:opacity .1s
 }
-.bar-cell:hover{filter:brightness(.87)}
-/* Barres de dispo : VERT et ORANGE uniquement */
-.av2{background:var(--grn);border-color:var(--grn)}
-.av1{background:var(--amb);border-color:var(--amb)}
-.cur-col:not(.av1):not(.av2){background:rgba(78,54,255,.05);border-color:rgba(78,54,255,.2)}
-.av2.cur-col,.av1.cur-col{outline:2.5px solid var(--acc);outline-offset:2px;z-index:1}
+.bar-cell:hover{opacity:.8}
+.av2{background:var(--grn)}
+.av1{background:var(--amb)}
+.cur-col:not(.av1):not(.av2){background:rgba(78,54,255,.08)}
+.av2.cur-col{outline:2.5px solid var(--acc);outline-offset:2px;z-index:1}
+.av1.cur-col{outline:2.5px solid var(--acc);outline-offset:2px;z-index:1}
 /* Pub sub-bars */
-.pub-sub{height:4px;border-radius:2px;margin-top:2px;background:transparent}
+.pub-sub{height:5px;border-radius:3px;margin-top:3px;background:transparent}
 .p-now{background:var(--acc)}
-.p-prep{background:var(--accM);border:1px dashed var(--acc)}
+.p-prep{background:var(--accM)}
 
 /* ─ Detail ─ */
-.sc-det{display:none;border-top:1px solid var(--border);background:var(--bg-detail)}
+.sc-det{display:none;border-top:1px solid var(--border)}
 .sc.open .sc-det{display:block}
 
-/* Barre de contact dans le détail */
+/* Contact links ligne */
 .det-cbar{
   display:flex;align-items:center;gap:8px;flex-wrap:wrap;
-  padding:10px 16px;
-  background:var(--bg-hdr-open);   /* même que l'en-tête ouverte */
-  border-bottom:1px solid var(--border)
+  padding:11px 16px;background:#fafafa;border-bottom:1px solid var(--g100);
 }
-.det-clbl{font-size:7.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--g400);margin-right:2px}
+.det-clbl{font-size:7px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--g300);margin-right:4px}
 .det-tags{display:flex;gap:4px}
 .det-link{
+  display:inline-flex;align-items:center;gap:5px;
   font-size:10px;color:var(--blk);font-weight:500;text-decoration:none;
-  background:var(--bg-card);border:1px solid var(--border);border-radius:4px;
-  padding:4px 10px;transition:background .1s;white-space:nowrap
+  background:var(--wh);border:1px solid var(--border);border-radius:6px;
+  padding:5px 12px;transition:all .1s;white-space:nowrap
 }
-.det-link:hover{background:var(--g100)}
+.det-link:hover{background:var(--blk);color:var(--wh);border-color:var(--blk)}
 .det-site{
-  font-size:9.5px;font-weight:600;color:var(--g700);text-decoration:none;
-  padding:5px 12px;border:1.5px solid var(--border);border-radius:4px;
+  font-size:10px;font-weight:600;color:var(--g700);text-decoration:none;
+  padding:5px 12px;border:1.5px solid var(--border);border-radius:6px;
   transition:all .12s;white-space:nowrap;
-  display:inline-flex;align-items:center;gap:4px
+  display:inline-flex;align-items:center;gap:5px
 }
 .det-site:hover{background:var(--blk);color:var(--wh);border-color:var(--blk)}
 
 /* Notes */
-.det-notes{display:grid;padding:14px 16px;gap:0}
-.det-notes.single .det-blk:not(:last-child){border-bottom:1px solid var(--border);margin-bottom:12px;padding-bottom:12px}
-.det-notes.dual{column-gap:20px}
-.det-notes.dual .det-blk:first-child{border-right:1px solid var(--border);padding-right:20px}
-.det-blk{padding-bottom:0}
+.det-notes{display:grid;padding:16px;gap:0;background:#fff}
+.det-notes.dual{grid-template-columns:1fr 1fr;column-gap:24px}
+.det-notes.single .det-blk:not(:last-child){border-bottom:1px solid var(--g100);margin-bottom:14px;padding-bottom:14px}
+.det-notes.dual .det-blk:first-child{border-right:1px solid var(--g100);padding-right:24px}
 .det-head{
-  display:flex;align-items:center;gap:7px;margin-bottom:7px;
-  font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--g700)
+  display:flex;align-items:center;gap:7px;margin-bottom:8px;
+  font-size:8px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--blk)
 }
-/* Indicateurs Stage / Alternance dans la description : couleur acc, PAS vert/orange */
-.det-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
-.det-dot.ds{background:var(--acc)}                                      /* Stage : carré plein */
-.det-dot.da{background:transparent;border:2px solid var(--acc)}          /* Alternance : contour */
-.det-txt{font-size:11px;color:var(--g700);line-height:1.9}
+.det-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.det-dot.ds{background:var(--acc)}
+.det-dot.da{background:transparent;border:2px solid var(--acc)}
+.det-txt{font-size:11.5px;color:var(--g700);line-height:1.85}
 .pub-note{
-  margin-top:9px;padding:8px 12px 8px 13px;
-  background:var(--accL);border-left:3px solid var(--acc);border-radius:0 4px 4px 0
+  margin-top:10px;padding:9px 13px 9px 14px;
+  background:var(--accL);border-left:3px solid var(--acc);border-radius:0 5px 5px 0
 }
-.pub-note-t{font-size:7.5px;font-weight:800;color:var(--acc);letter-spacing:.11em;text-transform:uppercase;margin-bottom:3px}
-.pub-note-b{font-size:10.5px;color:var(--g700);line-height:1.6}
+.pub-note-t{font-size:7px;font-weight:800;color:var(--acc);letter-spacing:.13em;text-transform:uppercase;margin-bottom:4px}
+.pub-note-b{font-size:10.5px;color:var(--g700);line-height:1.65}
 
 /* ══════════════════════════════════════
    LEGEND
 ══════════════════════════════════════ */
 #legend{
-  margin-top:16px;background:var(--bg-card);border:1px solid var(--border-card);
-  border-radius:var(--r);padding:11px 16px;
-  display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px
+  margin-top:20px;padding:10px 0;
+  border-top:1px solid var(--g100);
+  display:flex;align-items:center;flex-wrap:wrap;gap:5px 16px
 }
-.leg-t{font-size:7.5px;font-weight:800;color:var(--acc);letter-spacing:.14em;text-transform:uppercase}
+.leg-t{font-size:7px;font-weight:800;color:var(--g300);letter-spacing:.16em;text-transform:uppercase;margin-right:4px}
 .leg-sec{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.leg-vsep{width:1px;height:15px;background:var(--border);flex-shrink:0}
-.leg-i{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--g700)}
-.leg-sw{width:20px;height:10px;border-radius:3px;flex-shrink:0}
-.leg-tag{font-size:7px;padding:2px 7px;border-radius:3px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.leg-vsep{width:1px;height:13px;background:var(--g100);flex-shrink:0}
+.leg-i{display:flex;align-items:center;gap:6px;font-size:9.5px;color:var(--g500)}
+.leg-sw{width:16px;height:8px;border-radius:3px;flex-shrink:0}
+.leg-tag{font-size:7px;padding:2px 7px;border-radius:20px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
 .leg-now{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:9px;color:var(--g400)}
-.leg-now-pill{background:var(--acc);color:var(--wh);font-size:7.5px;font-weight:700;padding:2px 8px;border-radius:3px}
-#cal-note{margin-top:9px;font-size:8.5px;color:var(--g400);line-height:1.75}
+.leg-now-pill{background:var(--acc);color:var(--wh);font-size:7px;font-weight:700;padding:2px 8px;border-radius:20px}
+#cal-note{margin-top:12px;font-size:8.5px;color:var(--g300);line-height:1.75}
 
 /* ══════════════════════════════════════
    TOOLTIP
@@ -435,53 +385,33 @@ button,a,input,textarea{font-family:var(--f)}
 
 <!-- ══ TOPBAR ══ -->
 <div id="topbar">
-  <!-- Onglets profil -->
-  <div class="tabs" id="tab-container"></div>
-
-  <!-- Actions -->
-  <div class="top-actions">
-    <!-- ★ CTA PRINCIPAL ★ -->
-    <button id="pub-cta">
-      <span class="pub-cta-icon">⏱</span>
-      Quand publier ?
-    </button>
-
-    <div class="v-sep"></div>
-
-    <!-- Filtre type -->
-    <div class="seg">
-      <button class="seg-btn on" data-type="both">Stages &amp; Alternance</button>
-      <button class="seg-btn" data-type="stage">Stages</button>
-      <button class="seg-btn" data-type="alternance">Alternance</button>
-    </div>
-
-    <!-- PDF -->
-    <button class="util" id="pdf-btn">
-      <svg width="11" height="11" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 16v1a1 1 0 001 1h10a1 1 0 001-1v-1M7 10l3 3 3-3M10 3v10"/></svg>
-      PDF
-    </button>
-  </div>
-</div>
-
-<!-- ══ TAGLINE ══ -->
-<div id="tagline-bar"><span id="tagline"></span></div>
-
-<!-- ══ BANDEAU PUBLICATION ══ -->
-<div id="pub-banner">
-  <div class="pub-banner-inner">
-    <span class="pub-badge">⏱ Délais conseillés</span>
-    <div class="pub-rules">
-      <div class="pub-rule">
-        <div class="pub-rule-dot" style="background:#4e36ff"></div>
-        <strong>Publier maintenant</strong> — <span id="pb-s1"></span> · <span id="pb-a1"></span>
+  <div class="topbar-main">
+    <div class="tabs" id="tab-container"></div>
+    <div class="top-actions">
+      <div class="seg">
+        <button class="seg-btn on" id="seg-stage" data-type="stage">Stage</button>
+        <button class="seg-btn on" id="seg-alt" data-type="alternance">Alternance</button>
       </div>
-      <div class="pub-rule">
-        <div class="pub-rule-dot" style="background:#c4b5ff"></div>
-        <strong>Commencer à préparer</strong> — <span id="pb-s2"></span> · <span id="pb-a2"></span>
-      </div>
+      <div class="v-sep"></div>
+      <button id="pub-cta" class="on">
+        <svg width="11" height="11" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="10" cy="10" r="8"/><path d="M10 6v4l3 2"/></svg>
+        Quand publier
+      </button>
+      <button class="util" id="pdf-btn">
+        <svg width="11" height="11" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 16v1a1 1 0 001 1h10a1 1 0 001-1v-1M7 10l3 3 3-3M10 3v10"/></svg>
+        Exporter PDF
+      </button>
     </div>
   </div>
+  <div class="topbar-sub"><span id="tagline"></span></div>
 </div>
+
+<!-- Spans pour pub-banner (JS-only, pas affiché) -->
+<span id="pb-s1" style="display:none"></span><span id="pb-a1" style="display:none"></span>
+<span id="pb-s2" style="display:none"></span><span id="pb-a2" style="display:none"></span>
+
+<!-- Today strip pleine largeur entre topbar et calendrier -->
+<div id="today-box"></div>
 
 <!-- ══ CALENDRIER ══ -->
 <div id="cal-body">
@@ -489,7 +419,6 @@ button,a,input,textarea{font-family:var(--f)}
     <div class="ms" id="ms"><div></div></div>
   </div>
 
-  <div id="today-box"></div>
   <div id="school-rows"></div>
 
   <!-- Légende -->
@@ -640,7 +569,7 @@ const FALLBACK_DATA={
 let DATA=JSON.parse(JSON.stringify(FALLBACK_DATA));
 
 /* ══ ÉTAT ══ */
-let actProf="CRÉA",actType="both",showPub=false,expanded=null;
+let actProf="CRÉA",actType="both",showPub=true,expanded=null;
 let admDraft=null,admTab="CRÉA",admExp=null,draggedSchool=null,admCfgDraft=null;
 
 /* ══ TOOLTIP ══ */
@@ -756,6 +685,46 @@ async function loadAirtable() {
   render();
 }
 
+/* Re-fetch silencieux (avant PDF) — met à jour DATA + pubCfg sans overlay */
+async function loadAirtableSilent(){
+  const h={'Authorization':`Bearer ${AT.token}`};
+  const [eR,cR,pR,gR]=await Promise.all([
+    fetch(`https://api.airtable.com/v0/${AT.base}/${AT.eco}?sort[0][field]=Ordre&sort[0][direction]=asc`,{headers:h}),
+    fetch(`https://api.airtable.com/v0/${AT.base}/${AT.cal}`,{headers:h}),
+    fetch(`https://api.airtable.com/v0/${AT.base}/${AT.prof}`,{headers:h}),
+    fetch(`https://api.airtable.com/v0/${AT.base}/${AT.cfg}`,{headers:h})
+  ]);
+  if(!eR.ok||!cR.ok)throw new Error('fetch failed');
+  // Réutilise la même logique que loadAirtable mais sans UI
+  const eData=await eR.json(),cData=await cR.json(),pData=await pR.json(),gData=await gR.json();
+  // Paramètres
+  if(gData.records&&gData.records[0]){const gf=gData.records[0].fields;if(gf[FG.stage]!=null)pubCfg.stage=gf[FG.stage];if(gf[FG.alt]!=null)pubCfg.alt=gf[FG.alt];}
+  // Écoles
+  const allSchools={};
+  eData.records.forEach(r=>{const f=r.fields;const name=f[FE.nom];ecoIds[name]=r.id;LOGOS[name]=f[FE.logo]||'';allSchools[r.id]={name,email:f[FE.email]||'',phone:f[FE.tel]||'',logo:f[FE.logo]||'',visible:!!f[FE.visible],ordre:f[FE.ordre]||999};});
+  // Profils
+  const data={};
+  Object.entries(PROF_META).forEach(([k,v])=>{data[k]={...v,schools:{}};});
+  pData.records.forEach(r=>{const f=r.fields;const nom=typeof f[FP.nom]==='object'?(f[FP.nom]||{}).name:f[FP.nom];if(nom&&data[nom]){profIds[nom]=r.id;if(f[FP.fullLabel])data[nom].fullLabel=f[FP.fullLabel];if(f[FP.tagline])data[nom].tagline=f[FP.tagline];if(f[FP.contexte])data[nom].context=f[FP.contexte];}});
+  // Calendriers
+  cData.records.forEach(r=>{
+    const f=r.fields;
+    const profil=typeof f[FC.profil]==='object'?(f[FC.profil]||{}).name:f[FC.profil];
+    const type=typeof f[FC.type]==='object'?(f[FC.type]||{}).name:f[FC.type];
+    const ecoRaw=(f[FC.ecole]||[])[0];const ecoId=typeof ecoRaw==='object'?ecoRaw.id:ecoRaw;
+    const sch=allSchools[ecoId];
+    if(!sch||!data[profil])return;
+    const name=sch.name;calIds[`${name}|${profil}|${type}`]=r.id;
+    if(!data[profil].schools[name]){const m=SCHOOL_META[name]||{};data[profil].schools[name]={visible:sch.visible,email:sch.email,phone:sch.phone,logo:sch.logo,ordre:sch.ordre,level:'',url:m.url||'',contact:m.contact||'',stage:Array(12).fill(0),alternance:Array(12).fill(0),stageNote:'',altNote:'',stageDuration:''};}
+    const avail=FC.mo.map(fid=>f[fid]||0);const s=data[profil].schools[name];const fb=(FALLBACK_DATA[profil]||{schools:{}}).schools[name]||{};
+    if(f[FC.niveau])s.level=f[FC.niveau];
+    if(type==='Stage'){s.stage=avail;s.stageNote=f[FC.note]||fb.stageNote||'';s.stageDuration=f[FC.duree]||fb.stageDuration||'';}
+    else{s.alternance=avail;s.altNote=f[FC.note]||fb.altNote||'';}
+  });
+  DATA=data;
+  updatePubBanner();
+}
+
 function updatePubBanner(){
   const s=pubCfg.stage,a=pubCfg.alt;
   const el=id=>document.getElementById(id);
@@ -790,48 +759,37 @@ const MOF_LONG=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Aoû
 function renderTodayBox(sortedSchools,showS,showA){
   const box=document.getElementById('today-box');
   box.innerHTML='';
-  // Calculer qui contacter ce mois-ci (CUR)
   const now=[],prep=[];
   sortedSchools.forEach(([school,info])=>{
     const sp=pubCalc(info.stage,'stage'),ap=pubCalc(info.alternance,'alternance');
     const nowS=showS&&sp[CUR]===2,nowA=showA&&ap[CUR]===2;
     const prepS=showS&&sp[CUR]===1,prepA=showA&&ap[CUR]===1;
-    if(nowS||nowA) now.push({school,info,types:{s:nowS,a:nowA}});
-    else if(prepS||prepA) prep.push({school,info,types:{s:prepS,a:prepA}});
+    if(nowS||nowA) now.push({school,info,dotCls:'now',types:{s:nowS,a:nowA}});
+    else if(prepS||prepA) prep.push({school,info,dotCls:'prep',types:{s:prepS,a:prepA}});
   });
   if(!now.length&&!prep.length){box.classList.add('today-empty');return;}
   box.classList.remove('today-empty');
-  // Header
-  const hdr=document.createElement('div');hdr.className='today-hdr';
-  hdr.innerHTML=`<div class="today-hdr-mo">📅 ${MOF_LONG[CUR]} ${new Date().getFullYear()}</div><div class="today-hdr-sub">Écoles à contacter ce mois-ci pour votre recrutement</div>`;
-  box.appendChild(hdr);
-  const body=document.createElement('div');body.className='today-body';
-  const mkRow=(label,dotCls,entries)=>{
+  // Date
+  const mo=document.createElement('span');mo.className='today-mo';
+  mo.textContent=`📅 ${MOF_LONG[CUR]}`;box.appendChild(mo);
+  const mkGrp=(label,entries)=>{
     if(!entries.length)return;
-    const row=document.createElement('div');row.className='today-row';
-    const lbl=document.createElement('div');lbl.className='today-row-lbl';
-    const dot=document.createElement('div');dot.className=dotCls;
-    lbl.appendChild(dot);lbl.appendChild(document.createTextNode(label));
-    row.appendChild(lbl);
-    const chips=document.createElement('div');chips.className='today-chips';
-    entries.forEach(({school,info,types})=>{
-      const chip=document.createElement('div');chip.className='today-chip';
-      chip.title=info.email||school;
+    box.appendChild(Object.assign(document.createElement('span'),{className:'today-vsep'}));
+    const grp=document.createElement('div');grp.className='today-grp';
+    const lbl=document.createElement('span');lbl.className='today-grp-lbl';lbl.textContent=label;grp.appendChild(lbl);
+    entries.forEach(({school,info,dotCls})=>{
+      const chip=document.createElement('div');chip.className='today-chip';chip.title=`Contacter ${school}`;
+      const dot=document.createElement('span');dot.className=`today-chip-dot ${dotCls}`;chip.appendChild(dot);
       const logo=info.logo||LOGOS[school]||'';
       if(logo){const img=document.createElement('img');img.className='today-chip-logo';img.src=logo;img.alt=school;img.onerror=function(){this.replaceWith(document.createTextNode(school));};chip.appendChild(img);}
-      else{chip.appendChild(document.createTextNode(school));}
-      if(types.s){const t=document.createElement('span');t.className='today-chip-type s';t.textContent='Stage';chip.appendChild(t);}
-      if(types.a){const t=document.createElement('span');t.className='today-chip-type a';t.textContent='Alt.';chip.appendChild(t);}
-      // Clic → ouvre la carte
-      chip.addEventListener('click',()=>{expanded=school;render();const el=document.querySelector('.sc.open');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});});
-      chips.appendChild(chip);
+      chip.appendChild(document.createTextNode(school));
+      chip.addEventListener('click',()=>{expanded=school;render();setTimeout(()=>{const el=document.querySelector('.sc.open');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});},50);});
+      grp.appendChild(chip);
     });
-    row.appendChild(chips);
-    body.appendChild(row);
+    box.appendChild(grp);
   };
-  mkRow('Contacter maintenant','today-dot-now',now);
-  mkRow('Commencer à préparer','today-dot-prep',prep);
-  box.appendChild(body);
+  mkGrp('Contacter maintenant',now);
+  mkGrp('Préparer',prep);
 }
 
 /* ══ RENDER CALENDAR ══ */
@@ -865,15 +823,15 @@ function render(){
     const nm=document.createElement("span");nm.className="sc-name";nm.textContent=school;
     const sb=document.createElement("div");sb.className="sc-sub";
     const lv=document.createElement("span");lv.className="sc-lvl";lv.textContent=info.level;sb.appendChild(lv);
-    if(showS&&hasS){const t=document.createElement("span");t.className="tag tag-s";t.textContent="Stage";sb.appendChild(t);}
-    if(showA&&hasA){const t=document.createElement("span");t.className="tag tag-a";t.textContent="Alternance";sb.appendChild(t);}
+    if(showS&&hasS){const t=document.createElement("span");t.className="tag tag-s";t.textContent="Stage";t.title="Filtrer : Stages uniquement";t.addEventListener("click",e=>{e.stopPropagation();setFilter(actType==="stage"?"both":"stage");});sb.appendChild(t);}
+    if(showA&&hasA){const t=document.createElement("span");t.className="tag tag-a";t.textContent="Alternance";t.title="Filtrer : Alternance uniquement";t.addEventListener("click",e=>{e.stopPropagation();setFilter(actType==="alternance"?"both":"alternance");});sb.appendChild(t);}
     iz.appendChild(nm);iz.appendChild(sb);hdr.appendChild(iz);
     // Contact
     const cz=document.createElement("div");cz.className="sc-cz";
     const mb=document.createElement("a");mb.className="btn-mail";mb.href=mkMailto(info.email,school,actProf);mb.title=info.email;
     mb.innerHTML=`<svg width="11" height="9" viewBox="0 0 22 16" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="1" y="1" width="20" height="14" rx="2"/><path d="M1 4l10 7 10-7"/></svg> Contacter`;
     mb.addEventListener("click",e=>e.stopPropagation());cz.appendChild(mb);
-    const et=document.createElement("span");et.className="sc-email";et.textContent=info.email;cz.appendChild(et);
+    // Email retiré du header → visible uniquement dans la fiche dépliée
     hdr.appendChild(cz);
     const chev=document.createElement("div");chev.className="sc-chev";
     chev.innerHTML=`<svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8l5 5 5-5"/></svg>`;
@@ -911,8 +869,8 @@ function render(){
     const cb=document.createElement("div");cb.className="det-cbar";
     cb.innerHTML=`<span class="det-clbl">Contact recrutement</span>`;
     const dtg=document.createElement("div");dtg.className="det-tags";
-    if(showS&&hasS){const t=document.createElement("span");t.className="tag tag-s";t.textContent="Stage";dtg.appendChild(t);}
-    if(showA&&hasA){const t=document.createElement("span");t.className="tag tag-a";t.textContent="Alternance";dtg.appendChild(t);}
+    if(showS&&hasS){const t=document.createElement("span");t.className="tag tag-s";t.textContent="Stage";t.title="Filtrer : Stages uniquement";t.addEventListener("click",e=>{e.stopPropagation();setFilter(actType==="stage"?"both":"stage");});dtg.appendChild(t);}
+    if(showA&&hasA){const t=document.createElement("span");t.className="tag tag-a";t.textContent="Alternance";t.title="Filtrer : Alternance uniquement";t.addEventListener("click",e=>{e.stopPropagation();setFilter(actType==="alternance"?"both":"alternance");});dtg.appendChild(t);}
     cb.appendChild(dtg);
     const eL=document.createElement("a");eL.className="det-link";eL.href=mkMailto(info.email,school,actProf);eL.textContent=`✉ ${info.email}`;cb.appendChild(eL);
     if(info.phone){const pL=document.createElement("a");pL.className="det-link";pL.href=`tel:${info.phone.replace(/\s/g,"")}`;pL.textContent=`📞 ${info.phone}`;cb.appendChild(pL);}
@@ -953,30 +911,49 @@ function renderTabs(){
 }
 
 /* ══ FILTRE ══ */
-document.querySelectorAll(".seg-btn").forEach(btn=>{
-  btn.addEventListener("click",()=>{actType=btn.dataset.type;document.querySelectorAll(".seg-btn").forEach(b=>b.classList.toggle("on",b===btn));render();});
+function setFilter(type){
+  actType=type;
+  // Pill Stage : active sauf si filtre = alternance seul
+  document.getElementById("seg-stage").classList.toggle("on",type!=="alternance");
+  // Pill Alt : active sauf si filtre = stage seul
+  document.getElementById("seg-alt").classList.toggle("on",type!=="stage");
+  render();
+}
+document.getElementById("seg-stage").addEventListener("click",()=>{
+  setFilter(actType==="stage"?"both":"stage");
+});
+document.getElementById("seg-alt").addEventListener("click",()=>{
+  setFilter(actType==="alternance"?"both":"alternance");
 });
 
 /* ══ QUAND PUBLIER ══ */
 document.getElementById("pub-cta").addEventListener("click",function(){
   showPub=!showPub;
   this.classList.toggle("on",showPub);
-  document.getElementById("pub-banner").style.display=showPub?"block":"none";
+  // pub-banner supprimé — pub info dans legend + pub-note des cartes
   render();
 });
 
 /* ══ PDF — A4 PORTRAIT ══ */
-document.getElementById("pdf-btn").addEventListener("click",()=>{
+document.getElementById("pdf-btn").addEventListener("click", async ()=>{
+  // ── Re-fetch depuis la base de données avant génération ──
+  const btn=document.getElementById("pdf-btn");
+  const origTxt=btn.textContent;
+  btn.textContent="⏳ Sync…";btn.disabled=true;
+  try{ await loadAirtableSilent(); }catch(e){}
+  btn.textContent=origTxt;btn.disabled=false;
+
   const prof=DATA[actProf];
   const showS=actType!=="alternance",showA=actType!=="stage";
   const today=new Date().toLocaleDateString("fr-FR",{year:"numeric",month:"long",day:"numeric"});
   const typeLabel=actType==="both"?"Stages & Alternance":actType==="stage"?"Stages uniquement":"Alternance uniquement";
 
   // Cellules de barres
-  function cells(arr){
+  function cells(arr,isPub){
     return arr.map((v,i)=>{
-      const bg=v===2?"#16a34a":v===1?"#c27803":"#ebebf0";
-      const brd=v===2?"#16a34a":v===1?"#c27803":"#d5d5e0";
+      let bg,brd;
+      if(isPub){ bg=v===2?"#4e36ff":v===1?"#c4b5ff":"#ebebf0"; brd=v===2?"#4e36ff":v===1?"#c4b5ff":"#d5d5e0"; }
+      else { bg=v===2?"#16a34a":v===1?"#c27803":"#ebebf0"; brd=v===2?"#16a34a":v===1?"#c27803":"#d5d5e0"; }
       const cur=i===CUR?`outline:2px solid #4e36ff;outline-offset:1px;position:relative;z-index:1;`:"";
       return `<div style="flex:1;height:18px;border-radius:3px;background:${bg};border:1px solid ${brd};${cur}"></div>`;
     }).join("");
@@ -993,8 +970,11 @@ document.getElementById("pdf-btn").addEventListener("click",()=>{
     const hasS=info.stage.some(v=>v>0),hasA=info.alternance.some(v=>v>0);
     const tagS=hasS&&showS?`<span style="font-size:6.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:1px 5px;border-radius:2px;background:#eeeaff;color:#4e36ff;border:1px solid #c4b5ff">Stage</span>`:"";
     const tagA=hasA&&showA?`<span style="font-size:6.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:1px 5px;border-radius:2px;background:transparent;color:#4e36ff;border:1.5px solid #4e36ff;margin-left:3px">Alternance</span>`:"";
+    const sp=pubCalc(info.stage,"stage"),ap=pubCalc(info.alternance,"alternance");
     const rowS=showS?`<div style="display:flex;align-items:center;gap:0;margin-bottom:2px"><div style="width:44px;font-size:6.5px;font-weight:700;color:#9494aa;text-transform:uppercase;letter-spacing:.07em;text-align:right;padding-right:5px;flex-shrink:0">Stage</div><div style="flex:1;display:flex;gap:2px">${cells(info.stage)}</div></div>`:"";
-    const rowA=showA?`<div style="display:flex;align-items:center;gap:0"><div style="width:44px;font-size:6.5px;font-weight:700;color:#9494aa;text-transform:uppercase;letter-spacing:.07em;text-align:right;padding-right:5px;flex-shrink:0">Alt.</div><div style="flex:1;display:flex;gap:2px">${cells(info.alternance)}</div></div>`:"";
+    const rowA=showA?`<div style="display:flex;align-items:center;gap:0;margin-bottom:2px"><div style="width:44px;font-size:6.5px;font-weight:700;color:#9494aa;text-transform:uppercase;letter-spacing:.07em;text-align:right;padding-right:5px;flex-shrink:0">Alt.</div><div style="flex:1;display:flex;gap:2px">${cells(info.alternance)}</div></div>`:"";
+    const rowPS=showPub&&showS&&sp.some(v=>v>0)?`<div style="display:flex;align-items:center;gap:0;margin-bottom:2px"><div style="width:44px;font-size:6px;font-weight:700;color:#4e36ff;text-align:right;padding-right:5px;flex-shrink:0;letter-spacing:.04em">⏱ Pub. S</div><div style="flex:1;display:flex;gap:2px">${cells(sp,true)}</div></div>`:"";
+    const rowPA=showPub&&showA&&ap.some(v=>v>0)?`<div style="display:flex;align-items:center;gap:0;margin-bottom:2px"><div style="width:44px;font-size:6px;font-weight:700;color:#4e36ff;text-align:right;padding-right:5px;flex-shrink:0;letter-spacing:.04em">⏱ Pub. A</div><div style="flex:1;display:flex;gap:2px">${cells(ap,true)}</div></div>`:"";
     const noteS=showS?`<div style="margin-bottom:5px"><span style="font-size:7px;font-weight:700;color:#4e36ff;text-transform:uppercase;letter-spacing:.08em">■ Stage${info.stageDuration?` — ${info.stageDuration}`:""} · </span><span style="font-size:8px;color:#555;line-height:1.6">${info.stageNote}</span></div>`:"";
     const noteA=showA?`<div><span style="font-size:7px;font-weight:700;color:#4e36ff;text-transform:uppercase;letter-spacing:.08em;border:1px solid #4e36ff;padding:0 3px;border-radius:2px;margin-right:4px">▫ Alt.</span><span style="font-size:8px;color:#555;line-height:1.6">${info.altNote}</span></div>`:"";
     const logoSrc=info.logo||LOGOS[school]||"";
@@ -1013,7 +993,7 @@ document.getElementById("pdf-btn").addEventListener("click",()=>{
         </div>
       </div>
       <div style="padding:6px 10px 5px;border-bottom:1px solid #f0f0f0">
-        ${moHdr}${rowS}${rowA}
+        ${moHdr}${rowS}${rowA}${rowPS}${rowPA}
       </div>
       <div style="padding:7px 10px 8px;background:#fcfcfc">
         ${noteS}${noteA}
@@ -1022,7 +1002,7 @@ document.getElementById("pdf-btn").addEventListener("click",()=>{
   }
 
   let schoolsHTML="";
-  Object.entries(prof.schools).sort(([,a],[,b])=>(a.ordre||999)-(b.ordre||999)).forEach(([s,i])=>{schoolsHTML+=schoolBlock(s,i);});
+  Object.entries(prof.schools).filter(([,s])=>s.visible!==false).sort(([,a],[,b])=>(a.ordre||999)-(b.ordre||999)).forEach(([s,i])=>{schoolsHTML+=schoolBlock(s,i);});
 
   const legend=`<div style="display:flex;align-items:center;gap:12px;padding:7px 10px;background:#f8f8fc;border:1px solid #e2e2ea;border-radius:4px;margin-bottom:12px;flex-wrap:wrap">
     <span style="font-size:7px;font-weight:800;color:#4e36ff;letter-spacing:.12em;text-transform:uppercase">Légende</span>
