@@ -1,2 +1,2 @@
 # federationacademie
-# conçu par Haïssam Merivot ©
+# conçu par Haïssam Merivot
